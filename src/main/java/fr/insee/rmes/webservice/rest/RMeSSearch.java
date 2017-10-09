@@ -35,7 +35,7 @@ import io.swagger.annotations.ApiResponses;
 
 @Component
 @Path("/search")
-@Api(value = "Pogues Search")
+@Api(value = "DDI Search")
 public class RMeSSearch {
 
 	final static Logger logger = LogManager.getLogger(RMeSSearch.class);

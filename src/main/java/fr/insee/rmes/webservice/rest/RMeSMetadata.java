@@ -32,7 +32,7 @@ import io.swagger.annotations.ApiParam;
  * @author I6VWID
  */
 @Path("/meta-data")
-@Api(value = "Pogues MetaData API")
+@Api(value = "DDI MetaData API")
 public class RMeSMetadata {
 
 	final static Logger logger = LogManager.getLogger(RMeSMetadata.class);
