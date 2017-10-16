@@ -2,7 +2,10 @@ package fr.insee.rmes.metadata.service;
 
 import java.util.List;
 
+import org.w3c.dom.Node;
+
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.search.model.ResponseItem;
@@ -20,6 +23,17 @@ public interface MetadataService {
 	String getDDIDocument(String itemId, String groupId) throws Exception;
 
 	ResponseItem getDDIRoot(String id) throws Exception;
+	
+	/**
+	 * Get a List of codes with their id, agency and versions
+	 * @param id
+	 * @param node
+	 * @param questionScheme
+	 * @return
+	 * @throws Exception
+	 */
+	List<ColecticaItem> getCodeList (String id, Node node, ResponseItem questionScheme) throws Exception;
+	
 
 	List<Unit> getUnits() throws Exception;
 }

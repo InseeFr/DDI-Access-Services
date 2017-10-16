@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
@@ -215,6 +216,8 @@ public class MetadataServiceImpl implements MetadataService {
 		}
 		return instruments;
 	}
+	
+	
 
 	@Override
 	public String getDDIDocument(String itemId, String resourcePackageId) throws Exception {
@@ -249,4 +252,27 @@ public class MetadataServiceImpl implements MetadataService {
 		resourcePackage.setReferences(refs);
 		return resourcePackage;
 	}
+	
+	
+	
+	@Override
+	public List<ColecticaItem> getCodeList(String id, Node node, ResponseItem questionScheme) throws Exception {
+		List<ColecticaItem> codeList = new ArrayList<>();
+		String childExp = ".//*[local-name()='QuestionReference']";
+		NodeList children = xpathProcessor.queryList(node, childExp);
+		for (int i = 0; i < children.getLength(); i++) {
+			ColecticaItem code = new ColecticaItem();
+			String idCode = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String fragment = getItem(idCode).item;
+			Node child = xpathProcessor.toDocument(fragment);
+			code.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
+			code.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+			code.itemType = "Code";
+			code.setIdentifier(idCode);
+			
+		}
+		return codeList;
+	}
+
+	
 }
