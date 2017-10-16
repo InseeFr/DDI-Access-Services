@@ -57,13 +57,16 @@ public class MetadataClientImplTest {
 		assertTrue(units.size()>1);
 	}
 	
-	@Test
-	public void getChildrenRef(String id) throws Exception {
-		//GIVEN
-		ColecticaItemRefList colecticaItemRefList;
-		//WHEN
-		//when().get("%s/api/v1/set/%s/%s?api_key=%s", serviceUrl, agency, id, apiKey);
-	}
+//	@Test
+//	public void getChildrenRef() throws Exception {
+//		//GIVEN
+//		String id = "";
+//		ColecticaItemRefList colecticaItemRefList;
+//		//WHEN
+//		when().get("%s/api/v1/set/%s/%s?api_key=%s", serviceUrl, agency, id, apiKey);
+//		//THEN
+//		
+//	}
 	
 	
 	
