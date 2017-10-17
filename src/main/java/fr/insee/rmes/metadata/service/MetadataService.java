@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import fr.insee.rmes.metadata.model.Code;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
@@ -26,13 +27,12 @@ public interface MetadataService {
 	
 	/**
 	 * Get a List of codes with their id, agency and versions
-	 * @param id
-	 * @param node
-	 * @param questionScheme
-	 * @return
+	 * @param id : id CodeListReference
+	 * @param String packageId : identifiant du packageSource
+	 * @return List<Code> codeList
 	 * @throws Exception
 	 */
-	List<ColecticaItem> getCodeList (String id, Node node, ResponseItem questionScheme) throws Exception;
+	String getCodeList (String id, String packageId) throws Exception;
 	
 
 	List<Unit> getUnits() throws Exception;

@@ -14,10 +14,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import fr.insee.rmes.metadata.model.Code;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
@@ -122,5 +124,29 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
+	
+	@GET
+	@Path("codeList/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a codeList from Colectica repository reference {id}", response = String.class)
+	public Response getCodeList(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String ddiDocument = metadataService.getCodeList(id,resourcePackageId);
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+	
+	
 
 }

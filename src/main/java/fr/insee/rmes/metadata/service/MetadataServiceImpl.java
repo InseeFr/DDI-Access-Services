@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import fr.insee.rmes.metadata.model.Code;
+import fr.insee.rmes.metadata.model.CodeList;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
@@ -59,6 +61,7 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public List<Unit> getUnits() throws Exception {
+		getCodeList("a72e6e56-12a1-49b7-96c4-c724da3da5da", "c265b595-ced2-4526-88dc-151471de885d");
 		return metadataRepository.getUnits();
 	}
 
@@ -216,8 +219,6 @@ public class MetadataServiceImpl implements MetadataService {
 		}
 		return instruments;
 	}
-	
-	
 
 	@Override
 	public String getDDIDocument(String itemId, String resourcePackageId) throws Exception {
@@ -252,27 +253,46 @@ public class MetadataServiceImpl implements MetadataService {
 		resourcePackage.setReferences(refs);
 		return resourcePackage;
 	}
-	
-	
-	
+
 	@Override
-	public List<ColecticaItem> getCodeList(String id, Node node, ResponseItem questionScheme) throws Exception {
-		List<ColecticaItem> codeList = new ArrayList<>();
-		String childExp = ".//*[local-name()='QuestionReference']";
+	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
+		CodeList codeList = new CodeList();
+		List<Code> codes = new ArrayList<Code>();
+		Code code;
+		String fragment = getItem(itemId).item;
+		logger.debug("Fragment : " + fragment);
+
+		String childExp = "//*[local-name()='CodeList']";
+		Node node = xpathProcessor.queryList(fragment, childExp).item(0);
 		NodeList children = xpathProcessor.queryList(node, childExp);
+
+		codeList.setUniversallyUnique(Boolean.valueOf(
+				xpathProcessor.queryText(children.item(0), ".//*[local-name()='isUniversallyUnique']/text()")));
+
 		for (int i = 0; i < children.getLength(); i++) {
-			ColecticaItem code = new ColecticaItem();
-			String idCode = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			String fragment = getItem(idCode).item;
-			Node child = xpathProcessor.toDocument(fragment);
+			codeList.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
+			codeList.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+
+			codeList.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			logger.debug("\n");
+			logger.debug(codeList.toString());
+		}
+
+		childExp = "//*[local-name()='Code']";
+		node = xpathProcessor.queryList(fragment, childExp).item(0);
+		children = xpathProcessor.queryList(node, childExp);
+		for (int i = 0; i < children.getLength(); i++) {
+			code = new Code();
 			code.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
 			code.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
-			code.itemType = "Code";
-			code.setIdentifier(idCode);
-			
+			code.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			code.setValue(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Value']/text()"));
+			codes.add(code);
+			logger.debug(code.toString());
 		}
-		return codeList;
+		codeList.setCodeList(codes);
+		//TODO: retourner la CodeList
+		return fragment;
 	}
 
-	
 }
