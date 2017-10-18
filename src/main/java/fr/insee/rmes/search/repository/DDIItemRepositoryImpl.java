@@ -17,17 +17,18 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.insee.rmes.config.DDIItemRepositoryImplCondition;
 import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseItem;
 
 @Repository
-@Component(value = "DDIItemRepositoryImpl")
+@Conditional(value = DDIItemRepositoryImplCondition.class)
 public class DDIItemRepositoryImpl implements DDIItemRepository {
 
 	@Value("${fr.insee.rmes.elasticsearch.index.name}")
