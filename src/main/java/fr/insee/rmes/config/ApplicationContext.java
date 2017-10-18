@@ -31,7 +31,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @PropertySource(value = { "classpath:env/${fr.insee.rmes.env:dev}/ddi-access-services.properties",
-		"file:${catalina.base}/webapps/*.properties" }, ignoreResourceNotFound = true)
+		"file:${catalina.base}/webapps/ddi-access-services.properties" }, ignoreResourceNotFound = true)
 public class ApplicationContext {
 
 	@Value("${fr.insee.ntlm.user}")

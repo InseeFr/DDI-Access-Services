@@ -5,8 +5,6 @@ import java.util.List;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import fr.insee.rmes.search.model.DDIItem;
@@ -17,11 +15,7 @@ import fr.insee.rmes.search.repository.DDIItemRepository;
 @Service
 public class SearchServiceImpl implements SearchService {
 
-	@Value("${fr.insee.rmes.search.ddiItemRepository.impl}")
-	private static final String ddiItemRepositoryImpl = "DDIItemFakeImpl";
-
 	@Autowired
-	@Qualifier(ddiItemRepositoryImpl)
 	private DDIItemRepository ddiItemRepository;
 
 	@Override

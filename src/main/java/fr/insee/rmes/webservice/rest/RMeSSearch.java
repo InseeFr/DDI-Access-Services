@@ -102,7 +102,7 @@ public class RMeSSearch {
 	@GET
 	@Path("series")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Import indexes from Colectica", notes = "This require a living instance of colectica aswell as a up and running elasticsearch cluster", response = String.class)
+	@ApiOperation(value = "Get all sub-group (series)", notes = "Retrieve all operations with a parent id matching with a group Id given in parameters file", response = String.class)
 	public List<DDIItem> getSubGroups() throws Exception {
 		try {
 			return searchService.getSubGroups();
