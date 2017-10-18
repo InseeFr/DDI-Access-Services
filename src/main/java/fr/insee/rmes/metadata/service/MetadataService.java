@@ -29,10 +29,20 @@ public interface MetadataService {
 	 * Get a List of codes with their id, agency and versions
 	 * @param id : id CodeListReference
 	 * @param String packageId : identifiant du packageSource
-	 * @return List<Code> codeList
+	 * @return String fragmentCodeList
 	 * @throws Exception
 	 */
 	String getCodeList (String id, String packageId) throws Exception;
+	
+	String getSerie (String id, String packageId) throws Exception;
+	
+	String getOperation (String id, String packageId) throws Exception;
+	
+	String getDataCollection (String id, String packageId) throws Exception;
+	
+	String getQuestionnaire (String id, String packageId) throws Exception;
+	
+	String getSequence (String id, String packageId) throws Exception;
 	
 
 	List<Unit> getUnits() throws Exception;

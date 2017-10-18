@@ -20,4 +20,12 @@ public class CategoryReference extends ColecticaItem {
 		this.typeOfObject = typeOfObject;
 	}
 
+	@Override
+	public String toString() {
+		return "CategoryReference [typeOfObject=" + typeOfObject + ", agencyId=" + agencyId + ", version=" + version
+				+ ", identifier=" + identifier + "]";
+	}
+	
+	
+
 }
