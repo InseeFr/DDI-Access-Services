@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.Code;
+import fr.insee.rmes.metadata.model.CodeList;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
@@ -132,10 +133,10 @@ public class RMeSMetadata {
 	public Response getCodeList(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String ddiDocument = metadataService.getCodeList(id,resourcePackageId);
+			CodeList codeList = metadataService.getCodeList(id,resourcePackageId);
 			StreamingOutput stream = output -> {
 				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+					output.write(codeList.toString().getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
