@@ -72,7 +72,7 @@ public class ColecticaItem {
 
 
     public String getItemType() {
-        return itemType;
+    	return itemType;
     }
 
     public void setItemType(String itemType) {

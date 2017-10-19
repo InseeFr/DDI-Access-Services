@@ -126,7 +126,7 @@ public class RMeSSearch {
 	}
 
 	@GET
-	@Path("context/collection/{id}")
+	@Path("context/data-collection/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiOperation(value = "Get data collection context (Sub-group id, StudyUnit id) for a given data collection", notes = "Retrieve the context (Sub-group id, StudyUnit id) for a id given as a path parameter", response = String.class)
 	public DataCollectionContext getDataCollectionContext(@PathParam(value = "id") String id) throws Exception {
@@ -139,7 +139,7 @@ public class RMeSSearch {
 	}
 
 	@GET
-	@Path("operations/{id}/collections")
+	@Path("operations/{id}/data-collection")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiOperation(value = "Get all data collections for a given operation", notes = "Retrieve all data collections with a parent id matching the operation id given as a path parameter")
 	public List<DDIItem> getDataCollections(@PathParam(value = "id") String id) throws Exception {
