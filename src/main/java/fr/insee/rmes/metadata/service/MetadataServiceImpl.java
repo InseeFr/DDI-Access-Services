@@ -1,6 +1,7 @@
 package fr.insee.rmes.metadata.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,7 +18,6 @@ import fr.insee.rmes.metadata.model.CategoryReference;
 import fr.insee.rmes.metadata.model.Code;
 import fr.insee.rmes.metadata.model.CodeList;
 import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
@@ -259,7 +259,8 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	@Override
-	public CodeList getCodeList(String itemId, String ressourcePackageId) throws Exception {
+	public Map<String, Object> getCodeList(String itemId, String ressourcePackageId) throws Exception {
+		Map<String, Object> result = new HashMap<String, Object>();
 		CodeList codeList = new CodeList();
 		List<Code> codes = new ArrayList<Code>();
 		Code code;
@@ -307,78 +308,106 @@ public class MetadataServiceImpl implements MetadataService {
 			categoryReference.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
 			categoryReference.setTypeOfObject(
 					xpathProcessor.queryText(children.item(i), ".//*[local-name()='TypeOfObject']/text()"));
-			code.setCategorieReference(categoryReference);
+			code.setCategoryReference(categoryReference);
 
-			// Valuing the Categories
-			ColecticaItemRefList refs = new ColecticaItemRefList();
-			List<ColecticaItemRef> colecticaItemRefList = new ArrayList<ColecticaItemRef>();
-			ColecticaItemRef ref = new ColecticaItemRef();
-			ref.agencyId = categoryReference.agencyId;
-			ref.identifier = categoryReference.identifier;
-			ref.version = categoryReference.version;
-			refs.identifiers = colecticaItemRefList;
-			// TODO: Resolve the problem for valuing all the properties of a
-			// Category
-			List<ColecticaItem> categories = getItems(refs);
+			// Valuing the Category
+			String fragmentCategory = getItem(categoryReference.identifier).item;
+			String childCategory = "//*[local-name()='Category']";
+			Node nodeCategory = xpathProcessor.queryList(fragmentCategory, childCategory).item(0);
+			NodeList childrenCategory = xpathProcessor.queryList(nodeCategory, childCategory);
+			Category category = new Category();
+			category.agencyId = xpathProcessor.queryText(childrenCategory.item(0),
+					".//*[local-name()='Agency']/text()");
+			category.version = xpathProcessor.queryText(childrenCategory.item(0),
+					".//*[local-name()='Version']/text()");
+			category.identifier = xpathProcessor.queryText(childrenCategory.item(0), ".//*[local-name()='ID']/text()");
+
+			String childLabel = "//*[local-name()='Label']";
+			Node nodeLabel = xpathProcessor.queryList(fragmentCategory, childLabel).item(0);
+			NodeList childrenLabel = xpathProcessor.queryList(nodeLabel, childLabel);
+			category.setLabel(xpathProcessor.queryText(childrenLabel.item(0), ".//*[local-name()='Content']/text()"));
+			code.setCategory(category);
 			codes.add(code);
 			logger.debug(code.toString());
+			logger.debug(category.toString());
+			result.put(fragmentCategory, code.getCategory());
 		}
 		codeList.setCodeList(codes);
-		if (fragment.contains("CodeList") && fragment.contains("Label") && fragment.contains("HierarchyType")
-				&& fragment.contains("Code")) {
-			return codeList;
+		result.put(fragment, codeList);
+		if (fragment.contains("CodeList") && fragment.contains("Label") && fragment.contains("levelNumber")
+				&& codeList.identifier.equals(itemId) && fragment.contains("CategoryRelationship")
+				&& result.size() > 0) {
+			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
 		}
 	}
 
 	@Override
-	public String getSerie(String id, String packageId) throws Exception {
+	public Map<String, Object> getSerie(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
+		Map<String, Object> result = new HashMap<String, Object>();
+
 		if (fragment.contains("SubGroup")) {
-			return getDDIDocument(id, packageId);
+			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a SubGroup.", fragment);
 		}
 	}
 
 	@Override
-	public String getOperation(String id, String packageId) throws Exception {
+	public Map<String, Object> getOperation(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
+		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("StudyUnit")) {
-			return getDDIDocument(id, packageId);
+			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a StudyUnit.", fragment);
 		}
 	}
 
 	@Override
-	public String getDataCollection(String id, String packageId) throws Exception {
+	public Map<String, Object> getDataCollection(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
+		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("DataCollection")) {
-			return getDDIDocument(id, packageId);
+			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a DataCollection.", fragment);
 		}
 	}
 
 	@Override
-	public String getQuestionnaire(String id, String packageId) throws Exception {
+	public Map<String, Object> getQuestionnaire(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
+		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("Instrument")) {
-			return getDDIDocument(id, packageId);
+			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a Instrument.", fragment);
 		}
 	}
 
 	@Override
-	public String getSequence(String id, String packageId) throws Exception {
+	public Map<String, Object> getSequence(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
+		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("Sequence")) {
-			return getDDIDocument(id, packageId);
+			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a Sequence.", fragment);
+		}
+	}
+
+	@Override
+	public Map<String, Object> getQuestion(String id, String packageId) throws Exception {
+		String fragment = getItem(id).item;
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		if (fragment.contains("QuestionText") && fragment.contains("QuestionScheme") && fragment.contains("QuestionItem")) {
+			return result;
+		} else {
+			throw new RMeSException(404, "The type of this item isn't a QuestionGrid.", fragment);
 		}
 	}
 
