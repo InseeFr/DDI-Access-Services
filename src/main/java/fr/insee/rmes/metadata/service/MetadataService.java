@@ -25,6 +25,7 @@ public interface MetadataService {
 
 	String getDDIDocument(String itemId, String groupId) throws Exception;
 
+	
 	ResponseItem getDDIRoot(String id) throws Exception;
 	
 	/**
@@ -54,19 +55,46 @@ public interface MetadataService {
 	 */
 	Map<String,Object> getOperation (String id, String packageId) throws Exception;
 	
+	/**
+	 * Get a dataCollection with its id, agency and version
+	 * @param id : dataCollectionId
+	 * @param packageId : id of the Colectica Package
+	 * @return Map<String,Object> ObjectAndFragment
+	 * @throws Exception 
+	 */
 	Map<String,Object> getDataCollection (String id, String packageId) throws Exception;
 	
+	/**
+	 * Get a questionnaire with its id, agency and version
+	 * @param id : questionnaireId
+	 * @param packageId : id of the Colectica Package
+	 * @return Map<String,Object> ObjectAndFragment
+	 * @throws Exception 
+	 */
 	Map<String,Object> getQuestionnaire (String id, String packageId) throws Exception;
 	
-	Map<String,Object> getSequence (String id, String packageId) throws Exception;
 	/**
-	 * 
+	 * Get a sequence with its id, agency and version
+	 * @param id : sequenceId
+	 * @param packageId : id of the Colectica Package
+	 * @return Map<String,Object> ObjectAndFragment
+	 * @throws Exception 
+	 */
+	Map<String,Object> getSequence (String id, String packageId) throws Exception;
+	
+	/**
+	 * Get a question with its id, agency and version
 	 * @param id : id of the Instrument
 	 * @param packageId : id of the Colectica Package
 	 * @return Map<String,Object> ObjectAndFragment 
 	 * @throws Exception
 	 */
 	Map<String,Object> getQuestion(String id, String packageId) throws Exception;
-
+	
+	/**
+	 * Return a List of Units
+	 * @return € /k€ / %
+	 * @throws Exception
+	 */
 	List<Unit> getUnits() throws Exception;
 }

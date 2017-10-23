@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -15,10 +16,17 @@ import org.w3c.dom.NodeList;
 
 import fr.insee.rmes.metadata.model.Category;
 import fr.insee.rmes.metadata.model.CategoryReference;
+import fr.insee.rmes.metadata.model.Citation;
 import fr.insee.rmes.metadata.model.Code;
 import fr.insee.rmes.metadata.model.CodeList;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.ControlConstructScheme;
+import fr.insee.rmes.metadata.model.DataCollection;
+import fr.insee.rmes.metadata.model.Questionnaire;
+import fr.insee.rmes.metadata.model.Sequence;
+import fr.insee.rmes.metadata.model.StudyUnit;
+import fr.insee.rmes.metadata.model.SubGroup;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
@@ -347,8 +355,76 @@ public class MetadataServiceImpl implements MetadataService {
 	public Map<String, Object> getSerie(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
 		Map<String, Object> result = new HashMap<String, Object>();
+		SubGroup subGroup = new SubGroup();
 
-		if (fragment.contains("SubGroup")) {
+		String childExp = "//*[local-name()='SubGroup']";
+		Node node = xpathProcessor.queryList(fragment, childExp).item(0);
+		NodeList children = xpathProcessor.queryList(node, childExp);
+
+		subGroup.agencyId = xpathProcessor.queryText(children.item(0), ".//*[local-name()='Agency']/text()");
+		subGroup.identifier = xpathProcessor.queryText(children.item(0), ".//*[local-name()='ID']/text()");
+		subGroup.version = xpathProcessor.queryText(children.item(0), ".//*[local-name()='Version']/text()");
+		logger.debug("SubGroup = " + subGroup + "\n");
+		String childSubGroup = "//*[local-name()='Citation']";
+		Node nodeCitation = xpathProcessor.queryList(fragment, childSubGroup).item(0);
+		NodeList childrenCitation = xpathProcessor.queryList(nodeCitation, childSubGroup);
+		childSubGroup = "//*[local-name()='Title']";
+		nodeCitation = xpathProcessor.queryList(fragment, childSubGroup).item(0);
+		childrenCitation = xpathProcessor.queryList(nodeCitation, childSubGroup);
+
+		Citation citation = new Citation();
+		citation.setTitle(xpathProcessor.queryText(childrenCitation.item(0), ".//*[local-name()='String']/text()"));
+		subGroup.setCitation(citation);
+		logger.debug("SubGroup = " + subGroup + "\n");
+		childSubGroup = "//*[local-name()='StudyUnitReference']";
+		Node nodeStudyUnit = xpathProcessor.queryList(fragment, childSubGroup).item(0);
+		NodeList childrenStudyUnit = xpathProcessor.queryList(nodeStudyUnit, childSubGroup);
+
+		List<StudyUnit> studies = new ArrayList<StudyUnit>();
+		StudyUnit studyUnit;
+		String fragmentStudyUnit;
+		for (int i = 0; i < childrenStudyUnit.getLength(); i++) {
+			///////////////////////
+			// Valuing StudyUnit///
+			/////////////////////
+			studyUnit = new StudyUnit();
+			studyUnit.agencyId = xpathProcessor.queryText(childrenStudyUnit.item(i), ".//*[local-name()='Agency']/text()");
+			studyUnit.identifier = xpathProcessor.queryText(childrenStudyUnit.item(i), ".//*[local-name()='ID']/text()");
+			studyUnit.version = xpathProcessor.queryText(childrenStudyUnit.item(i), ".//*[local-name()='Version']/text()");
+			fragmentStudyUnit = getItem(studyUnit.identifier).item;
+			
+			childExp = "//*[local-name()='StudyUnit']";
+			node = xpathProcessor.queryList(fragmentStudyUnit, childExp).item(0);
+			children = xpathProcessor.queryList(node, childExp);
+			
+			childExp = "//*[local-name()='Citation']";
+			node = xpathProcessor.queryList(fragmentStudyUnit, childExp).item(0);
+			children = xpathProcessor.queryList(node, childExp);
+			
+			childExp = "//*[local-name()='Title']";
+			node = xpathProcessor.queryList(fragmentStudyUnit, childExp).item(0);
+			children = xpathProcessor.queryList(node, childExp);
+			
+			citation = new Citation();
+			citation.setTitle(xpathProcessor.queryText(children.item(0), ".//*[local-name()='String']/text()"));
+			studyUnit.setCitation(citation);
+			logger.debug(studyUnit);
+			DataCollection dataCollection = new DataCollection();
+			childExp = "//*[local-name()='DataCollectionReference']";
+			node = xpathProcessor.queryList(fragmentStudyUnit, childExp).item(0);
+			children = xpathProcessor.queryList(node, childExp);
+			dataCollection.agencyId = xpathProcessor.queryText(children.item(0), ".//*[local-name()='Agency']/text()");
+			dataCollection.identifier = xpathProcessor.queryText(children.item(0), ".//*[local-name()='ID']/text()");
+			dataCollection.version = xpathProcessor.queryText(children.item(0), ".//*[local-name()='Version']/text()");
+			logger.debug(dataCollection);
+			studyUnit.setDatacollection(dataCollection);
+			studies.add(studyUnit);
+			result.put(fragmentStudyUnit, studyUnit);
+		}
+		subGroup.setStudyUnits(studies);
+		logger.debug("SubGroup = " + subGroup + "\n");
+		result.put(fragment, subGroup);
+		if (fragment.contains("SubGroup") && subGroup!=null && subGroup.agencyId!=null && subGroup.identifier!=null) {
 			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a SubGroup.", fragment);
@@ -402,9 +478,10 @@ public class MetadataServiceImpl implements MetadataService {
 	@Override
 	public Map<String, Object> getQuestion(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		
+
 		Map<String, Object> result = new HashMap<String, Object>();
-		if (fragment.contains("QuestionText") && fragment.contains("QuestionScheme") && fragment.contains("QuestionItem")) {
+		if (fragment.contains("QuestionText") && fragment.contains("QuestionScheme")
+				&& fragment.contains("QuestionItem")) {
 			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a QuestionGrid.", fragment);
