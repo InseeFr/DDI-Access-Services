@@ -437,7 +437,7 @@ public class MetadataServiceImpl implements MetadataService {
 		logger.debug("SubGroup = " + subGroup + "\n");
 		if (result.contains("SubGroup") && subGroup != null && subGroup.agencyId != null
 				&& subGroup.identifier != null && (!result.contains("<Group>"))&& result!="") {
-			return fragment;
+			return result;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a SubGroup.", fragment);
 		}
