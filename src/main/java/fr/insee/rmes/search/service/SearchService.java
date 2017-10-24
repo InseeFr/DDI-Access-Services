@@ -4,16 +4,21 @@ import java.util.List;
 
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.json.simple.JSONObject;
 
 import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseItem;
+import fr.insee.rmes.search.model.ResponseSearchItem;
 
 public interface SearchService {
 
 	IndexResponse save(String type, ResponseItem item) throws Exception;
 
 	List<DDIItem> searchByLabel(String label, String... types) throws Exception;
+
+	List<ResponseSearchItem> searchByLabel(String subgroupId, String operationId, String dataCollectionId,
+			JSONObject criteria) throws Exception;
 
 	List<DDIItem> searchByLabelInSubgroup(String label, String subgroupId, String... types) throws Exception;
 

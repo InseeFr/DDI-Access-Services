@@ -19,11 +19,13 @@ import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DataCollectionContext;
+import fr.insee.rmes.search.model.ResponseSearchItem;
 import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.search.source.ColecticaSourceImporter;
@@ -52,21 +54,19 @@ public class RMeSSearch {
 	@ApiOperation(value = "Search Item", notes = "Search the application index for item across types`")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 500, message = "Unexpected error") })
-	public List<DDIItem> search(
-			@ApiParam(value = "A user id matching owner permission on each object of the collection", required = false) @QueryParam("subgroupId") String subgroupId,
-			DDIQuery query) throws Exception {
+	public List<ResponseSearchItem> search(
+			@ApiParam(value = "Sub-group (series) ID", required = false) @QueryParam("serie") String subgroupId,
+			@ApiParam(value = "Study Unit ID (operation)", required = false) @QueryParam("operation") String operationId,
+			@ApiParam(value = "Data Collection (campaign) ID", required = false) @QueryParam("campaign") String dataCollectionId,
+			@ApiParam(value = "Criteria") JSONObject criteria) throws Exception {
 		try {
-			String[] types = query.getTypes().toArray(new String[query.getTypes().size()]);
-			;
-			if (null != subgroupId) {
-				return searchService.searchByLabelInSubgroup(query.getFilter(), subgroupId, types);
-			}
-			return searchService.searchByLabel(query.getFilter(), types);
+			return searchService.searchByLabel(subgroupId,operationId,dataCollectionId,criteria);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
 	}
+	
 
 	@DELETE
 	@Path("questionnaire/{id}")
@@ -126,7 +126,7 @@ public class RMeSSearch {
 	}
 
 	@GET
-	@Path("context/collection/{id}")
+	@Path("context/data-collection/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiOperation(value = "Get data collection context (Sub-group id, StudyUnit id) for a given data collection", notes = "Retrieve the context (Sub-group id, StudyUnit id) for a id given as a path parameter", response = String.class)
 	public DataCollectionContext getDataCollectionContext(@PathParam(value = "id") String id) throws Exception {
@@ -139,7 +139,7 @@ public class RMeSSearch {
 	}
 
 	@GET
-	@Path("operations/{id}/collections")
+	@Path("operations/{id}/data-collection")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiOperation(value = "Get all data collections for a given operation", notes = "Retrieve all data collections with a parent id matching the operation id given as a path parameter")
 	public List<DDIItem> getDataCollections(@PathParam(value = "id") String id) throws Exception {
@@ -150,5 +150,7 @@ public class RMeSSearch {
 			throw e;
 		}
 	}
+	
+	
 
 }

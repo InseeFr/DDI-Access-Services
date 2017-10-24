@@ -109,7 +109,7 @@ public class DDIDocumentBuilder {
         for (int i = 0; i < rootNodes.getLength(); i++) {
             Node node = rootNodes.item(i);
             if (node.getNodeName().contains("Reference")) {
-;                String fragment = references.get(getId(node));
+                String fragment = references.get(getId(node));
                 if (null != fragment) {
                     Node child = getNode(fragment, document);
                     root.appendChild(child);

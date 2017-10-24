@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import fr.insee.rmes.metadata.model.CategoryReference;
+import fr.insee.rmes.metadata.model.Code;
+import fr.insee.rmes.metadata.model.CodeList;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
@@ -21,6 +24,7 @@ import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
+import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
@@ -249,4 +253,126 @@ public class MetadataServiceImpl implements MetadataService {
 		resourcePackage.setReferences(refs);
 		return resourcePackage;
 	}
+
+	@Override
+	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
+		CodeList codeList = new CodeList();
+		List<Code> codes = new ArrayList<Code>();
+		Code code;
+		CategoryReference categoryReference;
+		String fragment = getItem(itemId).item;
+		logger.debug("Fragment : " + fragment);
+
+		String childExp = "//*[local-name()='CodeList']";
+		Node node = xpathProcessor.queryList(fragment, childExp).item(0);
+		NodeList children = xpathProcessor.queryList(node, childExp);
+
+		codeList.setUniversallyUnique(Boolean.valueOf(
+				xpathProcessor.queryText(children.item(0), ".//*[local-name()='isUniversallyUnique']/text()")));
+
+		for (int i = 0; i < children.getLength(); i++) {
+			codeList.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
+			codeList.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+
+			codeList.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			logger.debug("\n");
+			logger.debug(codeList.toString());
+		}
+		
+		//Valorisation de la liste de codes
+		childExp = "//*[local-name()='Code']";
+		node = xpathProcessor.queryList(fragment, childExp).item(0);
+		children = xpathProcessor.queryList(node, childExp);
+		for (int i = 0; i < children.getLength(); i++) {
+			code = new Code();
+			code.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
+			code.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+			code.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			code.setValue(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Value']/text()"));
+			
+			//Valorisation de la Categorie
+			childExp = "//*[local-name()='CategoryReference']";
+			node = xpathProcessor.queryList(fragment, childExp).item(0);
+			children = xpathProcessor.queryList(node, childExp);
+			categoryReference = new CategoryReference();
+			categoryReference.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
+			categoryReference.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+			categoryReference.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			categoryReference.setTypeOfObject(xpathProcessor.queryText(children.item(i), ".//*[local-name()='TypeOfObject']/text()"));
+			code.setCategorieReference(categoryReference);
+			codes.add(code);
+			logger.debug(code.toString());
+		}
+		codeList.setCodeList(codes);
+		//TODO: retourner la CodeList
+		return fragment;
+	}
+
+	@Override
+	public String getSerie(String id, String packageId) throws Exception {
+		String fragment = getItem(id).item;
+		if (fragment.contains("SubGroup"))
+		{
+		return getDDIDocument(id,packageId);
+		}
+		else
+		{
+			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
+		}
+	}
+
+	@Override
+	public String getOperation(String id, String packageId) throws Exception {
+		String fragment = getItem(id).item;
+		if (fragment.contains("StudyUnit"))
+		{
+		return getDDIDocument(id,packageId);
+		}
+		else
+		{
+			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
+		}
+	}
+
+	@Override
+	public String getDataCollection(String id, String packageId) throws Exception {
+		String fragment = getItem(id).item;
+		if (fragment.contains("DataCollection"))
+		{
+		return getDDIDocument(id,packageId);
+		}
+		else
+		{
+			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
+		}
+	}
+
+	@Override
+	public String getQuestionnaire(String id, String packageId) throws Exception {
+		String fragment = getItem(id).item;
+		if (fragment.contains("Instrument"))
+		{
+		return getDDIDocument(id,packageId);
+		}
+		else
+		{
+			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
+		}
+	}
+
+	@Override
+	public String getSequence(String id, String packageId) throws Exception {
+		String fragment = getItem(id).item;
+		if (fragment.contains("Sequence"))
+		{
+		return getDDIDocument(id,packageId);
+		}
+		else
+		{
+			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
+		}
+	}
+	
+	
+
 }

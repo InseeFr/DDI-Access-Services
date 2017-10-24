@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.json.simple.JSONObject;
 
 import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseItem;
+import fr.insee.rmes.search.model.ResponseSearchItem;
 
 public interface DDIItemRepository {
 
@@ -26,4 +28,7 @@ public interface DDIItemRepository {
 	List<DDIItem> getDataCollections(String operationId) throws Exception;
 
 	DataCollectionContext getDataCollectionContext(String dataCollectionId) throws Exception;
+
+	List<ResponseSearchItem> getItemsByCriteria(String subgroupId, String operationId, String dataCollectionId,
+			JSONObject criteria);
 }

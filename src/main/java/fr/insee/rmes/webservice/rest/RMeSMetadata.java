@@ -14,10 +14,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import fr.insee.rmes.metadata.model.Code;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
@@ -122,5 +124,144 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
+	
+	@GET
+	@Path("codeList/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a codeList from Colectica repository reference {id}", response = String.class)
+	public Response getCodeList(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String ddiDocument = metadataService.getCodeList(id,resourcePackageId);
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("serie/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a serie from Colectica repository reference {id}", response = String.class)
+	public Response getSerie(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String ddiDocument = metadataService.getSerie(id,resourcePackageId);
+			
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("operation/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a operation from Colectica repository reference {id}", response = String.class)
+	public Response getOperation(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String ddiDocument = metadataService.getOperation(id,resourcePackageId);
+			
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("datacollection/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a data-collection from Colectica repository reference {id}", response = String.class)
+	public Response getDataCollection(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String ddiDocument = metadataService.getDataCollection(id,resourcePackageId);
+			
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("questionnaire/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a questionnaire from Colectica repository reference {id}", response = String.class)
+	public Response getQuestionnaire(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String ddiDocument = metadataService.getQuestionnaire(id,resourcePackageId);
+			
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("sequence/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a sequence from Colectica repository reference {id}", response = String.class)
+	public Response getSequence(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String ddiDocument = metadataService.getSequence(id,resourcePackageId);
+			
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+	
+	
 
 }
