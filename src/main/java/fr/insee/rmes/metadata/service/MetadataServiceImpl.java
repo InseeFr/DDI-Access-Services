@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.lucene.search.vectorhighlight.FragListBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -267,13 +268,15 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	@Override
-	public Map<String, Object> getCodeList(String itemId, String ressourcePackageId) throws Exception {
-		Map<String, Object> result = new HashMap<String, Object>();
+	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
+		logger.debug("Method started");
 		CodeList codeList = new CodeList();
 		List<Code> codes = new ArrayList<Code>();
 		Code code;
 		CategoryReference categoryReference;
 		String fragment = getItem(itemId).item;
+		String result = "";
+		result = fragment;
 		logger.debug("Fragment : " + fragment);
 
 		String childExp = "//*[local-name()='CodeList']";
@@ -284,8 +287,10 @@ public class MetadataServiceImpl implements MetadataService {
 				xpathProcessor.queryText(children.item(0), ".//*[local-name()='isUniversallyUnique']/text()")));
 
 		for (int i = 0; i < children.getLength(); i++) {
+			logger.debug(children.getLength());
 			codeList.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
-			codeList.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+			codeList.version = Integer
+					.valueOf(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()"));
 
 			codeList.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
 			logger.debug("\n");
@@ -300,7 +305,8 @@ public class MetadataServiceImpl implements MetadataService {
 		for (int i = 0; i < children.getLength(); i++) {
 			code = new Code();
 			code.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
-			code.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+			code.version = Integer
+					.valueOf(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()"));
 			code.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
 			code.setValue(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Value']/text()"));
 
@@ -311,8 +317,8 @@ public class MetadataServiceImpl implements MetadataService {
 			categoryReference = new CategoryReference();
 			categoryReference.agencyId = xpathProcessor.queryText(children.item(i),
 					".//*[local-name()='Agency']/text()");
-			categoryReference.version = xpathProcessor.queryText(children.item(i),
-					".//*[local-name()='Version']/text()");
+			categoryReference.version = Integer
+					.valueOf(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()"));
 			categoryReference.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
 			categoryReference.setTypeOfObject(
 					xpathProcessor.queryText(children.item(i), ".//*[local-name()='TypeOfObject']/text()"));
@@ -326,8 +332,8 @@ public class MetadataServiceImpl implements MetadataService {
 			Category category = new Category();
 			category.agencyId = xpathProcessor.queryText(childrenCategory.item(0),
 					".//*[local-name()='Agency']/text()");
-			category.version = xpathProcessor.queryText(childrenCategory.item(0),
-					".//*[local-name()='Version']/text()");
+			category.version = Integer
+					.valueOf(xpathProcessor.queryText(childrenCategory.item(0), ".//*[local-name()='Version']/text()"));
 			category.identifier = xpathProcessor.queryText(childrenCategory.item(0), ".//*[local-name()='ID']/text()");
 
 			String childLabel = "//*[local-name()='Label']";
@@ -338,23 +344,24 @@ public class MetadataServiceImpl implements MetadataService {
 			codes.add(code);
 			logger.debug(code.toString());
 			logger.debug(category.toString());
-			result.put(fragmentCategory, code.getCategory());
+			result = result + fragmentCategory;
 		}
 		codeList.setCodeList(codes);
-		result.put(fragment, codeList);
-		if (fragment.contains("CodeList") && fragment.contains("Label") && fragment.contains("levelNumber")
-				&& codeList.identifier.equals(itemId) && fragment.contains("CategoryRelationship")
-				&& result.size() > 0) {
+
+		if (result.contains("CodeList") && result.contains("Label") && result.contains("levelNumber")
+				&& codeList.identifier.equals(itemId) && result.contains("CategoryRelationship") && !(result.contains("<CodeListScheme>")) &&result != "") {
 			return result;
 		} else {
+			// Case when the id is unknown or don't match with the correct itemType
 			throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
 		}
 	}
 
 	@Override
-	public Map<String, Object> getSerie(String id, String packageId) throws Exception {
+	public String getSerie(String id, String packageId) throws Exception {
+		String result = "";
 		String fragment = getItem(id).item;
-		Map<String, Object> result = new HashMap<String, Object>();
+		result = fragment;
 		SubGroup subGroup = new SubGroup();
 
 		String childExp = "//*[local-name()='SubGroup']";
@@ -363,7 +370,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 		subGroup.agencyId = xpathProcessor.queryText(children.item(0), ".//*[local-name()='Agency']/text()");
 		subGroup.identifier = xpathProcessor.queryText(children.item(0), ".//*[local-name()='ID']/text()");
-		subGroup.version = xpathProcessor.queryText(children.item(0), ".//*[local-name()='Version']/text()");
+		subGroup.version = Integer
+				.valueOf(xpathProcessor.queryText(children.item(0), ".//*[local-name()='Version']/text()"));
 		logger.debug("SubGroup = " + subGroup + "\n");
 		String childSubGroup = "//*[local-name()='Citation']";
 		Node nodeCitation = xpathProcessor.queryList(fragment, childSubGroup).item(0);
@@ -388,23 +396,26 @@ public class MetadataServiceImpl implements MetadataService {
 			// Valuing StudyUnit///
 			/////////////////////
 			studyUnit = new StudyUnit();
-			studyUnit.agencyId = xpathProcessor.queryText(childrenStudyUnit.item(i), ".//*[local-name()='Agency']/text()");
-			studyUnit.identifier = xpathProcessor.queryText(childrenStudyUnit.item(i), ".//*[local-name()='ID']/text()");
-			studyUnit.version = xpathProcessor.queryText(childrenStudyUnit.item(i), ".//*[local-name()='Version']/text()");
+			studyUnit.agencyId = xpathProcessor.queryText(childrenStudyUnit.item(i),
+					".//*[local-name()='Agency']/text()");
+			studyUnit.identifier = xpathProcessor.queryText(childrenStudyUnit.item(i),
+					".//*[local-name()='ID']/text()");
+			studyUnit.version = Integer.valueOf(
+					xpathProcessor.queryText(childrenStudyUnit.item(i), ".//*[local-name()='Version']/text()"));
 			fragmentStudyUnit = getItem(studyUnit.identifier).item;
-			
+
 			childExp = "//*[local-name()='StudyUnit']";
 			node = xpathProcessor.queryList(fragmentStudyUnit, childExp).item(0);
 			children = xpathProcessor.queryList(node, childExp);
-			
+
 			childExp = "//*[local-name()='Citation']";
 			node = xpathProcessor.queryList(fragmentStudyUnit, childExp).item(0);
 			children = xpathProcessor.queryList(node, childExp);
-			
+
 			childExp = "//*[local-name()='Title']";
 			node = xpathProcessor.queryList(fragmentStudyUnit, childExp).item(0);
 			children = xpathProcessor.queryList(node, childExp);
-			
+
 			citation = new Citation();
 			citation.setTitle(xpathProcessor.queryText(children.item(0), ".//*[local-name()='String']/text()"));
 			studyUnit.setCitation(citation);
@@ -415,74 +426,70 @@ public class MetadataServiceImpl implements MetadataService {
 			children = xpathProcessor.queryList(node, childExp);
 			dataCollection.agencyId = xpathProcessor.queryText(children.item(0), ".//*[local-name()='Agency']/text()");
 			dataCollection.identifier = xpathProcessor.queryText(children.item(0), ".//*[local-name()='ID']/text()");
-			dataCollection.version = xpathProcessor.queryText(children.item(0), ".//*[local-name()='Version']/text()");
+			dataCollection.version = Integer
+					.valueOf(xpathProcessor.queryText(children.item(0), ".//*[local-name()='Version']/text()"));
 			logger.debug(dataCollection);
 			studyUnit.setDatacollection(dataCollection);
 			studies.add(studyUnit);
-			result.put(fragmentStudyUnit, studyUnit);
+			result = result + fragmentStudyUnit;
 		}
 		subGroup.setStudyUnits(studies);
 		logger.debug("SubGroup = " + subGroup + "\n");
-		result.put(fragment, subGroup);
-		if (fragment.contains("SubGroup") && subGroup!=null && subGroup.agencyId!=null && subGroup.identifier!=null) {
-			return result;
+		if (result.contains("SubGroup") && subGroup != null && subGroup.agencyId != null
+				&& subGroup.identifier != null && (!result.contains("<Group>"))&& result!="") {
+			return fragment;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a SubGroup.", fragment);
 		}
 	}
 
 	@Override
-	public Map<String, Object> getOperation(String id, String packageId) throws Exception {
+	public String getOperation(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("StudyUnit")) {
-			return result;
+			return fragment;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a StudyUnit.", fragment);
 		}
 	}
 
 	@Override
-	public Map<String, Object> getDataCollection(String id, String packageId) throws Exception {
+	public String getDataCollection(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("DataCollection")) {
-			return result;
+			return fragment;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a DataCollection.", fragment);
 		}
 	}
 
 	@Override
-	public Map<String, Object> getQuestionnaire(String id, String packageId) throws Exception {
+	public String getQuestionnaire(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("Instrument")) {
-			return result;
+			return fragment;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a Instrument.", fragment);
 		}
 	}
 
 	@Override
-	public Map<String, Object> getSequence(String id, String packageId) throws Exception {
+	public String getSequence(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("Sequence")) {
-			return result;
+			return fragment;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a Sequence.", fragment);
 		}
 	}
 
 	@Override
-	public Map<String, Object> getQuestion(String id, String packageId) throws Exception {
+	public String getQuestion(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
 
-		Map<String, Object> result = new HashMap<String, Object>();
 		if (fragment.contains("QuestionText") && fragment.contains("QuestionScheme")
 				&& fragment.contains("QuestionItem")) {
-			return result;
+			return fragment;
 		} else {
 			throw new RMeSException(404, "The type of this item isn't a QuestionGrid.", fragment);
 		}

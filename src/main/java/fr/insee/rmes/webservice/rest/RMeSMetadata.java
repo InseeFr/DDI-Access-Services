@@ -133,12 +133,10 @@ public class RMeSMetadata {
 	public Response getCodeList(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			Map<String, Object> codeList = metadataService.getCodeList(id, resourcePackageId);
+			String codeList = metadataService.getCodeList(id, resourcePackageId);
 			StreamingOutput stream = output -> {
 				try {
-					for (String fragment : codeList.keySet()) {
-						output.write(fragment.getBytes(StandardCharsets.UTF_8));
-					}
+					output.write(codeList.getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -157,13 +155,11 @@ public class RMeSMetadata {
 	public Response getSerie(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			Map<String, Object> serie = metadataService.getSerie(id, resourcePackageId);
+			String serie = metadataService.getSerie(id, resourcePackageId);
 
 			StreamingOutput stream = output -> {
 				try {
-					for (String serieFragment : serie.keySet()) {
-						output.write(serieFragment.getBytes(StandardCharsets.UTF_8));
-					}
+						output.write(serie.getBytes(StandardCharsets.UTF_8));
 
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
@@ -183,13 +179,11 @@ public class RMeSMetadata {
 	public Response getOperation(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			Map<String, Object> operation = metadataService.getOperation(id, resourcePackageId);
+			String operation = metadataService.getOperation(id, resourcePackageId);
 
 			StreamingOutput stream = output -> {
 				try {
-					for (String operationFragment : operation.keySet()) {
-						output.write(operationFragment.getBytes(StandardCharsets.UTF_8));
-					}
+						output.write(operation.getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -208,13 +202,11 @@ public class RMeSMetadata {
 	public Response getDataCollection(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			Map<String, Object> collection = metadataService.getDataCollection(id, resourcePackageId);
+			String collection = metadataService.getDataCollection(id, resourcePackageId);
 
 			StreamingOutput stream = output -> {
 				try {
-					for (String collectionFragment : collection.keySet()) {
-						output.write(collectionFragment.getBytes(StandardCharsets.UTF_8));
-					}
+						output.write(collection.getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -225,7 +217,6 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
-
 
 	@GET
 	@Path("sequence/{id}/ddi")
@@ -234,13 +225,11 @@ public class RMeSMetadata {
 	public Response getSequence(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			Map<String, Object> sequence = metadataService.getSequence(id, resourcePackageId);
+			String sequence = metadataService.getSequence(id, resourcePackageId);
 
 			StreamingOutput stream = output -> {
 				try {
-					for (String sequenceFragment : sequence.keySet()) {
-						output.write(sequenceFragment.getBytes(StandardCharsets.UTF_8));
-					}
+						output.write(sequence.getBytes(StandardCharsets.UTF_8));
 
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
@@ -252,7 +241,7 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
-	
+
 	@GET
 	@Path("questionnaire/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
@@ -260,13 +249,11 @@ public class RMeSMetadata {
 	public Response getQuestionnaire(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			Map<String, Object> sequence = metadataService.getQuestionnaire(id, resourcePackageId);
+			String questionnaire = metadataService.getQuestionnaire(id, resourcePackageId);
 
 			StreamingOutput stream = output -> {
 				try {
-					for (String sequenceFragment : sequence.keySet()) {
-						output.write(sequenceFragment.getBytes(StandardCharsets.UTF_8));
-					}
+						output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
 
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());

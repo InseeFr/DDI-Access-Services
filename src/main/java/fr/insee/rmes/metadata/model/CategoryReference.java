@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class CategoryReference extends ColecticaItem {
 	
-	@JsonProperty("typeOfObject")
+	@JsonProperty("TypeOfObject")
 	private String typeOfObject = null;
 
 	public String getTypeOfObject() {
