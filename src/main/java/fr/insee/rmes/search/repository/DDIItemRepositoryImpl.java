@@ -74,7 +74,7 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 	@Override
 	public List<DDIItem> getStudyUnits(String subgGroupId) throws Exception {
 		SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
-				.query(QueryBuilders.termQuery("parent.keyword", subgGroupId));
+				.query(QueryBuilders.termQuery("parent", subgGroupId));
 		SearchRequest request = new SearchRequest().indices(index).types("study-unit").source(srcBuilder);
 		return mapResponse(client.search(request));
 	}
@@ -82,7 +82,7 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 	@Override
 	public List<DDIItem> getDataCollections(String studyUnitId) throws Exception {
 		SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
-				.query(QueryBuilders.termQuery("parent.keyword", studyUnitId));
+				.query(QueryBuilders.termQuery("parent", studyUnitId));
 		SearchRequest request = new SearchRequest().indices(index).types("data-collection").source(srcBuilder);
 		return mapResponse(client.search(request));
 	}
