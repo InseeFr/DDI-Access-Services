@@ -1,16 +1,20 @@
 package fr.insee.rmes.metadata.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import fr.insee.rmes.metadata.model.*;
+import fr.insee.rmes.metadata.repository.GroupRepository;
+import fr.insee.rmes.metadata.repository.MetadataRepository;
+import fr.insee.rmes.metadata.utils.XpathProcessor;
+import fr.insee.rmes.search.model.ResourcePackage;
+import fr.insee.rmes.search.model.ResponseItem;
+import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
+import fr.insee.rmes.webservice.rest.RMeSException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
@@ -22,6 +26,7 @@ import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.webservice.rest.RMeSException;
+
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
@@ -137,7 +142,7 @@ public class MetadataServiceImpl implements MetadataService {
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem studyUnit = new ResponseItem();
 			studyUnit.setGroupId(subGroup.getGroupId());
-			studyUnit.setSubGroupId(id);
+			studyUnit.setSubGroupId(subGroup.getId());
 			studyUnit.setId(id);
 			studyUnit.setStudyUnitId(id);
 			studyUnit.setResourcePackageId(subGroup.getResourcePackageId());
@@ -161,8 +166,8 @@ public class MetadataServiceImpl implements MetadataService {
 			ResponseItem dataCollection = new ResponseItem();
 			dataCollection.setId(id);
 			dataCollection.setDataCollectionId(id);
-			dataCollection.setGroupId(studyUnit.getId());
-			dataCollection.setSubGroupId(studyUnit.getId());
+			dataCollection.setGroupId(studyUnit.getGroupId());
+			dataCollection.setSubGroupId(studyUnit.getSubGroupId());
 			dataCollection.setStudyUnitId(studyUnit.getId());
 			dataCollection.setResourcePackageId(studyUnit.getResourcePackageId());
 			dataCollection.setParent(studyUnit.getId());
@@ -208,7 +213,7 @@ public class MetadataServiceImpl implements MetadataService {
 			instrument.setId(id);
 			instrument.setParent(instrumentScheme.getId());
 			instrument.setDataCollectionId(instrumentScheme.getDataCollectionId());
-			instrument.setStudyUnitId(instrument.getStudyUnitId());
+			instrument.setStudyUnitId(instrumentScheme.getStudyUnitId());
 			instrument.setSubGroupId(instrumentScheme.getSubGroupId());
 			instrument.setGroupId(instrumentScheme.getGroupId());
 			instrument.setResourcePackageId(instrumentScheme.getResourcePackageId());
