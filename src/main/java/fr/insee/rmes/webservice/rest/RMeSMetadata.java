@@ -2,6 +2,7 @@ package fr.insee.rmes.webservice.rest;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,12 +15,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.Code;
+import fr.insee.rmes.metadata.model.CodeList;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
@@ -124,18 +125,18 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
-	
+
 	@GET
 	@Path("codeList/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a codeList from Colectica repository reference {id}", response = String.class)
+	@ApiOperation(value = "Get the codeList", notes = "Gets a DDI document with a codeList from Colectica repository reference {id}", response = String.class)
 	public Response getCodeList(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String ddiDocument = metadataService.getCodeList(id,resourcePackageId);
+			String codeList = metadataService.getCodeList(id, resourcePackageId);
 			StreamingOutput stream = output -> {
 				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+					output.write(codeList.getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -150,15 +151,16 @@ public class RMeSMetadata {
 	@GET
 	@Path("serie/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a serie from Colectica repository reference {id}", response = String.class)
+	@ApiOperation(value = "Get a Serie", notes = "Gets a DDI document with a serie from Colectica repository reference {id}", response = String.class)
 	public Response getSerie(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String ddiDocument = metadataService.getSerie(id,resourcePackageId);
-			
+			String serie = metadataService.getSerie(id, resourcePackageId);
+
 			StreamingOutput stream = output -> {
 				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+						output.write(serie.getBytes(StandardCharsets.UTF_8));
+
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -177,11 +179,11 @@ public class RMeSMetadata {
 	public Response getOperation(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String ddiDocument = metadataService.getOperation(id,resourcePackageId);
-			
+			String operation = metadataService.getOperation(id, resourcePackageId);
+
 			StreamingOutput stream = output -> {
 				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+						output.write(operation.getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -200,34 +202,11 @@ public class RMeSMetadata {
 	public Response getDataCollection(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String ddiDocument = metadataService.getDataCollection(id,resourcePackageId);
-			
-			StreamingOutput stream = output -> {
-				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
+			String collection = metadataService.getDataCollection(id, resourcePackageId);
 
-	@GET
-	@Path("questionnaire/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a questionnaire from Colectica repository reference {id}", response = String.class)
-	public Response getQuestionnaire(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
-		try {
-			String ddiDocument = metadataService.getQuestionnaire(id,resourcePackageId);
-			
 			StreamingOutput stream = output -> {
 				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+						output.write(collection.getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -246,11 +225,12 @@ public class RMeSMetadata {
 	public Response getSequence(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String ddiDocument = metadataService.getSequence(id,resourcePackageId);
-			
+			String sequence = metadataService.getSequence(id, resourcePackageId);
+
 			StreamingOutput stream = output -> {
 				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+						output.write(sequence.getBytes(StandardCharsets.UTF_8));
+
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -261,7 +241,29 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
-	
-	
+
+	@GET
+	@Path("questionnaire/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
+	public Response getQuestionnaire(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String questionnaire = metadataService.getQuestionnaire(id, resourcePackageId);
+
+			StreamingOutput stream = output -> {
+				try {
+						output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
+
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
 
 }

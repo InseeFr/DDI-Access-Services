@@ -16,7 +16,10 @@ public class Code extends ColecticaItem {
 	private String value = null;
 	
 	@JsonProperty("CategoryReference")
-	private CategoryReference categorieReference;
+	private CategoryReference categoryReference;
+	
+	@JsonProperty("Category")
+	private Category category;
 	
 	@JsonProperty("isDiscrete")
 	private boolean isDiscrete;
@@ -33,27 +36,32 @@ public class Code extends ColecticaItem {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	public CategoryReference getCategorieReference() {
-		return categorieReference;
-	}
-	public void setCategorieReference(CategoryReference categorieReference) {
-		this.categorieReference = categorieReference;
-	}
 	public boolean isDiscrete() {
 		return isDiscrete;
 	}
 	public void setDiscrete(boolean isDiscrete) {
 		this.isDiscrete = isDiscrete;
 	}
+	public CategoryReference getCategoryReference() {
+		return categoryReference;
+	}
+	public void setCategoryReference(CategoryReference categoryReference) {
+		this.categoryReference = categoryReference;
+	}
+	
+	public Category getCategory() {
+		return category;
+	}
+	public void setCategory(Category category) {
+		this.category = category;
+	}
 	@Override
 	public String toString() {
-		return "Code [levelNumber=" + levelNumber + ", value=" + value + ", categorieReference=" + categorieReference
-				+ ", isDiscrete=" + isDiscrete + ", itemType=" + itemType + ", agencyId=" + agencyId + ", version="
-				+ version + ", identifier=" + identifier + ", item=" + item + ", versionDate=" + versionDate
-				+ ", versionResponsibility=" + versionResponsibility + ", isPublished=" + isPublished
-				+ ", isDeprecated=" + isDeprecated + ", isProvisional=" + isProvisional + ", itemFormat=" + itemFormat
-				+ ", versionRationale=" + versionRationale + ", notes=" + notes + "]";
+		return "Code [levelNumber=" + levelNumber + ", value=" + value + ", categoryReference=" + categoryReference
+				+ ", category=" + category + ", isDiscrete=" + isDiscrete + ", agencyId=" + agencyId + ", version="
+				+ version + ", identifier=" + identifier + "]";
 	}
+	
 	
 	
 }
