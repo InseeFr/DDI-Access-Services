@@ -265,5 +265,29 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
+	
+	@GET
+	@Path("question/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document of a question", notes = "Gets a DDI document with a Question from Colectica repository reference {id}", response = String.class)
+	public Response getQuestion(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String questionnaire = metadataService.getQuestion(id, resourcePackageId);
+
+			StreamingOutput stream = output -> {
+				try {
+						output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
+
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
 
 }
