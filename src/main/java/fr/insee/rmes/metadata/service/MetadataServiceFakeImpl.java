@@ -266,7 +266,7 @@ public class MetadataServiceFakeImpl implements MetadataService {
 
 		for (int i = 0; i < children.getLength(); i++) {
 			codeList.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
-			codeList.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+			codeList.version = Integer.valueOf(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()"));
 
 			codeList.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
 			logger.debug("\n");
@@ -280,7 +280,7 @@ public class MetadataServiceFakeImpl implements MetadataService {
 		for (int i = 0; i < children.getLength(); i++) {
 			code = new Code();
 			code.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
-			code.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+			code.version = codeList.version = Integer.valueOf(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()"));
 			code.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
 			code.setValue(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Value']/text()"));
 			
@@ -290,10 +290,10 @@ public class MetadataServiceFakeImpl implements MetadataService {
 			children = xpathProcessor.queryList(node, childExp);
 			categoryReference = new CategoryReference();
 			categoryReference.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
-			categoryReference.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
+			categoryReference.version = Integer.valueOf(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()"));
 			categoryReference.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
 			categoryReference.setTypeOfObject(xpathProcessor.queryText(children.item(i), ".//*[local-name()='TypeOfObject']/text()"));
-			code.setCategorieReference(categoryReference);
+			//code.setCategorieReference(categoryReference);
 			codes.add(code);
 			logger.debug(code.toString());
 		}
@@ -365,6 +365,12 @@ public class MetadataServiceFakeImpl implements MetadataService {
 		{
 			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
 		}
+	}
+
+	@Override
+	public String getQuestion(String id, String packageId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
