@@ -8,6 +8,12 @@ import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.webservice.rest.RMeSException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +21,11 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.Unit;
+
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
@@ -56,6 +63,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public List<Unit> getUnits() throws Exception {
+		// getCodeList("a72e6e56-12a1-49b7-96c4-c724da3da5da",
+		// "c265b595-ced2-4526-88dc-151471de885d");
 		return metadataRepository.getUnits();
 	}
 
@@ -250,123 +259,160 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-		CodeList codeList = new CodeList();
-		List<Code> codes = new ArrayList<Code>();
-		Code code;
-		CategoryReference categoryReference;
+
 		String fragment = getItem(itemId).item;
-		logger.debug("Fragment : " + fragment);
+		logger.debug(fragment);
+		String res = "";
+		String fragmentExp = "//*[local-name()='Fragment']";
+		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
+		String labelExp = "//*[local-name()='CodeListScheme']/*[local-name()='Agency']/text()";
+		res = xpathProcessor.queryText(Node, labelExp);
+		logger.debug(res);
+		if (res != "") {
 
-		String childExp = "//*[local-name()='CodeList']";
-		Node node = xpathProcessor.queryList(fragment, childExp).item(0);
-		NodeList children = xpathProcessor.queryList(node, childExp);
+			res = getDDIDocument(itemId, ressourcePackageId);
 
-		codeList.setUniversallyUnique(Boolean.valueOf(
-				xpathProcessor.queryText(children.item(0), ".//*[local-name()='isUniversallyUnique']/text()")));
+			String DDIinstanceExp = "//*[local-name()='DDIInstance']/*[local-name()='DataCollection']/*[local-name()='CodeListScheme']";
+			Node = xpathProcessor.queryList(res, DDIinstanceExp).item(0);
+			String CodeListExp = "//*[local-name()='CodeList']/*[local-name()='Code']";
+			NodeList children = xpathProcessor.queryList(Node, CodeListExp);
+			logger.debug(children.getLength());
+			String categories = "";
+			for (int i = 0; i < children.getLength(); i++) {
+				labelExp = "//*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
+				String categoryIdRes = xpathProcessor.queryText(children.item(i), labelExp);
+				logger.debug(categoryIdRes);
+				categories = categories + getDDIDocument(categoryIdRes, ressourcePackageId);
+			}
+			logger.debug(categories);
+			res = res + categories;
 
-		for (int i = 0; i < children.getLength(); i++) {
-			codeList.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
-			codeList.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
-
-			codeList.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			logger.debug("\n");
-			logger.debug(codeList.toString());
+			return res;
 		}
-		
-		//Valorisation de la liste de codes
-		childExp = "//*[local-name()='Code']";
-		node = xpathProcessor.queryList(fragment, childExp).item(0);
-		children = xpathProcessor.queryList(node, childExp);
-		for (int i = 0; i < children.getLength(); i++) {
-			code = new Code();
-			code.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
-			code.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
-			code.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			code.setValue(xpathProcessor.queryText(children.item(i), ".//*[local-name()='Value']/text()"));
-			
-			//Valorisation de la Categorie
-			childExp = "//*[local-name()='CategoryReference']";
-			node = xpathProcessor.queryList(fragment, childExp).item(0);
-			children = xpathProcessor.queryList(node, childExp);
-			categoryReference = new CategoryReference();
-			categoryReference.agencyId = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Agency']/text()");
-			categoryReference.version = xpathProcessor.queryText(children.item(i), ".//*[local-name()='Version']/text()");
-			categoryReference.identifier = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			categoryReference.setTypeOfObject(xpathProcessor.queryText(children.item(i), ".//*[local-name()='TypeOfObject']/text()"));
-			code.setCategorieReference(categoryReference);
-			codes.add(code);
-			logger.debug(code.toString());
-		}
-		codeList.setCodeList(codes);
-		//TODO: retourner la CodeList
-		return fragment;
+
+		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
+
 	}
 
 	@Override
 	public String getSerie(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		if (fragment.contains("SubGroup"))
-		{
-		return getDDIDocument(id,packageId);
+		logger.debug(fragment);
+		String res = "";
+		String fragmentExp = "//*[local-name()='Fragment']";
+		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
+		String labelExp = "//*[local-name()='SubGroup']/*[local-name()='Agency']/text()";
+		res = xpathProcessor.queryText(Node, labelExp);
+		logger.debug(res);
+		if (res != "") {
+
+			res = getDDIDocument(id, packageId);
+
+			return res;
 		}
-		else
-		{
-			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
-		}
+
+		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
+
 	}
 
 	@Override
 	public String getOperation(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		if (fragment.contains("StudyUnit"))
-		{
-		return getDDIDocument(id,packageId);
+		logger.debug(fragment);
+		String res = "";
+		String fragmentExp = "//*[local-name()='Fragment']";
+		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
+		String labelExp = "//*[local-name()='StudyUnit']/*[local-name()='Agency']/text()";
+		res = xpathProcessor.queryText(Node, labelExp);
+		logger.debug(res);
+		if (res != "") {
+
+			res = getDDIDocument(id, packageId);
+
+			return res;
 		}
-		else
-		{
-			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
-		}
+
+		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
 	}
 
 	@Override
 	public String getDataCollection(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		if (fragment.contains("DataCollection"))
-		{
-		return getDDIDocument(id,packageId);
+		logger.debug(fragment);
+		String res = "";
+		String fragmentExp = "//*[local-name()='Fragment']";
+		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
+		String labelExp = "//*[local-name()='DataCollection']/*[local-name()='Agency']/text()";
+		res = xpathProcessor.queryText(Node, labelExp);
+		logger.debug(res);
+		if (res != "") {
+
+			res = getDDIDocument(id, packageId);
+
+			return res;
 		}
-		else
-		{
-			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
-		}
+
+		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
 	}
 
 	@Override
 	public String getQuestionnaire(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		if (fragment.contains("Instrument"))
-		{
-		return getDDIDocument(id,packageId);
+		logger.debug(fragment);
+		StringBuilder res = new StringBuilder();
+		String fragmentExp = "//*[local-name()='Fragment']";
+		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
+		String labelExp = "//*[local-name()='Instrument']/*[local-name()='Agency']/text()";
+		res.append(xpathProcessor.queryText(Node, labelExp));
+		logger.debug(res);
+		if (!(res.equals(""))) {
+			res = new StringBuilder();
+			res.append(getDDIDocument(id, packageId));
+
+			return res.toString();
 		}
-		else
-		{
-			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
-		}
+
+		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
 	}
 
 	@Override
 	public String getSequence(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
-		if (fragment.contains("Sequence"))
-		{
-		return getDDIDocument(id,packageId);
+		logger.debug(fragment);
+		String res = "";
+		String fragmentExp = "//*[local-name()='Fragment']";
+		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
+		String labelExp = "//*[local-name()='Sequence']/*[local-name()='Agency']/text()";
+		res = xpathProcessor.queryText(Node, labelExp);
+		logger.debug(res);
+		if (res != "") {
+
+			res = getDDIDocument(id, packageId);
+
+			return res;
 		}
-		else
-		{
-			throw new RMeSException(404, "L'identifiant de l'objet demandé n'est pas du bon type", fragment);
-		}
+
+		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
 	}
-	
-	
+
+	@Override
+	public String getQuestion(String id, String packageId) throws Exception {
+		String fragment = getItem(id).item;
+		logger.debug(fragment);
+		StringBuilder res = new StringBuilder();
+		String fragmentExp = "//*[local-name()='Fragment']";
+		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
+		String labelExp = "//*[local-name()='QuestionItem']/*[local-name()='Agency']/text()";
+		res.append(xpathProcessor.queryText(Node, labelExp));
+		logger.debug(res);
+		if (!(res.equals(""))) {
+			res = new StringBuilder();
+			res.append(getDDIDocument(id, packageId));
+
+			return res.toString();
+		}
+
+		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
+	}
 
 }
