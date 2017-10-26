@@ -31,3 +31,9 @@ hs_err_pid*
 \.settings/org\.eclipse\.jdt\.core\.prefs
 
 \.settings/org\.eclipse\.m2e\.core\.prefs
+
+src/main/resources/env/dev/ddi-access-services\.properties
+
+src/main/resources/env/dv/ddi-access-services\.properties
+
+src/main/resources/env/qa/ddi-access-services\.properties
