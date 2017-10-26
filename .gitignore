@@ -37,3 +37,5 @@ src/main/resources/env/dev/ddi-access-services\.properties
 src/main/resources/env/dv/ddi-access-services\.properties
 
 src/main/resources/env/qa/ddi-access-services\.properties
+
+\.settings/
