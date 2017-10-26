@@ -1,0 +1,190 @@
+{
+  "mappings": {
+    "sub-group": {
+      "properties": {
+        "groupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "label": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "resourcePackageId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "subGroupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "group": {
+      "properties": {
+        "group-id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "label": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "resourcePackageId": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    },
+    "study-unit": {
+      "properties": {
+        "groupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "label": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "resourcePackageId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "studyUnitId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "subGroupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    },
+    "data-collection": {
+      "properties": {
+        "dataCollectionId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "groupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "label": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "resourcePackageId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "studyUnitId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "subGroupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    },
+    "instrument-scheme": {
+      "properties": {
+        "dataCollectionId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "groupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "parent": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "resourcePackageId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "studyUnitId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "subGroupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    },
+    "instrument": {
+      "properties": {
+        "dataCollectionId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "groupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "label": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "resourcePackageId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "studyUnitId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "subGroupId": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  }
+}
