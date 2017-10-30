@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import fr.insee.rmes.config.DDIItemFakeImplCondition;
 import fr.insee.rmes.search.model.DDIItem;
+import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.model.ResponseSearchItem;
@@ -282,19 +283,19 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 
 	@Override
 	public List<ResponseSearchItem> getItemsByCriteria(String subgroupId, String operationId, String dataCollectionId,
-			JSONObject criteria) {
+			DDIQuery criteria) throws Exception {
 
 		List<ResponseSearchItem> response = new ArrayList<ResponseSearchItem>();
 
-		List<String> types =  (List<String>) criteria.get("types");
-		
+		List<String> types = criteria.getTypes();
+
 		for (String type : types) {
-			if (type.toLowerCase().equals("Instrument")) {
-				String filter = (String) criteria.get("filter");
+			if (type.toLowerCase().equals("instrument")) {
+				String filter = criteria.getFilter();
 				response = getIntruments(subgroupId, operationId, dataCollectionId, filter);
 			}
-			if (type.toLowerCase().equals("CodeList")) {
-				String filter = (String) criteria.get("filter");
+			if (type.toLowerCase().equals("codelist")) {
+				String filter = criteria.getFilter();
 				response = getCodeLists(subgroupId, operationId, dataCollectionId, filter);
 			}
 
@@ -304,8 +305,8 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 	}
 
 	private List<ResponseSearchItem> getCodeLists(String subgroupId, String operationId, String dataCollectionId,
-			String filter) {
-		
+			String filter) throws Exception {
+
 		List<ResponseSearchItem> codeLists = initCodeLists();
 		List<ResponseSearchItem> codeListsFiltered = new ArrayList<ResponseSearchItem>();
 		List<ResponseSearchItem> codeListsFilteredFinal = new ArrayList<ResponseSearchItem>();
@@ -313,20 +314,20 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 			if (operationId != null) {
 				if (dataCollectionId != null) {
 					for (ResponseSearchItem codeList : codeLists) {
-						if (codeList.getCampaign().equals(dataCollectionId)) {
+						if (codeList.getDataCollectionId()!=null && codeList.getDataCollectionId().equals(dataCollectionId)) {
 							codeListsFiltered.add(codeList);
 						}
 					}
 				} else {
 					for (ResponseSearchItem codeList : codeLists) {
-						if (codeList.getOperation().equals(operationId)) {
+						if (codeList.getStudyUnitId()!=null && codeList.getStudyUnitId().equals(operationId)) {
 							codeListsFiltered.add(codeList);
 						}
 					}
 				}
 			} else {
 				for (ResponseSearchItem codeList : codeLists) {
-					if (codeList.getSerie().equals(subgroupId)) {
+					if (codeList.getSubgroupId()!=null && codeList.getSubgroupId().equals(subgroupId)) {
 						codeListsFiltered.add(codeList);
 					}
 				}
@@ -334,21 +335,30 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 		} else {
 			codeListsFiltered.addAll(codeLists);
 		}
-
+		codeListsFiltered = addCommonCodeList(codeListsFiltered);
+		
 		for (ResponseSearchItem codeList : codeListsFiltered) {
-			if (codeList.getTitle().contains(filter)) {
+			if (codeList.getTitle().toUpperCase().contains(filter.toUpperCase())) {
 				codeListsFilteredFinal.add(codeList);
 			}
 		}
+		codeListsFilteredFinal = updateContextLabel(codeListsFilteredFinal);
+
 		return codeListsFilteredFinal;
-		
+
 	}
-	
-	
-	
+
+	private List<ResponseSearchItem> addCommonCodeList(List<ResponseSearchItem> rsiList) {
+		ResponseSearchItem rsi = new ResponseSearchItem("CLI0101", "COMMUN - Liste de codes Oui/Non", null, null);
+		rsiList.add(rsi);
+		rsi = new ResponseSearchItem("CLI0102", "COMMUN - Liste de codes Femme/Homme", null, null);
+		rsiList.add(rsi);
+		return rsiList;
+	}
+
 	private List<ResponseSearchItem> getIntruments(String subgroupId, String operationId, String dataCollectionId,
-			String filter) {
-		
+			String filter) throws Exception {
+
 		List<ResponseSearchItem> instruments = initIntruments();
 		List<ResponseSearchItem> instrumentsFiltered = new ArrayList<ResponseSearchItem>();
 		List<ResponseSearchItem> instrumentsFilteredFinal = new ArrayList<ResponseSearchItem>();
@@ -356,20 +366,20 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 			if (operationId != null) {
 				if (dataCollectionId != null) {
 					for (ResponseSearchItem instrument : instruments) {
-						if (instrument.getCampaign().equals(dataCollectionId)) {
+						if (instrument.getDataCollectionId().equals(dataCollectionId)) {
 							instrumentsFiltered.add(instrument);
 						}
 					}
 				} else {
 					for (ResponseSearchItem instrument : instruments) {
-						if (instrument.getOperation().equals(operationId)) {
+						if (instrument.getStudyUnitId().equals(operationId)) {
 							instrumentsFiltered.add(instrument);
 						}
 					}
 				}
 			} else {
 				for (ResponseSearchItem instrument : instruments) {
-					if (instrument.getSerie().equals(subgroupId)) {
+					if (instrument.getSubgroupId().equals(subgroupId)) {
 						instrumentsFiltered.add(instrument);
 					}
 				}
@@ -377,43 +387,73 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 		} else {
 			instrumentsFiltered.addAll(instruments);
 		}
-
 		for (ResponseSearchItem instrument : instrumentsFiltered) {
-			if (instrument.getTitle().contains(filter)) {
+			if (instrument.getTitle().toUpperCase().contains(filter.toUpperCase())) {
 				instrumentsFilteredFinal.add(instrument);
 			}
 		}
+
+		instrumentsFilteredFinal = updateContextLabel(instrumentsFilteredFinal);
+
 		return instrumentsFilteredFinal;
 	}
-	
+
+	private List<ResponseSearchItem> updateContextLabel(List<ResponseSearchItem> rsiList) throws Exception {
+
+		for (ResponseSearchItem rsi : rsiList) {
+
+			String subGroupID = rsi.getSubgroupId();
+			String studyUnitID = rsi.getStudyUnitId();
+
+			if (rsi.getSubgroupId() != null) {
+				for (DDIItem ddiItem : this.getSubGroups()) {
+					if (rsi.getSubgroupId().equals(ddiItem.getId())) {
+						rsi.setSubgroupId(ddiItem.getLabel());
+					}
+				}
+			}
+			if (rsi.getStudyUnitId() != null) {
+				for (DDIItem ddiItem : this.getStudyUnits(subGroupID)) {
+					if (rsi.getStudyUnitId().equals(ddiItem.getId())) {
+						rsi.setStudyUnitId(ddiItem.getLabel());
+					}
+				}
+			}
+			if (rsi.getDataCollectionId() != null) {
+				for (DDIItem ddiItem : this.getDataCollections(studyUnitID)) {
+					if (rsi.getDataCollectionId().equals(ddiItem.getId())) {
+						rsi.setDataCollectionId(ddiItem.getLabel());
+					}
+				}
+			}
+		}
+		return rsiList;
+	}
+
 	private List<ResponseSearchItem> initCodeLists() {
 
 		List<ResponseSearchItem> codeLists = new ArrayList<ResponseSearchItem>();
+		ResponseSearchItem rsi = new ResponseSearchItem("CLI0101", "COMMUN - Liste de codes Oui/Non", null, null);
+		codeLists.add(rsi);
+		rsi = new ResponseSearchItem("CLI0102", "COMMUN - Liste de codes Femme/Homme", null, null);
+		codeLists.add(rsi);
 		String subgroupId = "SG02";
 		String studyUnitId = "SU02";
-		ResponseSearchItem rsi = new ResponseSearchItem("CLI0201",
-				"Liste de codes Oui/Non FPE", subgroupId, studyUnitId);
+		rsi = new ResponseSearchItem("CLI0201", "Liste de codes Oui/Non/Peut-être FPE", subgroupId, studyUnitId);
 		codeLists.add(rsi);
-		rsi = new ResponseSearchItem("CLI0202",
-				"Liste de codes Oui/Non/Peut-être FPE", subgroupId, studyUnitId);
-		codeLists.add(rsi);
-		rsi = new ResponseSearchItem("CLI0203",
-				"Liste de codes A/B/C FPE", subgroupId, studyUnitId);
+		rsi = new ResponseSearchItem("CLI0202", "Liste de codes Femme/Homme FPE", subgroupId, studyUnitId);
 		codeLists.add(rsi);
 		subgroupId = "SG03";
 		studyUnitId = "SU03";
-		rsi = new ResponseSearchItem("CLI0301",
-				"Liste de codes Oui/Non EEC", subgroupId, studyUnitId);
+		rsi = new ResponseSearchItem("CLI0301", "Liste de codes Type de contrat EEC", subgroupId, studyUnitId);
 		codeLists.add(rsi);
-		rsi = new ResponseSearchItem("CLI0302",
-				"Liste de codes Oui/Non/Peut-être EEC", subgroupId, studyUnitId);
+		rsi = new ResponseSearchItem("CLI0302", "Liste de codes Oui/Non/Peut-être EEC", subgroupId, studyUnitId);
 		codeLists.add(rsi);
-		rsi = new ResponseSearchItem("CLI0303",
-				"Liste de codes A/B/C EEC", subgroupId, studyUnitId);
+		rsi = new ResponseSearchItem("CLI0303", "Liste de codes Secteur activité EEC", subgroupId, studyUnitId);
 		codeLists.add(rsi);
+
 		return codeLists;
 	}
-	
 
 	private List<ResponseSearchItem> initIntruments() {
 

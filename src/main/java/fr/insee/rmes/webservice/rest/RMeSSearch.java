@@ -55,18 +55,17 @@ public class RMeSSearch {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 500, message = "Unexpected error") })
 	public List<ResponseSearchItem> search(
-			@ApiParam(value = "Sub-group (series) ID", required = false) @QueryParam("serie") String subgroupId,
-			@ApiParam(value = "Study Unit ID (operation)", required = false) @QueryParam("operation") String operationId,
-			@ApiParam(value = "Data Collection (campaign) ID", required = false) @QueryParam("campaign") String dataCollectionId,
-			@ApiParam(value = "Criteria") JSONObject criteria) throws Exception {
+			@ApiParam(value = "Search only items referring to sub-group id", required = false) @QueryParam("subgroupId") String subgroupId,
+			@ApiParam(value = "Search only items referring to study-unit id", required = false) @QueryParam("studyUnitId") String studyUnitId,
+			@ApiParam(value = "Search only items referring to data-collection id", required = false) @QueryParam("dataCollectionId") String dataCollectionId,
+			DDIQuery criteria) throws Exception {
 		try {
-			return searchService.searchByLabel(subgroupId,operationId,dataCollectionId,criteria);
+			return searchService.searchByLabel(subgroupId, studyUnitId, dataCollectionId, criteria);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
 	}
-	
 
 	@DELETE
 	@Path("questionnaire/{id}")
@@ -150,7 +149,5 @@ public class RMeSSearch {
 			throw e;
 		}
 	}
-	
-	
 
 }

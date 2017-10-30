@@ -15,7 +15,6 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
@@ -25,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.rmes.config.DDIItemRepositoryImplCondition;
 import fr.insee.rmes.search.model.DDIItem;
+import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.model.ResponseSearchItem;
@@ -124,7 +124,7 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 	
 	@Override
 	public List<ResponseSearchItem> getItemsByCriteria(String subgroupId, String operationId, String dataCollectionId,
-			JSONObject criteria) {
+			DDIQuery criteria) throws Exception {
 		// TODO 
 		return null;
 	}
