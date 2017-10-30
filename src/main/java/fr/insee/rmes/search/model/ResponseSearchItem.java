@@ -10,11 +10,11 @@ public class ResponseSearchItem {
 
 	private String version;
 
-	private String serie;
+	private String subgroupId;
 
-	private String operation;
+	private String studyUnitId;
 
-	private String campaign;
+	private String dataCollectionId;
 
 	private String type;
 
@@ -28,9 +28,9 @@ public class ResponseSearchItem {
 		this.name = id;
 		this.version = "0";
 		this.title = title;
-		this.serie = serie;
-		this.operation = operation;
-		this.campaign = campaign;
+		this.subgroupId = serie;
+		this.studyUnitId = operation;
+		this.dataCollectionId = campaign;
 		this.type = "Instrument";
 
 	}
@@ -41,8 +41,8 @@ public class ResponseSearchItem {
 		this.name = id;
 		this.version = "0";
 		this.title = title;
-		this.serie = serie;
-		this.operation = operation;
+		this.subgroupId = serie;
+		this.studyUnitId = operation;
 		this.type = "CodeList";
 
 	}
@@ -80,28 +80,28 @@ public class ResponseSearchItem {
 		this.version = version;
 	}
 
-	public String getSerie() {
-		return serie;
+	public String getSubgroupId() {
+		return subgroupId;
 	}
 
-	public void setSerie(String serie) {
-		this.serie = serie;
+	public void setSubgroupId(String subgroupId) {
+		this.subgroupId = subgroupId;
 	}
 
-	public String getOperation() {
-		return operation;
+	public String getStudyUnitId() {
+		return studyUnitId;
 	}
 
-	public void setOperation(String operation) {
-		this.operation = operation;
+	public void setStudyUnitId(String studyUnitId) {
+		this.studyUnitId = studyUnitId;
 	}
 
-	public String getCampaign() {
-		return campaign;
+	public String getDataCollectionId() {
+		return dataCollectionId;
 	}
 
-	public void setCampaign(String campaign) {
-		this.campaign = campaign;
+	public void setDataCollectionId(String dataCollectionId) {
+		this.dataCollectionId = dataCollectionId;
 	}
 
 	public String getType() {
