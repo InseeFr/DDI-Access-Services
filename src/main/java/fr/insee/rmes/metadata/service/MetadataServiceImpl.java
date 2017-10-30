@@ -8,24 +8,25 @@ import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.webservice.rest.RMeSException;
+import io.swagger.models.Xml;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.XMLFormatter;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.persistence.jaxb.xmlmodel.XmlAccessMethods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
-
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
@@ -259,35 +260,33 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-
+		String ddiSpecHead = "<DDIInstance xmlns=\"ddi:instance:3_2\" xmlns:a=\"ddi:archive:3_2\" xmlns:d=\"ddi:datacollection:3_2\" xmlns:g=\"ddi:group:3_2\" xmlns:l=\"ddi:logicalproduct:3_2\" xmlns:r=\"ddi:reusable:3_2\" xmlns:s=\"ddi:studyunit:3_2\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"ddi:instance:3_2 http://www.ddialliance.org/Specification/DDI-Lifecycle/3.2/XMLSchema/instance.xsd\">";
+		String ddiSpecFooter = "</DDIInstance>";
 		String fragment = getItem(itemId).item;
 		logger.debug(fragment);
-		String res = "";
-		String fragmentExp = "//*[local-name()='Fragment']";
-		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
-		String labelExp = "//*[local-name()='CodeListScheme']/*[local-name()='Agency']/text()";
-		res = xpathProcessor.queryText(Node, labelExp);
+		StringBuilder res = new StringBuilder();
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
+		res.append(xpathProcessor.queryText(fragment, fragmentExp));
 		logger.debug(res);
-		if (res != "") {
-
-			res = getDDIDocument(itemId, ressourcePackageId);
-
-			String DDIinstanceExp = "//*[local-name()='DDIInstance']/*[local-name()='DataCollection']/*[local-name()='CodeListScheme']";
-			Node = xpathProcessor.queryList(res, DDIinstanceExp).item(0);
-			String CodeListExp = "//*[local-name()='CodeList']/*[local-name()='Code']";
-			NodeList children = xpathProcessor.queryList(Node, CodeListExp);
+		StringBuilder categories = new StringBuilder();
+		if (!(res.length() == 0)) {
+			res = new StringBuilder();
+			res.append(getDDIDocument(itemId, ressourcePackageId));
+			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
+			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
 			logger.debug(children.getLength());
-			String categories = "";
+			String categoryIdRes;
 			for (int i = 0; i < children.getLength(); i++) {
-				labelExp = "//*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
-				String categoryIdRes = xpathProcessor.queryText(children.item(i), labelExp);
+				String labelExp = "//*[local-name()='ID']/text()";
+				categoryIdRes = xpathProcessor.queryText(children.item(i), labelExp);
 				logger.debug(categoryIdRes);
-				categories = categories + getDDIDocument(categoryIdRes, ressourcePackageId);
+				//TODO :Solve the problem.
+				/*categories.append(getDDIDocument(categoryIdRes, ressourcePackageId).replace(ddiSpecHead, "")
+						.replace(ddiSpecFooter, ""));*/
 			}
 			logger.debug(categories);
-			res = res + categories;
-
-			return res;
+			res.append(categories.toString());
+			return res.toString();
 		}
 
 		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
@@ -299,10 +298,8 @@ public class MetadataServiceImpl implements MetadataService {
 		String fragment = getItem(id).item;
 		logger.debug(fragment);
 		String res = "";
-		String fragmentExp = "//*[local-name()='Fragment']";
-		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
-		String labelExp = "//*[local-name()='SubGroup']/*[local-name()='Agency']/text()";
-		res = xpathProcessor.queryText(Node, labelExp);
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='SubGroup']";
+		res = xpathProcessor.queryText(fragment, fragmentExp);
 		logger.debug(res);
 		if (res != "") {
 
@@ -319,17 +316,15 @@ public class MetadataServiceImpl implements MetadataService {
 	public String getOperation(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
 		logger.debug(fragment);
-		String res = "";
-		String fragmentExp = "//*[local-name()='Fragment']";
-		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
-		String labelExp = "//*[local-name()='StudyUnit']/*[local-name()='Agency']/text()";
-		res = xpathProcessor.queryText(Node, labelExp);
+		StringBuilder res = new StringBuilder();
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='StudyUnit']/*[local-name()='Agency']/text()";
+		res.append(xpathProcessor.queryText(fragment, fragmentExp));
 		logger.debug(res);
-		if (res != "") {
+		if (res.length() > 0) {
+			res = new StringBuilder();
+			res.append(getDDIDocument(id, packageId));
 
-			res = getDDIDocument(id, packageId);
-
-			return res;
+			return res.toString();
 		}
 
 		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
@@ -339,17 +334,15 @@ public class MetadataServiceImpl implements MetadataService {
 	public String getDataCollection(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
 		logger.debug(fragment);
-		String res = "";
-		String fragmentExp = "//*[local-name()='Fragment']";
-		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
-		String labelExp = "//*[local-name()='DataCollection']/*[local-name()='Agency']/text()";
-		res = xpathProcessor.queryText(Node, labelExp);
+		StringBuilder res = new StringBuilder();
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='DataCollection']/*[local-name()='Agency']/text()";
+		res.append(xpathProcessor.queryText(fragment, fragmentExp));
 		logger.debug(res);
-		if (res != "") {
+		if (res.length() > 0) {
+			res = new StringBuilder();
+			res.append(getDDIDocument(id, packageId));
 
-			res = getDDIDocument(id, packageId);
-
-			return res;
+			return res.toString();
 		}
 
 		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
@@ -360,12 +353,10 @@ public class MetadataServiceImpl implements MetadataService {
 		String fragment = getItem(id).item;
 		logger.debug(fragment);
 		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']";
-		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
-		String labelExp = "//*[local-name()='Instrument']/*[local-name()='Agency']/text()";
-		res.append(xpathProcessor.queryText(Node, labelExp));
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='Instrument']/*[local-name()='Agency']/text()";
+		res.append(xpathProcessor.queryText(fragment, fragmentExp));
 		logger.debug(res);
-		if (!(res.equals(""))) {
+		if (res.length() > 0) {
 			res = new StringBuilder();
 			res.append(getDDIDocument(id, packageId));
 
@@ -379,17 +370,15 @@ public class MetadataServiceImpl implements MetadataService {
 	public String getSequence(String id, String packageId) throws Exception {
 		String fragment = getItem(id).item;
 		logger.debug(fragment);
-		String res = "";
-		String fragmentExp = "//*[local-name()='Fragment']";
-		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
-		String labelExp = "//*[local-name()='Sequence']/*[local-name()='Agency']/text()";
-		res = xpathProcessor.queryText(Node, labelExp);
+		StringBuilder res = new StringBuilder();
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='Sequence']/*[local-name()='Agency']/text()";
+		res.append(xpathProcessor.queryText(fragment, fragmentExp));
 		logger.debug(res);
-		if (res != "") {
+		if (res.length() > 0) {
+			res = new StringBuilder();
+			res.append(getDDIDocument(id, packageId));
 
-			res = getDDIDocument(id, packageId);
-
-			return res;
+			return res.toString();
 		}
 
 		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
@@ -400,12 +389,10 @@ public class MetadataServiceImpl implements MetadataService {
 		String fragment = getItem(id).item;
 		logger.debug(fragment);
 		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']";
-		Node Node = xpathProcessor.queryList(fragment, fragmentExp).item(0);
-		String labelExp = "//*[local-name()='QuestionItem']/*[local-name()='Agency']/text()";
-		res.append(xpathProcessor.queryText(Node, labelExp));
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='QuestionItem']/*[local-name()='Agency']/text()";
+		res.append(xpathProcessor.queryText(fragment, fragmentExp));
 		logger.debug(res);
-		if (!(res.equals(""))) {
+		if (res.length() > 0) {
 			res = new StringBuilder();
 			res.append(getDDIDocument(id, packageId));
 

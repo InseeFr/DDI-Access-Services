@@ -108,8 +108,10 @@ public class MetadataServiceFakeImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
+
 		// TODO Auto-generated method stub
 		return null;
+
 	}
 
 	@Override
@@ -146,6 +148,6 @@ public class MetadataServiceFakeImpl implements MetadataService {
 	public String getQuestion(String id, String packageId) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
-	}
+  }
 
 }
