@@ -64,6 +64,25 @@ public class MetadataClientImpl implements MetadataClient {
 		return new ColecticaItemRefList(refs);
 	}
 
+	public Integer getLastestVersionItem(String id) throws Exception {
+		String url = String.format("%s/api/v1/item/%s/%s/versions/_latest?api_key=%s", serviceUrl, agency, id, apiKey);
+		return restTemplate.getForObject(url, Integer.class);
+
+	}
+
+	public void postItems(List<ColecticaItem> colecticaItemsList) throws Exception {
+
+		for (ColecticaItem colecticaItem : colecticaItemsList) {
+			postItem(colecticaItem);
+		}
+
+	}
+
+	public void postItem(ColecticaItem colecticaItem) throws Exception {
+		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, agency, apiKey);
+		restTemplate.postForObject(url, colecticaItem, String.class);
+	}
+
 	public List<Unit> getUnits() throws Exception {
 
 		// Fake
@@ -82,8 +101,5 @@ public class MetadataClientImpl implements MetadataClient {
 		units.add(unit3);
 		return units;
 	}
-
-	
-	
 
 }
