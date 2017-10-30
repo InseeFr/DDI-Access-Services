@@ -150,4 +150,16 @@ public class MetadataServiceFakeImpl implements MetadataService {
 		return null;
   }
 
+	@Override
+	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

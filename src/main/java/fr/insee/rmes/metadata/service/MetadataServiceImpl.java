@@ -24,10 +24,6 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemRefList;
-import fr.insee.rmes.metadata.model.Unit;
-
 @Service
 public class MetadataServiceImpl implements MetadataService {
 
@@ -400,6 +396,16 @@ public class MetadataServiceImpl implements MetadataService {
 		}
 
 		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
+	}
+
+	@Override
+	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
+		return metadataRepository.postNewItems(refs);
+	}
+
+	@Override
+	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
+		return metadataRepository.postUpdateItems(refs);
 	}
 
 }

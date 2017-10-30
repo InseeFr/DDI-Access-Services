@@ -2,7 +2,10 @@ package fr.insee.rmes.metadata.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.http.entity.ContentType;
@@ -19,6 +22,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
@@ -70,19 +75,6 @@ public class MetadataClientImpl implements MetadataClient {
 
 	}
 
-	public void postItems(List<ColecticaItem> colecticaItemsList) throws Exception {
-
-		for (ColecticaItem colecticaItem : colecticaItemsList) {
-			postItem(colecticaItem);
-		}
-
-	}
-
-	public void postItem(ColecticaItem colecticaItem) throws Exception {
-		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, agency, apiKey);
-		restTemplate.postForObject(url, colecticaItem, String.class);
-	}
-
 	public List<Unit> getUnits() throws Exception {
 
 		// Fake
@@ -100,6 +92,23 @@ public class MetadataClientImpl implements MetadataClient {
 		unit3.setUri("http://id.insee.fr/unit/percent");
 		units.add(unit3);
 		return units;
+	}
+
+	@Override
+	public String postItems(ColecticaItemPostRefList colecticaItemsList) throws Exception {
+		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, agency, apiKey);
+		return restTemplate.postForObject(url, colecticaItemsList, String.class);
+	}
+
+	@Override
+	public String postItem(ColecticaItemPostRef ref) {
+		
+		List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
+		ColecticaItemPostRefList colecticaItemsList = new ColecticaItemPostRefList();
+		colecticaItemsList.setItems(items);
+		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, agency, apiKey);
+		return restTemplate.postForObject(url, colecticaItemsList, String.class);
+
 	}
 
 }
