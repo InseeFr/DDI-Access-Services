@@ -30,7 +30,7 @@ public class ColecticaItemPostRefList {
 	private List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
 
 	@JsonProperty("Options")
-	private List<String> options = new ArrayList<String>();
+	private Object options = new Object();
 
 	public List<ColecticaItemPostRef> getItems() {
 		return items;
@@ -40,11 +40,11 @@ public class ColecticaItemPostRefList {
 		this.items = items;
 	}
 
-	public List<String> getOptions() {
+	public Object getOptions() {
 		return options;
 	}
 
-	public void setOptions(List<String> options) {
+	public void setOptions(Object options) {
 		this.options = options;
 	}
 

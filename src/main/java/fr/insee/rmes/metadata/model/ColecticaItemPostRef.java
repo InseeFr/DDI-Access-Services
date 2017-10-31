@@ -6,139 +6,138 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import fr.insee.rmes.metadata.model.ColecticaItemRef.Unformatted;
+
 public class ColecticaItemPostRef {
 
-		@JsonProperty("Identifier")
-		public String identifier;
+	@JsonProperty("Identifier")
+	public String identifier;
 
-		@JsonProperty("Version")
-		public String version;
+	@JsonProperty("Version")
+	public String version;
 
-		@JsonProperty("AgencyId")
-		public String agencyId;
-		
-		
+	@JsonProperty("AgencyId")
+	public String agencyId;
 
-		public ColecticaItemPostRef() {
-		}
+	public ColecticaItemPostRef() {
+	}
 
-		public ColecticaItemPostRef(String identifier, String version, String agencyId) {
-			this.agencyId = agencyId;
-			this.identifier = identifier;
-			this.version = version;
-		}
+	public ColecticaItemPostRef(String identifier, String version, String agencyId) {
+		this.agencyId = agencyId;
+		this.identifier = identifier;
+		this.version = version;
+	}
 
-		@JsonProperty("ItemType")
-		private UUID itemType;
+	@JsonProperty("ItemType")
+	private UUID itemType;
 
-		@JsonProperty("Item")
-		private String item;
+	@JsonProperty("Item")
+	private String item;
 
-		@JsonProperty("Notes")
-		private List<String> notes = new ArrayList<String>();
+	@JsonProperty("Notes")
+	private List<Unformatted> notes = new ArrayList<Unformatted>();
 
-		@JsonProperty("VersionDate")
-		private String versionDate;
+	@JsonProperty("VersionDate")
+	private String versionDate;
 
-		@JsonProperty("VersionResponsibility")
-		private String versionResponsibility;
+	@JsonProperty("VersionResponsibility")
+	private String versionResponsibility;
 
-		@JsonProperty("IsPublished")
-		private boolean isPublished;
+	@JsonProperty("IsPublished")
+	private boolean isPublished;
 
-		@JsonProperty("IsDeprecated")
-		private boolean isDeprecated;
+	@JsonProperty("IsDeprecated")
+	private boolean isDeprecated;
 
-		@JsonProperty("ItemFormat")
-		private UUID itemFormat;
+	@JsonProperty("ItemFormat")
+	private UUID itemFormat;
 
-		public String getIdentifier() {
-			return identifier;
-		}
+	public String getIdentifier() {
+		return identifier;
+	}
 
-		public void setIdentifier(String identifier) {
-			this.identifier = identifier;
-		}
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
 
-		public String getVersion() {
-			return version;
-		}
+	public String getVersion() {
+		return version;
+	}
 
-		public void setVersion(String version) {
-			this.version = version;
-		}
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-		public String getAgencyId() {
-			return agencyId;
-		}
+	public String getAgencyId() {
+		return agencyId;
+	}
 
-		public void setAgencyId(String agencyId) {
-			this.agencyId = agencyId;
-		}
+	public void setAgencyId(String agencyId) {
+		this.agencyId = agencyId;
+	}
 
-		public UUID getItemType() {
-			return itemType;
-		}
+	public UUID getItemType() {
+		return itemType;
+	}
 
-		public void setItemType(UUID itemType) {
-			this.itemType = itemType;
-		}
+	public void setItemType(UUID itemType) {
+		this.itemType = itemType;
+	}
 
-		public String getItem() {
-			return item;
-		}
+	public String getItem() {
+		return item;
+	}
 
-		public void setItem(String item) {
-			this.item = item;
-		}
+	public void setItem(String item) {
+		this.item = item;
+	}
 
-		public List<String> getNotes() {
-			return notes;
-		}
+	public List<Unformatted> getNotes() {
+		return notes;
+	}
 
-		public void setNotes(List<String> notes) {
-			this.notes = notes;
-		}
+	public void setNotes(List<Unformatted> notes) {
+		this.notes = notes;
+	}
 
-		public String getVersionDate() {
-			return versionDate;
-		}
+	public String getVersionDate() {
+		return versionDate;
+	}
 
-		public void setVersionDate(String versionDate) {
-			this.versionDate = versionDate;
-		}
+	public void setVersionDate(String versionDate) {
+		this.versionDate = versionDate;
+	}
 
-		public String getVersionResponsibility() {
-			return versionResponsibility;
-		}
+	public String getVersionResponsibility() {
+		return versionResponsibility;
+	}
 
-		public void setVersionResponsibility(String versionResponsibility) {
-			this.versionResponsibility = versionResponsibility;
-		}
+	public void setVersionResponsibility(String versionResponsibility) {
+		this.versionResponsibility = versionResponsibility;
+	}
 
-		public boolean isPublished() {
-			return isPublished;
-		}
+	public boolean isPublished() {
+		return isPublished;
+	}
 
-		public void setPublished(boolean isPublished) {
-			this.isPublished = isPublished;
-		}
+	public void setPublished(boolean isPublished) {
+		this.isPublished = isPublished;
+	}
 
-		public boolean isDeprecated() {
-			return isDeprecated;
-		}
+	public boolean isDeprecated() {
+		return isDeprecated;
+	}
 
-		public void setDeprecated(boolean isDeprecated) {
-			this.isDeprecated = isDeprecated;
-		}
+	public void setDeprecated(boolean isDeprecated) {
+		this.isDeprecated = isDeprecated;
+	}
 
-		public UUID getItemFormat() {
-			return itemFormat;
-		}
+	public UUID getItemFormat() {
+		return itemFormat;
+	}
 
-		public void setItemFormat(UUID itemFormat) {
-			this.itemFormat = itemFormat;
-		}
-		
+	public void setItemFormat(UUID itemFormat) {
+		this.itemFormat = itemFormat;
+	}
 
 }

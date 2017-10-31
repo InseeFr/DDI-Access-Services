@@ -96,18 +96,30 @@ public class MetadataClientImpl implements MetadataClient {
 
 	@Override
 	public String postItems(ColecticaItemPostRefList colecticaItemsList) throws Exception {
-		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, agency, apiKey);
-		return restTemplate.postForObject(url, colecticaItemsList, String.class);
+		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, apiKey);
+
+		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+		headers.add("Content-type", ContentType.APPLICATION_JSON.getMimeType());
+		HttpEntity<ColecticaItemPostRefList> request = new HttpEntity<>(colecticaItemsList, headers);
+		ResponseEntity<ColecticaItem[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
+				ColecticaItem[].class);
+		return response.getStatusCode().toString();
+		
 	}
 
 	@Override
 	public String postItem(ColecticaItemPostRef ref) {
-		
+
 		List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
 		ColecticaItemPostRefList colecticaItemsList = new ColecticaItemPostRefList();
 		colecticaItemsList.setItems(items);
-		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, agency, apiKey);
-		return restTemplate.postForObject(url, colecticaItemsList, String.class);
+		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, apiKey);
+		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+		headers.add("Content-type", ContentType.APPLICATION_JSON.getMimeType());
+		HttpEntity<ColecticaItemPostRefList> request = new HttpEntity<>(colecticaItemsList, headers);
+		ResponseEntity<ColecticaItem[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
+				ColecticaItem[].class);
+		return response.getStatusCode().toString();
 
 	}
 
