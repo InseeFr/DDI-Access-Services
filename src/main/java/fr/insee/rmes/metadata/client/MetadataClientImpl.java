@@ -2,7 +2,10 @@ package fr.insee.rmes.metadata.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.http.entity.ContentType;
@@ -19,6 +22,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
@@ -64,6 +69,12 @@ public class MetadataClientImpl implements MetadataClient {
 		return new ColecticaItemRefList(refs);
 	}
 
+	public Integer getLastestVersionItem(String id) throws Exception {
+		String url = String.format("%s/api/v1/item/%s/%s/versions/_latest?api_key=%s", serviceUrl, agency, id, apiKey);
+		return restTemplate.getForObject(url, Integer.class);
+
+	}
+
 	public List<Unit> getUnits() throws Exception {
 
 		// Fake
@@ -83,7 +94,21 @@ public class MetadataClientImpl implements MetadataClient {
 		return units;
 	}
 
-	
-	
+	@Override
+	public String postItems(ColecticaItemPostRefList colecticaItemsList) throws Exception {
+		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, agency, apiKey);
+		return restTemplate.postForObject(url, colecticaItemsList, String.class);
+	}
+
+	@Override
+	public String postItem(ColecticaItemPostRef ref) {
+		
+		List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
+		ColecticaItemPostRefList colecticaItemsList = new ColecticaItemPostRefList();
+		colecticaItemsList.setItems(items);
+		String url = String.format("%s/api/v1/item?api_key=%s", serviceUrl, agency, apiKey);
+		return restTemplate.postForObject(url, colecticaItemsList, String.class);
+
+	}
 
 }
