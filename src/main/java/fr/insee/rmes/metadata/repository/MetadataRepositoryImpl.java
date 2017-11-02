@@ -74,17 +74,11 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 		String result;
 		for (ColecticaItemPostRef colecticaItemPostRef : refs.getItems()) {
 			version = Integer.valueOf(colecticaItemPostRef.version);
-			if (version > 0) {
 				version++;
 				colecticaItemPostRef.version = String.valueOf(version);
 				result = metadataClient.postItems(refs);
 				results.put(colecticaItemPostRef, result);
-			} else {
-				colecticaItemPostRef.version = String.valueOf(version);
-				Map<ColecticaItemPostRef, String> singleResult = postNewItem(colecticaItemPostRef);
-				results.put(colecticaItemPostRef, singleResult.get(colecticaItemPostRef));
-
-			}
+				
 		}
 		return results;
 
