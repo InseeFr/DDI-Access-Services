@@ -273,12 +273,13 @@ public class MetadataServiceImpl implements MetadataService {
 			logger.debug(children.getLength());
 			String categoryIdRes;
 			for (int i = 0; i < children.getLength(); i++) {
-				String labelExp = "//*[local-name()='ID']/text()";
+				String labelExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
 				categoryIdRes = xpathProcessor.queryText(children.item(i), labelExp);
 				logger.debug(categoryIdRes);
-				//TODO :Solve the problem.
-				/*categories.append(getDDIDocument(categoryIdRes, ressourcePackageId).replace(ddiSpecHead, "")
-						.replace(ddiSpecFooter, ""));*/
+				logger.debug(getItem(categoryIdRes).item);
+
+				// TODO :Solve the problem.
+				categories.append(getItem(categoryIdRes).item.replace(ddiSpecHead, "").replace(ddiSpecFooter, ""));
 			}
 			logger.debug(categories);
 			res.append(categories.toString());
