@@ -40,33 +40,48 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 
 	@Override
 	public void source() throws Exception {
-		
+
 		searchService.deleteAll();
-		
-		for (String id : rootIds) {
-			logger.debug("Getting data from colectica API for root id " + id);
-			ResponseItem r = metadataService.getDDIRoot(id);
-			logger.debug("Root contains " + r.getChildren().size() + " groups");
-			for (ResponseItem g : r.getChildren()) {
-				searchService.save("group", g);
-				saveSeries(g.getChildren());
+
+		if (rootIds.size() > 0) {
+			for (String id : rootIds) {
+				logger.debug("Getting data from colectica API for root id " + id);
+				ResponseItem r = metadataService.getDDIRoot(id);
+				logger.debug("Root contains " + r.getChildren().size() + " groups");
+				for (ResponseItem g : r.getChildren()) {
+					searchService.save("group", g);
+					saveSeries(g.getChildren());
+				}
+
+				List<ResponseItem> clsList = metadataService.getDDICodeListSchemeFromGroupRoot(id);
+				logger.debug("Root contains contains " + clsList.size() + " CodeListScheme");
+				for (ResponseItem cls : clsList) {
+					searchService.save("code-list-scheme", cls);
+					saveCodeList(cls.getChildren());
+				}
+
 			}
 		}
+
 		for (String id : ressourcePackageIds) {
-			List<ResponseItem> clsList = metadataService.getDDICodeListScheme(id);
-			logger.debug("RessourcePackage contains " + clsList.size() + " CodeListScheme");
-			for (ResponseItem cls : clsList) {
-				searchService.save("code-list-scheme", cls);
-				saveCodeList(cls.getChildren());
+			if (id != null && !id.equals("")) {
+				logger.debug("Getting data from colectica API for ressource package  id " + id);
+				List<ResponseItem> clsList = metadataService.getDDICodeListSchemeFromResourcePackage(id);
+				logger.debug("RessourcePackage contains " + clsList.size() + " CodeListScheme");
+				for (ResponseItem cls : clsList) {
+					searchService.save("code-list-scheme", cls);
+					saveCodeList(cls.getChildren());
+				}
 			}
 		}
+
 	}
 
 	private void saveCodeList(List<ResponseItem> clsList) throws Exception {
 		for (ResponseItem cls : clsList) {
 			searchService.save("code-list", cls);
 		}
-		
+
 	}
 
 	public void saveSeries(List<ResponseItem> subGroups) throws Exception {

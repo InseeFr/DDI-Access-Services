@@ -168,8 +168,15 @@ public class MetadataServiceFakeImpl implements MetadataService {
 		return null;
 	}
 
+
 	@Override
-	public List<ResponseItem> getDDICodeListScheme(String id) throws Exception {
+	public List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

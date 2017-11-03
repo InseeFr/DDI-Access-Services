@@ -162,7 +162,6 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
 					}
 				}
-
 				for (DDIItem ddiItem : ddiItems) {
 					ResponseSearchItem rsi = new ResponseSearchItem();
 					rsi.setId(ddiItem.getName());
@@ -173,32 +172,18 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 					rsi.setVersion("1");
 					responses.add(rsi);
 				}	
-				
-				
 			}
 
 			if (type.toLowerCase().equals("codelist")) {
 				if (subgroupId != null) {
-					if (operationId != null) {
-						if (criteriaFilter != null) {
-							ddiItems = jdbcTemplate.query(
-									"SELECT * FROM ddi_item WHERE type='code-list' and studyunitid=?  and UPPER(label) like ?",
-									new BeanPropertyRowMapper<DDIItem>(DDIItem.class), operationId, criteriaFilter);
-						} else {
-							ddiItems = jdbcTemplate.query(
-									"SELECT * FROM ddi_item WHERE type='code-list' and studyunitid=?",
-									new BeanPropertyRowMapper<DDIItem>(DDIItem.class), operationId);
-						}
+					if (criteriaFilter != null) {
+						ddiItems = jdbcTemplate.query(
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=?and UPPER(label) like ?",
+								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId, criteriaFilter);
 					} else {
-						if (criteriaFilter != null) {
-							ddiItems = jdbcTemplate.query(
-									"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=?and UPPER(label) like ?",
-									new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId, criteriaFilter);
-						} else {
-							ddiItems = jdbcTemplate.query(
-									"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=?",
-									new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId);
-						}
+						ddiItems = jdbcTemplate.query(
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=?",
+								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId);
 					}
 				} else {
 					if (criteriaFilter != null) {
@@ -214,8 +199,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 					ResponseSearchItem rsi = new ResponseSearchItem();
 					rsi.setId(ddiItem.getId());
 					rsi.setTitle(ddiItem.getLabel());
-					//rsi.setStudyUnitId(getItemById(ddiItem.getStudyUnitId()).getLabel());
-					//rsi.setSubgroupId(getItemById(ddiItem.getSubGroupId()).getLabel());
+					rsi.setSubgroupId(getItemById(ddiItem.getSubGroupId()).getLabel());
 					rsi.setVersion("1");
 					responses.add(rsi);
 				}	

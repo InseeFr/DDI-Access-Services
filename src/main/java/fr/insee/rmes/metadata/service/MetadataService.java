@@ -127,5 +127,7 @@ public interface MetadataService {
 
 	List<String> getRessourcePackageIds();
 
-	List<ResponseItem> getDDICodeListScheme(String id) throws Exception;;
+	List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String id) throws Exception;
+
+	List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception;
 }
