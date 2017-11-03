@@ -124,4 +124,10 @@ public interface MetadataService {
 	 * @throws Exception
 	 */
 	List<Unit> getUnits() throws Exception;
+
+	List<String> getRessourcePackageIds();
+
+	List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String id) throws Exception;
+
+	List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception;
 }

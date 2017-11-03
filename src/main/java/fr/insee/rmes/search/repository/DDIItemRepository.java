@@ -31,4 +31,6 @@ public interface DDIItemRepository {
 
 	List<ResponseSearchItem> getItemsByCriteria(String subgroupId, String operationId, String dataCollectionId,
 			DDIQuery criteria) throws Exception;
+
+	void deleteAll() throws Exception;
 }

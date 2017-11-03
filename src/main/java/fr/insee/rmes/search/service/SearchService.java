@@ -32,4 +32,6 @@ public interface SearchService {
 
 	DataCollectionContext getDataCollectionContext(String id) throws Exception;
 
+	void deleteAll() throws Exception;
+
 }

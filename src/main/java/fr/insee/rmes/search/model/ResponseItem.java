@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class ResponseItem {
 
 	private String id;
+	
+	private String name;
 
 	private String label;
 
@@ -109,4 +111,15 @@ public class ResponseItem {
 	public String toString() {
 		return this.id + "-" + this.label + "-";
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	
+	
 }
