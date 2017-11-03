@@ -32,14 +32,14 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 		String qString = "";
 		String id = item.getId();
 		if (getItemById(id) == null) {
-			qString = "INSERT INTO ddi_item (id, label, parent, groupid, subgroupid, studyunitid, datacollectionid, resourcepackageid, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			qString = "INSERT INTO ddi_item (id, label, parent, groupid, subgroupid, studyunitid, datacollectionid, resourcepackageid, type, name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			jdbcTemplate.update(qString, id, item.getLabel(), item.getParent(), item.getGroupId(), item.getSubGroupId(),
-					item.getStudyUnitId(), item.getDataCollectionId(), item.getResourcePackageId(), type);
+					item.getStudyUnitId(), item.getDataCollectionId(), item.getResourcePackageId(), type, item.getName());
 
 		} else {
-			qString = "UPDATE ddi_item set id=?, label=?, parent=?, groupid=?, subgroupid=?, studyunitid=?, datacollectionid=?, resourcepackageid=?, type=? where id=?";
+			qString = "UPDATE ddi_item set id=?, label=?, parent=?, groupid=?, subgroupid=?, studyunitid=?, datacollectionid=?, resourcepackageid=?, type=?, name=? where id=?";
 			jdbcTemplate.update(qString, id, item.getLabel(), item.getParent(), item.getGroupId(), item.getSubGroupId(),
-					item.getStudyUnitId(), item.getDataCollectionId(), item.getResourcePackageId(), type, id);
+					item.getStudyUnitId(), item.getDataCollectionId(), item.getResourcePackageId(), type, item.getName(), id);
 		}
 		return null;
 	}
@@ -133,11 +133,11 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 						} else {
 							if (criteriaFilter != null) {
 								ddiItems = jdbcTemplate.query(
-										"SELECT * FROM ddi_item WHERE type='instrument' and operationid=? and UPPER(label) like ?",
+										"SELECT * FROM ddi_item WHERE type='instrument' and studyunitid=? and UPPER(label) like ?",
 										new BeanPropertyRowMapper<DDIItem>(DDIItem.class), operationId, criteriaFilter);
 							} else {
 								ddiItems = jdbcTemplate.query(
-										"SELECT * FROM ddi_item WHERE type='instrument' and operationid=?",
+										"SELECT * FROM ddi_item WHERE type='instrument' and studyunitid=?",
 										new BeanPropertyRowMapper<DDIItem>(DDIItem.class), operationId);
 							}
 						}
@@ -165,7 +165,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 
 				for (DDIItem ddiItem : ddiItems) {
 					ResponseSearchItem rsi = new ResponseSearchItem();
-					rsi.setId(ddiItem.getId());
+					rsi.setId(ddiItem.getName());
 					rsi.setTitle(ddiItem.getLabel());
 					rsi.setDataCollectionId(getItemById(ddiItem.getDataCollectionId()).getLabel());
 					rsi.setStudyUnitId(getItemById(ddiItem.getStudyUnitId()).getLabel());
@@ -182,11 +182,11 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 					if (operationId != null) {
 						if (criteriaFilter != null) {
 							ddiItems = jdbcTemplate.query(
-									"SELECT * FROM ddi_item WHERE type='code-list' and operationid=?  and UPPER(label) like ?",
+									"SELECT * FROM ddi_item WHERE type='code-list' and studyunitid=?  and UPPER(label) like ?",
 									new BeanPropertyRowMapper<DDIItem>(DDIItem.class), operationId, criteriaFilter);
 						} else {
 							ddiItems = jdbcTemplate.query(
-									"SELECT * FROM ddi_item WHERE type='code-list' and operationid=?",
+									"SELECT * FROM ddi_item WHERE type='code-list' and studyunitid=?",
 									new BeanPropertyRowMapper<DDIItem>(DDIItem.class), operationId);
 						}
 					} else {
@@ -210,16 +210,17 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
 					}
 				}
+				for (DDIItem ddiItem : ddiItems) {
+					ResponseSearchItem rsi = new ResponseSearchItem();
+					rsi.setId(ddiItem.getId());
+					rsi.setTitle(ddiItem.getLabel());
+					//rsi.setStudyUnitId(getItemById(ddiItem.getStudyUnitId()).getLabel());
+					//rsi.setSubgroupId(getItemById(ddiItem.getSubGroupId()).getLabel());
+					rsi.setVersion("1");
+					responses.add(rsi);
+				}	
 			}
-			for (DDIItem ddiItem : ddiItems) {
-				ResponseSearchItem rsi = new ResponseSearchItem();
-				rsi.setId(ddiItem.getId());
-				rsi.setTitle(ddiItem.getLabel());
-				//rsi.setStudyUnitId(getItemById(ddiItem.getStudyUnitId()).getLabel());
-				//rsi.setSubgroupId(getItemById(ddiItem.getSubGroupId()).getLabel());
-				rsi.setVersion("1");
-				responses.add(rsi);
-			}	
+			
 		}
 
 		

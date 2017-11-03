@@ -112,7 +112,6 @@ public class ApplicationContext {
 	
 	@Bean 
 	public MetaDataRootContext getMetaDataContext(){
-				
 		MetaDataRootContext metaDataContext = new MetaDataRootContext();
 		metaDataContext.setRessourcePackageIds(ressourcePackageIds);
 		metaDataContext.setSubGroupIds(subGroupIds);
