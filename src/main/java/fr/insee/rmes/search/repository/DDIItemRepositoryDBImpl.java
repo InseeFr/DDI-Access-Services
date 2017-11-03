@@ -178,28 +178,49 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 				if (subgroupId != null) {
 					if (criteriaFilter != null) {
 						ddiItems = jdbcTemplate.query(
-								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=?and UPPER(label) like ?",
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=? and UPPER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId, criteriaFilter);
+						
+						ddiItems.addAll(jdbcTemplate.query(
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL and UPPER(label) like ?",
+								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter));
+						
 					} else {
 						ddiItems = jdbcTemplate.query(
 								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId);
+						
+						ddiItems.addAll(jdbcTemplate.query(
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL ",
+								new BeanPropertyRowMapper<DDIItem>(DDIItem.class)));
 					}
 				} else {
 					if (criteriaFilter != null) {
 						ddiItems = jdbcTemplate.query(
-								"SELECT * FROM ddi_item WHERE type='code-list' and UPPER(label) like ?",
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL and UPPER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter);
+						
+						ddiItems.addAll(jdbcTemplate.query(
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NOT NULL and UPPER(label) like ?",
+								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter));
+						
 					} else {
-						ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='code-list'",
+						ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
+						
+						ddiItems.addAll(jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NOT NULL",
+								new BeanPropertyRowMapper<DDIItem>(DDIItem.class)));
 					}
 				}
 				for (DDIItem ddiItem : ddiItems) {
 					ResponseSearchItem rsi = new ResponseSearchItem();
 					rsi.setId(ddiItem.getId());
 					rsi.setTitle(ddiItem.getLabel());
-					rsi.setSubgroupId(getItemById(ddiItem.getSubGroupId()).getLabel());
+					if(ddiItem.getSubGroupId()!=null){
+						rsi.setSubgroupId(getItemById(ddiItem.getSubGroupId()).getLabel());
+					}else{
+						rsi.setSubgroupId("COMMUN");
+					}
 					rsi.setVersion("1");
 					responses.add(rsi);
 				}	

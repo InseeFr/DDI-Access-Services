@@ -65,10 +65,10 @@ public class ApplicationContext {
 	@Value("${fr.insee.ntlm.domain}")
 	private String ntlmDomain;
 	
-	@Value("${fr.insee.rmes.search.root.sub-group.ids}")
+	@Value("#{'${fr.insee.rmes.search.root.sub-group.ids}'.split(',')}")
 	private List<String> subGroupIds;
 	
-	@Value("${fr.insee.rmes.search.root.resource-package.ids}")
+	@Value("#{'${fr.insee.rmes.search.root.resource-package.ids}'.split(',')}")
 	private List<String> ressourcePackageIds;
 
 	@Bean

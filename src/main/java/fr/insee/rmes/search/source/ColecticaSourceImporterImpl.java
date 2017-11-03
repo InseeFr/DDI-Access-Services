@@ -41,10 +41,9 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 	@Override
 	public void source() throws Exception {
 
-		searchService.deleteAll();
-
-		if (rootIds.size() > 0) {
-			for (String id : rootIds) {
+		//searchService.deleteAll();
+		for (String id : rootIds) {
+			if (id != null && !id.equals("")) {
 				logger.debug("Getting data from colectica API for root id " + id);
 				ResponseItem r = metadataService.getDDIRoot(id);
 				logger.debug("Root contains " + r.getChildren().size() + " groups");
@@ -59,7 +58,6 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 					searchService.save("code-list-scheme", cls);
 					saveCodeList(cls.getChildren());
 				}
-
 			}
 		}
 
