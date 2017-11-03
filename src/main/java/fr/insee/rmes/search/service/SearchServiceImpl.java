@@ -64,4 +64,10 @@ public class SearchServiceImpl implements SearchService {
 				criteria);
 	}
 
+	@Override
+	public void deleteAll() throws Exception {
+		ddiItemRepository.deleteAll();
+			
+	}
+
 }

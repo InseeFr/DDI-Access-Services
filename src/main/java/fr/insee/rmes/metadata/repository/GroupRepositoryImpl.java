@@ -1,24 +1,27 @@
 package fr.insee.rmes.metadata.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import fr.insee.rmes.config.MetaDataRootContext;
 
 @Service
 public class GroupRepositoryImpl implements GroupRepository {
 
-	// @Autowired
-	// JdbcTemplate jdbcTemplate;
 
-	// TODO externalize the root ID in a database
+	@Autowired
+	MetaDataRootContext metaDataRootContext;
+
 	@Override
 	public List<String> getRootIds() throws Exception {
-		// return jdbcTemplate.queryForList("SELECT id FROM ddi_group",
-		// String.class);
-		List<String> rootIds = new ArrayList<String>();
-		rootIds.add("5696739a-751c-4603-a0bc-e4c05bd41c83");
-		return rootIds;
+		return metaDataRootContext.getSubGroupIds();
+	}
+
+	@Override
+	public List<String> getRessourcePackageIds() {
+		return metaDataRootContext.getRessourcePackageIds();
 	}
 
 }

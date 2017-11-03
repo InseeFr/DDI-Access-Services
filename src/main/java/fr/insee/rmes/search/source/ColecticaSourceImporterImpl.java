@@ -25,11 +25,13 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 	SearchService searchService;
 
 	List<String> rootIds;
+	List<String> ressourcePackageIds;
 
 	@PostConstruct
 	public void setUp() throws Exception {
 		try {
 			rootIds = metadataService.getGroupIds();
+			ressourcePackageIds = metadataService.getRessourcePackageIds();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
@@ -38,16 +40,33 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 
 	@Override
 	public void source() throws Exception {
+		
+		searchService.deleteAll();
+		
 		for (String id : rootIds) {
 			logger.debug("Getting data from colectica API for root id " + id);
 			ResponseItem r = metadataService.getDDIRoot(id);
 			logger.debug("Root contains " + r.getChildren().size() + " groups");
 			for (ResponseItem g : r.getChildren()) {
-				System.out.println(g);
 				searchService.save("group", g);
 				saveSeries(g.getChildren());
 			}
 		}
+		for (String id : ressourcePackageIds) {
+			List<ResponseItem> clsList = metadataService.getDDICodeListScheme(id);
+			logger.debug("RessourcePackage contains " + clsList.size() + " CodeListScheme");
+			for (ResponseItem cls : clsList) {
+				searchService.save("code-list-scheme", cls);
+				saveCodeList(cls.getChildren());
+			}
+		}
+	}
+
+	private void saveCodeList(List<ResponseItem> clsList) throws Exception {
+		for (ResponseItem cls : clsList) {
+			searchService.save("code-list", cls);
+		}
+		
 	}
 
 	public void saveSeries(List<ResponseItem> subGroups) throws Exception {

@@ -634,4 +634,9 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 		return instruments;
 	}
 
+	@Override
+	public void deleteAll() throws Exception {
+		// Nothing to do
+	}
+
 }

@@ -16,7 +16,7 @@ public class Log4j2ServletContextListener implements ServletContextListener {
         this.listener = new Log4jServletContextListener();
         String env = System.getProperty("fr.insee.rmes.env");
         if(null == env) {
-            env = "dev";
+            env = "dv";
         }
         this.log4j2ConfigFile = String.format("env/%s/log4j2.xml", env);
     }
