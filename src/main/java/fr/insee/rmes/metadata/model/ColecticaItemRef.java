@@ -8,7 +8,7 @@ public class ColecticaItemRef {
 	public String identifier;
 
 	@JsonProperty("Version")
-	public Integer version;
+	public int version;
 
 	@JsonProperty("AgencyId")
 	public String agencyId;
@@ -16,7 +16,7 @@ public class ColecticaItemRef {
 	public ColecticaItemRef() {
 	}
 
-	public ColecticaItemRef(String identifier, Integer version, String agencyId) {
+	public ColecticaItemRef(String identifier, int version, String agencyId) {
 		this.agencyId = agencyId;
 		this.identifier = identifier;
 		this.version = version;
@@ -32,15 +32,19 @@ public class ColecticaItemRef {
 		public String item1;
 
 		@JsonProperty("Item2")
-		public Integer item2;
+		public int item2;
 
 		@JsonProperty("Item3")
 		public String item3;
 
-		public Unformatted(String item1, Integer item2, String item3) {
+		public Unformatted(String item1, int item2, String item3) {
 			this.item1 = item1;
 			this.item2 = item2;
 			this.item3 = item3;
+		}
+
+		public Unformatted() {
+
 		}
 
 		public ColecticaItemRef format() {

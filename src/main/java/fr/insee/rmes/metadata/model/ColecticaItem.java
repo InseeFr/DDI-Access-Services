@@ -36,7 +36,7 @@ public class ColecticaItem {
     public String agencyId;
 
     @JsonProperty("Version")
-    public Integer version;
+    public String version;
 
     @JsonProperty("Identifier")
     public String identifier;
@@ -87,15 +87,17 @@ public class ColecticaItem {
         this.agencyId = agencyId;
     }
 
-    public Integer getVersion() {
-        return version;
-    }
+    
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
+    public String getVersion() {
+		return version;
+	}
 
-    public String getIdentifier() {
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getIdentifier() {
         return identifier;
     }
 
