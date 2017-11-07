@@ -47,6 +47,7 @@ public class MetadataClientImpl implements MetadataClient {
 
 	public ColecticaItem getItem(String id) throws Exception {
 		String url = String.format("%s/api/v1/item/%s/%s?api_key=%s", serviceUrl, agency, id, apiKey);
+		logger.info("GET Item on " + id );
 		return restTemplate.getForObject(url, ColecticaItem.class);
 	}
 
@@ -57,6 +58,7 @@ public class MetadataClientImpl implements MetadataClient {
 		HttpEntity<ColecticaItemRefList> request = new HttpEntity<>(query, headers);
 		ResponseEntity<ColecticaItem[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
 				ColecticaItem[].class);
+		logger.info("GET Items with query : " + query.toString() );
 		return Arrays.asList(response.getBody());
 	}
 
@@ -66,11 +68,13 @@ public class MetadataClientImpl implements MetadataClient {
 		response = restTemplate.exchange(url, HttpMethod.GET, null, ColecticaItemRef.Unformatted[].class);
 		List<ColecticaItemRef> refs = Arrays.asList(response.getBody()).stream()
 				.map(unformatted -> unformatted.format()).collect(Collectors.toList());
+		logger.info("Get ChildrenRef for id : " + id);
 		return new ColecticaItemRefList(refs);
 	}
 
 	public Integer getLastestVersionItem(String id) throws Exception {
 		String url = String.format("%s/api/v1/item/%s/%s/versions/_latest?api_key=%s", serviceUrl, agency, id, apiKey);
+		logger.info("GET LastestVersion for Item " + id );
 		return restTemplate.getForObject(url, Integer.class);
 
 	}

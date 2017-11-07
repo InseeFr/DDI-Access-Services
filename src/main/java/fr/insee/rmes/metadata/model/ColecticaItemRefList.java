@@ -26,5 +26,9 @@ public class ColecticaItemRefList {
     @JsonProperty("Identifiers")
     public List<ColecticaItemRef> identifiers;
 
+    
+    public String toString(){
+    	return "List of "  + identifiers.size() + " ColecticaItemRef" ;
+    }
 
 }

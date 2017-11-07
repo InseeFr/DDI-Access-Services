@@ -113,7 +113,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 		String criteriaFilter = null;
 		if (criteria.getFilter() != null) {
 			criteriaFilter = "%" + criteria.getFilter() + "%";
-			criteriaFilter = criteriaFilter.toUpperCase();
+			criteriaFilter = criteriaFilter.toLowerCase();
 		}
 		for (String type : criteria.getTypes()) {
 			if (type.toLowerCase().equals("instrument")) {
@@ -122,7 +122,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 						if (dataCollectionId != null) {
 							if (criteriaFilter != null) {
 								ddiItems = jdbcTemplate.query(
-										"SELECT * FROM ddi_item WHERE type='instrument' and datacollectionid=? and UPPER(label) like ?",
+										"SELECT * FROM ddi_item WHERE type='instrument' and datacollectionid=? and LOWER(label) like ?",
 										new BeanPropertyRowMapper<DDIItem>(DDIItem.class), dataCollectionId,
 										criteriaFilter);
 							} else {
@@ -133,7 +133,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 						} else {
 							if (criteriaFilter != null) {
 								ddiItems = jdbcTemplate.query(
-										"SELECT * FROM ddi_item WHERE type='instrument' and studyunitid=? and UPPER(label) like ?",
+										"SELECT * FROM ddi_item WHERE type='instrument' and studyunitid=? and LOWER(label) like ?",
 										new BeanPropertyRowMapper<DDIItem>(DDIItem.class), operationId, criteriaFilter);
 							} else {
 								ddiItems = jdbcTemplate.query(
@@ -144,7 +144,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 					} else {
 						if (criteriaFilter != null) {
 							ddiItems = jdbcTemplate.query(
-									"SELECT * FROM ddi_item WHERE type='instrument' and subgroupid=? and UPPER(label) like ?",
+									"SELECT * FROM ddi_item WHERE type='instrument' and subgroupid=? and LOWER(label) like ?",
 									new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId, criteriaFilter);
 						} else {
 							ddiItems = jdbcTemplate.query(
@@ -155,7 +155,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 				} else {
 					if (criteriaFilter != null) {
 						ddiItems = jdbcTemplate.query(
-								"SELECT * FROM ddi_item WHERE type='instrument' and UPPER(label) like ?",
+								"SELECT * FROM ddi_item WHERE type='instrument' and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter);
 					} else {
 						ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='instrument'",
@@ -178,11 +178,11 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 				if (subgroupId != null) {
 					if (criteriaFilter != null) {
 						ddiItems = jdbcTemplate.query(
-								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=? and UPPER(label) like ?",
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=? and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId, criteriaFilter);
 						
 						ddiItems.addAll(jdbcTemplate.query(
-								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL and UPPER(label) like ?",
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter));
 						
 					} else {
@@ -197,11 +197,11 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 				} else {
 					if (criteriaFilter != null) {
 						ddiItems = jdbcTemplate.query(
-								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL and UPPER(label) like ?",
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter);
 						
 						ddiItems.addAll(jdbcTemplate.query(
-								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NOT NULL and UPPER(label) like ?",
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NOT NULL and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter));
 						
 					} else {
