@@ -136,8 +136,8 @@ public class MetadataServiceImpl implements MetadataService {
 				Node child = xpathProcessor.toDocument(fragment);
 				ResponseItem cls = new ResponseItem();
 				cls.setId(id);
-//				cls.setLabel(xpathProcessor.queryText(child,
-//						".//*[local-name()='CodeListScheme']/*[local-name()='Label']/*[local-name()='Title']/*[local-name()='String']/text()"));
+				// cls.setLabel(xpathProcessor.queryText(child,
+				// ".//*[local-name()='CodeListScheme']/*[local-name()='Label']/*[local-name()='Title']/*[local-name()='String']/text()"));
 				cls.setParent(idRP);
 				cls.setResourcePackageId(idRP);
 				cls.setSubGroupId(idSubGroup);
@@ -372,8 +372,7 @@ public class MetadataServiceImpl implements MetadataService {
 				// TODO :Solve the problem.
 				/*
 				 * categories.append(getDDIDocument(categoryIdRes,
-				 * ressourcePackageId).replace(ddiSpecHead, "")
-				 * .replace(ddiSpecFooter, ""));
+				 * ressourcePackageId).replace(ddiSpecHead, "") .replace(ddiSpecFooter, ""));
 				 */
 			}
 			logger.debug(categories);
@@ -501,7 +500,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
-		return metadataRepository.postUpdateItems(refs);
+			return metadataRepository.postUpdateItems(refs);
+		
 	}
 
 	@Override

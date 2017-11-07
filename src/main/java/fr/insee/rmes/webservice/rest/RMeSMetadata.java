@@ -1,7 +1,6 @@
 package fr.insee.rmes.webservice.rest;
 
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore.Entry;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jboss.logging.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
@@ -293,11 +291,12 @@ public class RMeSMetadata {
 	}
 
 	@POST
-	@Path("item/ddi/new")
+	@Path("item/ddi/")
 	@Produces(MediaType.TEXT_HTML)
 	@ApiOperation(value = "add a new Item", notes = "Add a new Item in the Colectica repository reference {id}", response = String.class)
 	public Response postItems(@ApiParam(value = "refs") ColecticaItemPostRefList refs) throws Exception {
 		try {
+			// TODO: add @PUT instead of @POST
 			Map<ColecticaItemPostRef, String> results = metadataService.postNewItems(refs);
 			StreamingOutput stream = output -> {
 				try {

@@ -103,6 +103,15 @@ public class DDIDocumentBuilder {
         String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
         return getDocument(fragment);
     }
+    
+    private Document buildEnvelope(String name) throws Exception {
+    	StringBuilder strBuilder = new StringBuilder();
+    	strBuilder.append("transforms/templates/");
+    	strBuilder.append(name);
+        URL url = Resources.getResource(strBuilder.toString());
+        String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
+        return getDocument(fragment);
+    }
 
     private void walk(Node root, Document document, Map<String, String> references) throws Exception {
         NodeList rootNodes = root.getChildNodes();
