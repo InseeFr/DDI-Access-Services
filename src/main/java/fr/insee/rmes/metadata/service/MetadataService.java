@@ -130,4 +130,6 @@ public interface MetadataService {
 	List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String id) throws Exception;
 
 	List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception;
+
+	String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception;
 }

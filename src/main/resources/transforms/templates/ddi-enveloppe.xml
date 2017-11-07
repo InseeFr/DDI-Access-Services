@@ -10,12 +10,4 @@
              xmlns:l="ddi:logicalproduct:3_2"
              xsi:schemaLocation="ddi:instance:3_2 http://www.ddialliance.org/Specification/DDI-Lifecycle/3.2/XMLSchema/instance.xsd"
              >
-    <r:Agency>fr.insee</r:Agency>
-    <r:ID/>
-    <r:Version/>
-    <r:Citation>
-        <r:Title/>
-    </r:Citation>
-    <r:DataCollection>
-</r:DataCollection>
 </DDIInstance>

@@ -1,24 +1,20 @@
 package fr.insee.rmes.metadata.service;
 
-import fr.insee.rmes.metadata.model.*;
-import fr.insee.rmes.metadata.repository.GroupRepository;
-import fr.insee.rmes.metadata.repository.MetadataRepository;
-import fr.insee.rmes.metadata.utils.XpathProcessor;
-import fr.insee.rmes.search.model.ResourcePackage;
-import fr.insee.rmes.search.model.ResponseItem;
-import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
-import fr.insee.rmes.webservice.rest.RMeSException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.w3c.dom.Node;
+
+import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
+import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.Unit;
+import fr.insee.rmes.search.model.ResourcePackage;
+import fr.insee.rmes.search.model.ResponseItem;
 
 @Service
 public class MetadataServiceFakeImpl implements MetadataService {
@@ -177,6 +173,12 @@ public class MetadataServiceFakeImpl implements MetadataService {
 
 	@Override
 	public List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

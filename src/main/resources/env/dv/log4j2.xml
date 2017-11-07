@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration status="DEBUG">
-    <appenders>
-        <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
+<configuration status="INFO">
+	<appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
 
-        <File name="file" fileName="logs/pogues-dv.log">
-            <PatternLayout pattern="%d{yyyy-mm-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </File>
-    </appenders>
+		<File name="file" fileName="logs/ddi-services-dv.log">
+			<PatternLayout
+				pattern="%d{yyyy-mm-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</File>
+	</appenders>
 
-    <loggers>
-        <root level="debug">
-            <appender-ref ref="console" level="debug"/>
-            <appender-ref ref="file" level="debug"/>
-        </root>
-        <logger name="org.elasticsearch" level="error"/>
-    </loggers>
+	<loggers>
+		<root level="INFO">
+			<appender-ref ref="console" level="INFO" />
+			<appender-ref ref="file" level="INFO" />
+		</root>
+		<logger name="org.elasticsearch" level="INFO" />
+		<logger name="org.apache.commons.httpclient">
+			<level value="fatal" />
+		</logger>
+
+		<logger name="httpclient.wire.header">
+			<level value="fatal" />
+		</logger>
+
+		<logger name="httpclient.wire.content">
+			<level value="fatal" />
+		</logger>
+	</loggers>
 </configuration>

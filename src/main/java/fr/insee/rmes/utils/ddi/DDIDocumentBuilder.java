@@ -27,84 +27,111 @@ import java.util.Map;
 
 public class DDIDocumentBuilder {
 
-    private Node itemNode;
-    private Node resourcePackageNode;
-    private Document packagedDocument;
 
-    public DDIDocumentBuilder() {
-        try {
-            packagedDocument = buildEnvelope();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	// TODO add a new parameter to use different envelope
+	private Boolean envelope;
+	private Node itemNode;
+	private Node resourcePackageNode;
+	private Document packagedDocument;
 
+	public DDIDocumentBuilder() {
+		this.envelope = true;
+		try {
+			packagedDocument = buildEnvelope();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    public DDIDocumentBuilder build() {
-        if (null != itemNode) {
-            packagedDocument.getDocumentElement()
-                    .getElementsByTagName("r:DataCollection")
-                    .item(0)
-                    .appendChild(itemNode);
-        }
-        if (null != resourcePackageNode) {
-            packagedDocument.getDocumentElement()
-                    .appendChild(resourcePackageNode);
-        }
-        return this;
-    }
+	public DDIDocumentBuilder(Boolean enveloppe) {
+		this.envelope = enveloppe;
+		if (enveloppe) {
+			try {
+				packagedDocument = buildEnvelope();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				packagedDocument = buildWithoutEnvelope();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-    public DDIDocumentBuilder buildItemDocument(String rootId, Map<String, String> references) throws Exception {
-        itemNode = buildNode(packagedDocument, rootId, references);
-        return this;
-    }
+	}
 
-    public DDIDocumentBuilder buildResourcePackageDocument(String rootId, Map<String, String> references) throws Exception {
-        resourcePackageNode = buildNode(packagedDocument, rootId, references);
-        return this;
-    }
+	public DDIDocumentBuilder build() {
+		if (envelope) {
+			if (null != itemNode) {
+				packagedDocument.getDocumentElement().appendChild(itemNode);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
+			}
+		} else {
+			if (null != itemNode) {
+				packagedDocument.appendChild(itemNode);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.appendChild(resourcePackageNode);
+			}
+		}
+		return this;
+	}
 
-    public Document getDocument() {
-        return packagedDocument;
-    }
+	public DDIDocumentBuilder buildItemDocument(String rootId, Map<String, String> references) throws Exception {
+		itemNode = buildNode(packagedDocument, rootId, references);
+		return this;
+	}
 
-    public String toString() {
-        StringWriter stringWriter = new StringWriter();
-        try {
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            NodeList nodeList = (NodeList) xPath.evaluate("//text()[normalize-space()='']", packagedDocument,
-                    XPathConstants.NODESET);
+	public DDIDocumentBuilder buildResourcePackageDocument(String rootId, Map<String, String> references)
+			throws Exception {
+		resourcePackageNode = buildNode(packagedDocument, rootId, references);
+		return this;
+	}
 
-            for (int i = 0; i < nodeList.getLength(); ++i) {
-                Node node = nodeList.item(i);
-                node.getParentNode().removeChild(node);
-            }
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            StreamResult streamResult = new StreamResult(stringWriter);
-            transformer.transform(new DOMSource(packagedDocument), streamResult);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return stringWriter.toString();
-    }
+	public Document getDocument() {
+		return packagedDocument;
+	}
 
-    private Node buildNode(Document document, String rootId, Map<String, String> references) throws Exception {
-        Node node = getNode(references.get(rootId), document);
-        walk(node, document, references);
-        return node;
-    }
+	public String toString() {
+		StringWriter stringWriter = new StringWriter();
+		try {
+			XPath xPath = XPathFactory.newInstance().newXPath();
+			NodeList nodeList = (NodeList) xPath.evaluate("//text()[normalize-space()='']", packagedDocument,
+					XPathConstants.NODESET);
 
-    private Document buildEnvelope() throws Exception {
-        URL url = Resources.getResource("transforms/templates/ddi-enveloppe.xml");
-        String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
-        return getDocument(fragment);
-    }
-    
-    private Document buildEnvelope(String name) throws Exception {
+			for (int i = 0; i < nodeList.getLength(); ++i) {
+				Node node = nodeList.item(i);
+				node.getParentNode().removeChild(node);
+			}
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+			StreamResult streamResult = new StreamResult(stringWriter);
+			transformer.transform(new DOMSource(packagedDocument), streamResult);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return stringWriter.toString();
+	}
+
+	private Node buildNode(Document document, String rootId, Map<String, String> references) throws Exception {
+		Node node = getNode(references.get(rootId), document);
+		walk(node, document, references);
+		return node;
+	}
+
+	private Document buildEnvelope() throws Exception {
+		URL url = Resources.getResource("transforms/templates/ddi-enveloppe.xml");
+		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
+		return getDocument(fragment);
+	}
+  
+  private Document buildEnvelope(String name) throws Exception {
     	StringBuilder strBuilder = new StringBuilder();
     	strBuilder.append("transforms/templates/");
     	strBuilder.append(name);
@@ -113,50 +140,54 @@ public class DDIDocumentBuilder {
         return getDocument(fragment);
     }
 
-    private void walk(Node root, Document document, Map<String, String> references) throws Exception {
-        NodeList rootNodes = root.getChildNodes();
-        for (int i = 0; i < rootNodes.getLength(); i++) {
-            Node node = rootNodes.item(i);
-            if (node.getNodeName().contains("Reference")) {
-                String fragment = references.get(getId(node));
-                if (null != fragment) {
-                    Node child = getNode(fragment, document);
-                    root.appendChild(child);
-                    root.removeChild(node);
-                    walk(child, document, references);
-                }
-            }
-        }
-    }
+	private Document buildWithoutEnvelope() throws Exception {
+		return getDocument(null);
 
-    private Node getNode(String fragment, Document doc) throws Exception {
-        Element node = getDocument(fragment).getDocumentElement();
-        Node newNode = node.cloneNode(true);
-        // Transfer ownership of the new node into the destination document
-        doc.adoptNode(newNode);
-        return newNode;
-    }
+	}
 
-    private static String getId(Node refNode) throws Exception {
-        NodeList refChildren = refNode.getChildNodes();
-        for (int i = 0; i < refChildren.getLength(); i++) {
-            if (refChildren.item(i).getNodeName().equals("r:ID")) {
-                System.out.println(refNode.getNodeName() + " -> " + refChildren.item(i).getTextContent());
-                return refChildren.item(i).getTextContent();
-            }
-        }
-        throw new Exception("No reference found in node");
-    }
+	private void walk(Node root, Document document, Map<String, String> references) throws Exception {
+		NodeList rootNodes = root.getChildNodes();
+		for (int i = 0; i < rootNodes.getLength(); i++) {
+			Node node = rootNodes.item(i);
+			if (node.getNodeName().contains("Reference")) {
+				String fragment = references.get(getId(node));
+				if (null != fragment) {
+					Node child = getNode(fragment, document);
+					root.appendChild(child);
+					root.removeChild(node);
+					walk(child, document, references);
+				}
+			}
+		}
+	}
 
-    private Document getDocument(String fragment) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        if (null == fragment || fragment.isEmpty()) {
-            return builder.newDocument();
-        }
-        InputSource ddiSource = new InputSource(new StringReader(fragment));
-        return builder.parse(ddiSource);
-    }
+	private Node getNode(String fragment, Document doc) throws Exception {
+		Element node = getDocument(fragment).getDocumentElement();
+		Node newNode = node.cloneNode(true);
+		// Transfer ownership of the new node into the destination document
+		doc.adoptNode(newNode);
+		return newNode;
+	}
 
+	private static String getId(Node refNode) throws Exception {
+		NodeList refChildren = refNode.getChildNodes();
+		for (int i = 0; i < refChildren.getLength(); i++) {
+			if (refChildren.item(i).getNodeName().equals("r:ID")) {
+				System.out.println(refNode.getNodeName() + " -> " + refChildren.item(i).getTextContent());
+				return refChildren.item(i).getTextContent();
+			}
+		}
+		throw new Exception("No reference found in node");
+	}
+
+	private Document getDocument(String fragment) throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		if (null == fragment || fragment.isEmpty()) {
+			return builder.newDocument();
+		}
+		InputSource ddiSource = new InputSource(new StringReader(fragment));
+		return builder.parse(ddiSource);
+	}
 
 }
