@@ -1,7 +1,9 @@
 package fr.insee.rmes.metadata.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,7 +32,7 @@ public class ColecticaItemPostRefList {
 	private List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
 
 	@JsonProperty("Options")
-	private Object options = new Object();
+	private Map<String, Object> options = new HashMap<String, Object>();
 
 	public List<ColecticaItemPostRef> getItems() {
 		return items;
@@ -40,13 +42,12 @@ public class ColecticaItemPostRefList {
 		this.items = items;
 	}
 
-	public Object getOptions() {
+	public Map<String, Object> getOptions() {
 		return options;
 	}
 
-	public void setOptions(Object options) {
+	public void setOptions(Map<String, Object> options) {
 		this.options = options;
 	}
 
 }
-

@@ -1,8 +1,14 @@
 package fr.insee.rmes.webservice.rest;
 
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -18,11 +24,13 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.ColecticaPostRefDisplayed;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import io.swagger.annotations.Api;
@@ -294,10 +302,26 @@ public class RMeSMetadata {
 	@Path("item/ddi/")
 	@Produces(MediaType.TEXT_HTML)
 	@ApiOperation(value = "add a new Item", notes = "Add a new Item in the Colectica repository reference {id}", response = String.class)
-	public Response postItems(@ApiParam(value = "refs") ColecticaItemPostRefList refs) throws Exception {
+	public Response postItems(@ApiParam(value = "refsDisplayed") ColecticaPostRefDisplayed refsDisplayed)
+			throws Exception {
 		try {
 			// TODO: add @PUT instead of @POST
-			Map<ColecticaItemPostRef, String> results = metadataService.postNewItems(refs);
+			ColecticaItemPostRefList listOfPostItems = new ColecticaItemPostRefList();
+			List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
+			ColecticaItemPostRef colecticaPostItemRef = new ColecticaItemPostRef();
+			colecticaPostItemRef.setItem(refsDisplayed.getItem());
+			// TODO: Create a Map with each UUID as key and the name of the item as value
+			// colecticaPostItemRef.setItemFormat(metadataService.getItemFormatrepository());
+			colecticaPostItemRef.setVersionDate(LocalDateTime.now().toString());
+			/*
+			 * set the DDI version of the item 
+			 * 3.1 : "34F5DC49-BE0C-4919-9FC2-F84BE994FA34"
+			 * 3.2 : "C0CA1BD4-1839-4233-A5B5-906DA0302B89"
+			 */
+			colecticaPostItemRef.setItemFormat(UUID.fromString("C0CA1BD4-1839-4233-A5B5-906DA0302B89"));
+			items.add(colecticaPostItemRef);
+			listOfPostItems.setItems(items);
+			Map<ColecticaItemPostRef, String> results = metadataService.postNewItems(listOfPostItems);
 			StreamingOutput stream = output -> {
 				try {
 					for (ColecticaItemPostRef result : results.keySet()) {
