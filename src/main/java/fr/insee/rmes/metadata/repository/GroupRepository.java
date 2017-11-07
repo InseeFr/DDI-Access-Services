@@ -6,4 +6,6 @@ public interface GroupRepository {
 
 	List<String> getRootIds() throws Exception;
 
+	List<String> getRessourcePackageIds();
+
 }

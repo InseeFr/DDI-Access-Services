@@ -1,7 +1,9 @@
 package fr.insee.rmes.webservice.rest;
 
 import java.nio.charset.StandardCharsets;
+import java.security.KeyStore.Entry;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -16,9 +18,12 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jboss.logging.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
@@ -156,7 +161,7 @@ public class RMeSMetadata {
 
 			StreamingOutput stream = output -> {
 				try {
-						output.write(serie.getBytes(StandardCharsets.UTF_8));
+					output.write(serie.getBytes(StandardCharsets.UTF_8));
 
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
@@ -180,7 +185,7 @@ public class RMeSMetadata {
 
 			StreamingOutput stream = output -> {
 				try {
-						output.write(operation.getBytes(StandardCharsets.UTF_8));
+					output.write(operation.getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -203,7 +208,7 @@ public class RMeSMetadata {
 
 			StreamingOutput stream = output -> {
 				try {
-						output.write(collection.getBytes(StandardCharsets.UTF_8));
+					output.write(collection.getBytes(StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
@@ -226,7 +231,7 @@ public class RMeSMetadata {
 
 			StreamingOutput stream = output -> {
 				try {
-						output.write(sequence.getBytes(StandardCharsets.UTF_8));
+					output.write(sequence.getBytes(StandardCharsets.UTF_8));
 
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
@@ -250,7 +255,7 @@ public class RMeSMetadata {
 
 			StreamingOutput stream = output -> {
 				try {
-						output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
+					output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
 
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
@@ -262,7 +267,7 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
-	
+
 	@GET
 	@Path("question/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
@@ -274,8 +279,67 @@ public class RMeSMetadata {
 
 			StreamingOutput stream = output -> {
 				try {
-						output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
+					output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
 
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@POST
+	@Path("item/ddi/new")
+	@Produces(MediaType.TEXT_HTML)
+	@ApiOperation(value = "add a new Item", notes = "Add a new Item in the Colectica repository reference {id}", response = String.class)
+	public Response postItems(@ApiParam(value = "refs") ColecticaItemPostRefList refs) throws Exception {
+		try {
+			Map<ColecticaItemPostRef, String> results = metadataService.postNewItems(refs);
+			StreamingOutput stream = output -> {
+				try {
+					for (ColecticaItemPostRef result : results.keySet()) {
+						if (!(results.get(result).equals("200"))) {
+							throw new RMeSException(Integer.valueOf(results.get(result)),
+									"An error Occured from the Repository",
+									"The item identifier is : " + result.identifier);
+						}
+
+					}
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (
+
+		Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@POST
+	@Path("item/ddi/update")
+	@Produces(MediaType.TEXT_HTML)
+	@ApiOperation(value = "update an Item", notes = "Update an Item already present in the Colectica repository reference {id}", response = String.class)
+	public Response postItemsUpdate(@ApiParam(value = "refs") ColecticaItemPostRefList refs) throws Exception {
+		try {
+			Map<ColecticaItemPostRef, String> results = metadataService.postUpdateItems(refs);
+
+			StreamingOutput stream = output -> {
+				try {
+					for (ColecticaItemPostRef result : results.keySet()) {
+						if (!(results.get(result).equals("200"))) {
+							throw new RMeSException(Integer.valueOf(results.get(result)),
+									"An error Occured from the Repository",
+									"The item identifier is : " + result.identifier);
+						}
+
+					}
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}

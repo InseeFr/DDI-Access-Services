@@ -5,42 +5,33 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public class DDIItemRepositoryDBImplCondition implements Condition {
 
-import io.swagger.jaxrs.config.BeanConfig;
+	private String ddiItemRepositoryImpl;
 
-/**
- * ² Created by acordier on 24/07/17.
- */
-public class SwaggerConfig extends HttpServlet {
-
-	private final static Logger logger = LogManager.getLogger(SwaggerConfig.class);
-
-	public void init(ServletConfig config) throws ServletException {
+	@Override
+	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		
 		try {
-			super.init(config);
 			Properties props = getEnvironmentProperties();
-			BeanConfig beanConfig = new BeanConfig();
-			beanConfig.setTitle("DDI Access services");
-			beanConfig.setVersion("0.1");
-			beanConfig.setDescription("DDI Access API endpoints");
-			beanConfig.setSchemes(new String[] { "http" });
-			// TODO Externalize the parameter
-			beanConfig.setBasePath("/ddi-access-services/api");
-			beanConfig.setHost(props.getProperty("fr.insee.rmes.api.host"));
-			beanConfig.setResourcePackage("fr.insee.rmes.webservice.rest");
-			beanConfig.setScan(true);
-		} catch (Exception e) {
+			ddiItemRepositoryImpl = props.getProperty("fr.insee.rmes.search.DDIItemRepository.impl");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error(e.getMessage());
 		}
-	}
+		
+		if (ddiItemRepositoryImpl.equals("DDIItemRepositoryDBImpl")) {
+			return true;
+		} else {
+			return false;
+		}
 
+	}
+	
 	private Properties getEnvironmentProperties() throws IOException {
 		Properties props = new Properties();
 		String env = System.getProperty("fr.insee.rmes.env");
@@ -65,5 +56,7 @@ public class SwaggerConfig extends HttpServlet {
 		}
 		return props;
 	}
+	
+	
 
 }

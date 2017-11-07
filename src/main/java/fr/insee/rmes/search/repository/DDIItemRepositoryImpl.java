@@ -128,4 +128,9 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 		// TODO 
 		return null;
 	}
+
+	@Override
+	public void deleteAll() throws Exception {
+		// TODO Auto-generated method stub
+	}
 }

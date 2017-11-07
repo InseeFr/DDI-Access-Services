@@ -72,6 +72,7 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-beans</artifactId>
                 </exclusion>
+                
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-context</artifactId>
@@ -171,6 +172,13 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>2.8.2</version>
+        </dependency>
+         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4-1200-jdbc41</version>
+            <!-- TODO This should be provided by the container -->
+            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
