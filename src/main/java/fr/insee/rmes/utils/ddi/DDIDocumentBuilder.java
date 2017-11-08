@@ -27,7 +27,6 @@ import java.util.Map;
 
 public class DDIDocumentBuilder {
 
-
 	// TODO add a new parameter to use different envelope
 	private Boolean envelope;
 	private Node itemNode;
@@ -43,9 +42,9 @@ public class DDIDocumentBuilder {
 		}
 	}
 
-	public DDIDocumentBuilder(Boolean enveloppe) {
-		this.envelope = enveloppe;
-		if (enveloppe) {
+	public DDIDocumentBuilder(Boolean envelope) {
+		this.envelope = envelope;
+		if (envelope) {
 			try {
 				packagedDocument = buildEnvelope();
 			} catch (Exception e) {
@@ -58,6 +57,23 @@ public class DDIDocumentBuilder {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public DDIDocumentBuilder(Boolean enveloppe, String nameEnvelope) {
+			this.envelope = enveloppe;
+			if (enveloppe && !(nameEnvelope.isEmpty())) {
+				try {
+					packagedDocument = buildEnvelope(nameEnvelope);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					packagedDocument = buildWithoutEnvelope();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
 	}
 
@@ -130,15 +146,15 @@ public class DDIDocumentBuilder {
 		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
 		return getDocument(fragment);
 	}
-  
-  private Document buildEnvelope(String name) throws Exception {
-    	StringBuilder strBuilder = new StringBuilder();
-    	strBuilder.append("transforms/templates/");
-    	strBuilder.append(name);
-        URL url = Resources.getResource(strBuilder.toString());
-        String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
-        return getDocument(fragment);
-    }
+
+	private Document buildEnvelope(String name) throws Exception {
+		StringBuilder strBuilder = new StringBuilder();
+		strBuilder.append("transforms/templates/");
+		strBuilder.append(name);
+		URL url = Resources.getResource(strBuilder.toString());
+		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
+		return getDocument(fragment);
+	}
 
 	private Document buildWithoutEnvelope() throws Exception {
 		return getDocument(null);
