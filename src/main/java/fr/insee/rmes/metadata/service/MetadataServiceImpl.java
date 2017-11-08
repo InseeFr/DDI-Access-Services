@@ -351,6 +351,28 @@ public class MetadataServiceImpl implements MetadataService {
 				.buildItemDocument(itemId, refs).build().toString();
 	}
 	
+	@Override
+	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName)
+			throws Exception {
+		List<ColecticaItem> items = getItems(getChildrenRef(itemId));
+		Map<String, String> refs = items.stream().filter(item -> null != item)
+				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
+					try {
+						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}));
+//		ResourcePackage resourcePackage = getResourcePackage(resourcePackageId);
+//		refs.putAll(resourcePackage.getReferences());
+		return new DDIDocumentBuilder(false,envelopeName)
+				// .buildResourcePackageDocument(resourcePackage.getId(),
+				// resourcePackage.getReferences())
+				.buildItemDocument(itemId, refs).build().toString();
+	}
+	
+	
+	
 	
 	
 	
@@ -371,7 +393,7 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-		
+		String formatRes = "";
 		String fragment = getItem(itemId).item;
 		logger.debug(fragment);
 		StringBuilder res = new StringBuilder();
@@ -392,10 +414,14 @@ public class MetadataServiceImpl implements MetadataService {
 				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
 				logger.warn(categoryIdRes);
 				categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
-
+				
 			}
 			logger.debug(categories);
-			res.append(categories.toString());
+			formatRes = categories.toString().replaceAll("<Category>", "<l:Category>");
+			formatRes = formatRes.replaceAll("</Category>", "</l:Category>");
+			formatRes = formatRes.replaceAll("<Code>", "<l:Code>");
+			formatRes = formatRes.replaceAll("</Code>", "</l:Code>");
+			res.append(formatRes);
 			return res.toString();
 		}
 
@@ -527,5 +553,7 @@ public class MetadataServiceImpl implements MetadataService {
 	public List<String> getRessourcePackageIds() {
 		return groupRepository.getRessourcePackageIds();
 	}
+
+	
 
 }
