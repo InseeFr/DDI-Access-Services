@@ -420,6 +420,8 @@ public class MetadataServiceImpl implements MetadataService {
 			formatRes = formatRes.replaceAll("</Category>", "</l:Category>");
 			formatRes = formatRes.replaceAll("<Code>", "<l:Code>");
 			formatRes = formatRes.replaceAll("</Code>", "</l:Code>");
+			formatRes = formatRes.replaceAll("<CodeList>", "<l:CodeList>");
+			formatRes = formatRes.replaceAll("</CodeList>", "</l:CodeList>");
 			res.append(formatRes);
 
 			return res.toString();

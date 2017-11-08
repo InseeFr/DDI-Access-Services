@@ -183,4 +183,11 @@ public class MetadataServiceFakeImpl implements MetadataService {
 		return null;
 	}
 
+	@Override
+	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
