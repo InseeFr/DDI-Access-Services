@@ -1,6 +1,22 @@
 package fr.insee.rmes.metadata.service;
 
-import fr.insee.rmes.metadata.model.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
+import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
@@ -8,21 +24,6 @@ import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.webservice.rest.RMeSException;
-import io.swagger.models.Xml;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.XMLFormatter;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.persistence.jaxb.xmlmodel.XmlAccessMethods;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
@@ -331,7 +332,6 @@ public class MetadataServiceImpl implements MetadataService {
 				.buildItemDocument(itemId, refs).build().toString();
 	}
 
-	
 	@Override
 	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception {
 		List<ColecticaItem> items = getItems(getChildrenRef(itemId));
@@ -343,17 +343,15 @@ public class MetadataServiceImpl implements MetadataService {
 						throw new RuntimeException(e);
 					}
 				}));
-//		ResourcePackage resourcePackage = getResourcePackage(resourcePackageId);
-//		refs.putAll(resourcePackage.getReferences());
+		// ResourcePackage resourcePackage =
+		// getResourcePackage(resourcePackageId);
+		// refs.putAll(resourcePackage.getReferences());
 		return new DDIDocumentBuilder(false)
 				// .buildResourcePackageDocument(resourcePackage.getId(),
 				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).build().toString();
 	}
-	
-	
-	
-	
+
 	public ResourcePackage getResourcePackage(String id) throws Exception {
 		ResourcePackage resourcePackage = new ResourcePackage(id);
 		List<ColecticaItem> items = getItems(getChildrenRef(id));
@@ -371,30 +369,29 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-		
+
 		String fragment = getItem(itemId).item;
 		logger.debug(fragment);
 		StringBuilder res = new StringBuilder();
 		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
 		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		logger.debug(res);
 		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
 			res = new StringBuilder();
 			res.append(getDDIDocumentWithoutEnvelope(itemId, ressourcePackageId));
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-			logger.warn(children.getLength());
 			String categoryIdRes;
-			for (int i = 0; i < children.getLength(); i++) {
+			for (int i = 1; i < children.getLength()+1; i++) {
 
-				String labelExp = "//*[local-name()='Code']["+i+"]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
+				String labelExp = "//*[local-name()='Code'][" + i
+						+ "]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
 				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
-				logger.warn(categoryIdRes);
-				categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
-
+				if (categoryIdRes != null && !categoryIdRes.equals("")) {
+					categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
+					logger.warn("Add a categorie : " + categoryIdRes);
+				}
 			}
-			logger.debug(categories);
 			res.append(categories.toString());
 			return res.toString();
 		}
@@ -519,8 +516,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
-			return metadataRepository.postUpdateItems(refs);
-		
+		return metadataRepository.postUpdateItems(refs);
+
 	}
 
 	@Override
