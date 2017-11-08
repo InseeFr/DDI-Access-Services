@@ -387,10 +387,12 @@ public class MetadataServiceImpl implements MetadataService {
 			logger.warn(children.getLength());
 			String categoryIdRes;
 			for (int i = 0; i < children.getLength(); i++) {
+
 				String labelExp = "//*[local-name()='Code']["+i+"]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
 				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
 				logger.warn(categoryIdRes);
 				categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
+
 			}
 			logger.debug(categories);
 			res.append(categories.toString());
@@ -517,7 +519,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
-		return metadataRepository.postUpdateItems(refs);
+			return metadataRepository.postUpdateItems(refs);
+		
 	}
 
 	@Override

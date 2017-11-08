@@ -22,6 +22,8 @@ public interface MetadataRepository {
 	Map<ColecticaItemPostRef,String> postNewItem(ColecticaItemPostRef ref) throws Exception;
 	
 	Map<ColecticaItemPostRef,String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception;
+	
+	Integer getLastestVersionItem(String id) throws Exception;
 
 	List<Unit> getUnits() throws Exception;
 }

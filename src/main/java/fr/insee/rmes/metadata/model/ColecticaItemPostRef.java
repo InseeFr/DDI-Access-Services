@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.insee.rmes.metadata.model.ColecticaItemRef.Unformatted;
 
-public class ColecticaItemPostRef {
+public class ColecticaItemPostRef extends ColecticaPostRefDisplayed {
 
 	@JsonProperty("Identifier")
 	public String identifier;
@@ -17,22 +19,19 @@ public class ColecticaItemPostRef {
 	public String version;
 
 	@JsonProperty("AgencyId")
+	@Value("${fr.insee.rmes.api.remote.metadata.agency}")
 	public String agencyId;
 
 	public ColecticaItemPostRef() {
 	}
 
-	public ColecticaItemPostRef(String identifier, String version, String agencyId) {
-		this.agencyId = agencyId;
+	public ColecticaItemPostRef(String identifier, String version) {
 		this.identifier = identifier;
 		this.version = version;
 	}
 
 	@JsonProperty("ItemType")
 	private UUID itemType;
-
-	@JsonProperty("Item")
-	private String item;
 
 	@JsonProperty("Notes")
 	private List<Unformatted> notes = new ArrayList<Unformatted>();

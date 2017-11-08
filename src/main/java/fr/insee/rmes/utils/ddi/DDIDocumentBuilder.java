@@ -27,6 +27,7 @@ import java.util.Map;
 
 public class DDIDocumentBuilder {
 
+
 	// TODO add a new parameter to use different envelope
 	private Boolean envelope;
 	private Node itemNode;
@@ -129,6 +130,15 @@ public class DDIDocumentBuilder {
 		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
 		return getDocument(fragment);
 	}
+  
+  private Document buildEnvelope(String name) throws Exception {
+    	StringBuilder strBuilder = new StringBuilder();
+    	strBuilder.append("transforms/templates/");
+    	strBuilder.append(name);
+        URL url = Resources.getResource(strBuilder.toString());
+        String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
+        return getDocument(fragment);
+    }
 
 	private Document buildWithoutEnvelope() throws Exception {
 		return getDocument(null);
