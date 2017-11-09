@@ -32,10 +32,7 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Autowired
 	MetadataRepository metadataRepository;
-
-	@Autowired
-	MetadataServiceItem metadataServiceItem;
-
+	
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
 
@@ -339,7 +336,7 @@ public class MetadataServiceImpl implements MetadataService {
 	
 	@Override
 	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope) throws Exception {
-		List<ColecticaItem> items = getItems(getChildrenRef(itemId));
+		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
 				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
 					try {

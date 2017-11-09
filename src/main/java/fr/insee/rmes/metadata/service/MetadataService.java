@@ -81,5 +81,7 @@ public interface MetadataService {
 	List<String> getGroupIds() throws Exception;
 	
 	List<String> getRessourcePackageIds() throws Exception;
+
+	String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope) throws Exception;
 	
 }

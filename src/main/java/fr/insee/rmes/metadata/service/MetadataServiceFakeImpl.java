@@ -27,23 +27,7 @@ public class MetadataServiceFakeImpl implements MetadataService {
 		return null;
 	}
 
-	@Override
-	public ColecticaItem getItem(String id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public ColecticaItemRefList getChildrenRef(String id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<ColecticaItem> getItems(ColecticaItemRefList refs) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public List<Unit> getUnits() throws Exception {
@@ -110,53 +94,7 @@ public class MetadataServiceFakeImpl implements MetadataService {
 
 	}
 
-	@Override
-	public String getSerie(String id, String packageId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getOperation(String id, String packageId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getDataCollection(String id, String packageId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getQuestionnaire(String id, String packageId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getSequence(String id, String packageId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getQuestion(String id, String packageId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public List<String> getRessourcePackageIds() {
@@ -165,17 +103,7 @@ public class MetadataServiceFakeImpl implements MetadataService {
 	}
 
 
-	@Override
-	public List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception {
@@ -185,6 +113,31 @@ public class MetadataServiceFakeImpl implements MetadataService {
 
 	@Override
 	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getQuestionnaire(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getSequence(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getQuestion(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope)
 			throws Exception {
 		// TODO Auto-generated method stub
 		return null;

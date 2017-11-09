@@ -163,7 +163,7 @@ public class RMeSMetadata {
 	public Response getSequence(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String sequence = metadataService.getSequence(id, resourcePackageId);
+			String sequence = metadataService.getSequence(id);
 
 			StreamingOutput stream = output -> {
 				try {
