@@ -32,7 +32,7 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Autowired
 	MetadataRepository metadataRepository;
-	
+
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
 
