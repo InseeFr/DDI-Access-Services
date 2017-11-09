@@ -149,4 +149,6 @@ public interface MetadataService {
 	 * @throws Exception
 	 */
 	String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName) throws Exception;
+	
+	String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope) throws Exception;
 }

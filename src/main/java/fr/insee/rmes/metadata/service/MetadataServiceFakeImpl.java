@@ -190,4 +190,11 @@ public class MetadataServiceFakeImpl implements MetadataService {
 		return null;
 	}
 
+	@Override
+	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

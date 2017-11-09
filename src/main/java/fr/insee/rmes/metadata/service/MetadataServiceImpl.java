@@ -351,6 +351,26 @@ public class MetadataServiceImpl implements MetadataService {
 				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).build().toString();
 	}
+	
+	@Override
+	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope) throws Exception {
+		List<ColecticaItem> items = getItems(getChildrenRef(itemId));
+		Map<String, String> refs = items.stream().filter(item -> null != item)
+				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
+					try {
+						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}));
+		// ResourcePackage resourcePackage =
+		// getResourcePackage(resourcePackageId);
+		// refs.putAll(resourcePackage.getReferences());
+		return new DDIDocumentBuilder(true, nameEnvelope)
+				// .buildResourcePackageDocument(resourcePackage.getId(),
+				// resourcePackage.getReferences())
+				.buildItemDocument(itemId, refs).build().toString();
+	}
 
 	
 	@Override
@@ -392,7 +412,7 @@ public class MetadataServiceImpl implements MetadataService {
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
 
 		String formatRes = "";
-
+		String categoryRes = "";
 		String fragment = getItem(itemId).item;
 		logger.debug(fragment);
 		StringBuilder res = new StringBuilder();
@@ -401,26 +421,30 @@ public class MetadataServiceImpl implements MetadataService {
 		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
 			res = new StringBuilder();
-			res.append(getDDIDocumentWithoutEnvelope(itemId, ressourcePackageId));
+			res.append(getDDIItemWithEnvelope(itemId, ressourcePackageId,"ddi-envelope-codeListScheme.xml"));
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
 			String categoryIdRes;
 			for (int i = 1; i < children.getLength()+1; i++) {
-
+				categoryRes="";
+				
 				String labelExp = "//*[local-name()='Code'][" + i
 						+ "]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
 				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
 
 				logger.warn(categoryIdRes);
-				categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
+				categoryRes = getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId, "ddi-envelope-categoryScheme.xml");
+				formatRes = categories.toString().replaceAll("<Category", "<l:Category");
+				formatRes = formatRes.replaceAll("</Category>", "</l:Category>");
+				logger.debug(categoryRes);
+				categories.append(categoryRes);
 				
 			}
 			logger.debug(categories);
-			formatRes = categories.toString().replaceAll("<Category>", "<l:Category>");
-			formatRes = formatRes.replaceAll("</Category>", "</l:Category>");
+			
 			formatRes = formatRes.replaceAll("<Code>", "<l:Code>");
 			formatRes = formatRes.replaceAll("</Code>", "</l:Code>");
-			formatRes = formatRes.replaceAll("<CodeList>", "<l:CodeList>");
+			formatRes = formatRes.replaceAll("<CodeList", "<l:CodeList");
 			formatRes = formatRes.replaceAll("</CodeList>", "</l:CodeList>");
 			res.append(formatRes);
 
