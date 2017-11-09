@@ -70,4 +70,9 @@ public class SearchServiceImpl implements SearchService {
 			
 	}
 
+	@Override
+	public DDIItem getDDIItemById(String id) throws Exception {
+		return ddiItemRepository.getItemById(id);
+	}
+
 }

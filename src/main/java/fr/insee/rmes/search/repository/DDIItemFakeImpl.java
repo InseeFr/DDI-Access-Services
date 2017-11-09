@@ -639,4 +639,11 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 		// Nothing to do
 	}
 
+	@Override
+	public DDIItem getItemById(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }
