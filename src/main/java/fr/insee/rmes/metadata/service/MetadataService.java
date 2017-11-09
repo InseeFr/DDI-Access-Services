@@ -22,78 +22,34 @@ public interface MetadataService {
 	String getCodeList(String id, String packageId) throws Exception;
 
 	/**
-	 * Get a Serie with its id, agency and version
-	 * 
-	 * @param id
-	 *            : id CodeListReference
-	 * @param String
-	 *            packageId : id of sourcePackage
-	 * @return Fragment
-	 * @throws Exception
-	 */
-	String getSerie(String id, String packageId) throws Exception;
-
-	/**
-	 * Get an Operation with its id, agency and version
-	 * 
-	 * @param id
-	 *            : id SubGroupReference
-	 * @param String
-	 *            packageId : id of sourcePackage
-	 * @return Fragment
-	 * @throws Exception
-	 */
-	String getOperation(String id, String packageId) throws Exception;
-
-	/**
-	 * Get a dataCollection with its id, agency and version
-	 * 
-	 * @param id
-	 *            : dataCollectionId
-	 * @param packageId
-	 *            : id of the Colectica Package
-	 * @return Fragment
-	 * @throws Exception
-	 */
-	String getDataCollection(String id, String packageId) throws Exception;
-
-	/**
 	 * Get a questionnaire with its id, agency and version
 	 * 
 	 * @param id
 	 *            : questionnaireId
-	 * @param packageId
-	 *            : id of the Colectica Package
 	 * @return Fragment
 	 * @throws Exception
 	 */
-	String getQuestionnaire(String id, String packageId) throws Exception;
+	String getQuestionnaire(String id) throws Exception;
 
 	/**
 	 * Get a sequence with its id, agency and version
 	 * 
 	 * @param id
 	 *            : sequenceId
-	 * @param packageId
-	 *            : id of the Colectica Package
 	 * @return Fragment
 	 * @throws Exception
 	 */
-	String getSequence(String id, String packageId) throws Exception;
+	String getSequence(String id) throws Exception;
 
 	/**
 	 * Get a question with its id, agency and version
 	 * 
 	 * @param id
-	 *            : id of the Instrument
-	 * @param packageId
-	 *            : id of the Colectica Package
+	 *            : questionId
 	 * @return Fragment
 	 * @throws Exception
 	 */
-	String getQuestion(String id, String packageId) throws Exception;
-
-
+	String getQuestion(String id) throws Exception;
 
 	/**
 	 * Return a List of Units

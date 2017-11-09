@@ -236,7 +236,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 		}
 	}
 
-	private DDIItem getItemById(String id) throws Exception {
+	public DDIItem getItemById(String id) throws Exception {
 		try {
 			List<DDIItem> ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE id=?",
 					new BeanPropertyRowMapper<DDIItem>(DDIItem.class), id);
@@ -256,5 +256,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 		String qString = "DELETE FROM ddi_item";
 		jdbcTemplate.update(qString);
 	}
+
+	
 
 }

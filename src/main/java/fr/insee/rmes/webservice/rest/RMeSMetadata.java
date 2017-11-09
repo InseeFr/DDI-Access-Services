@@ -155,76 +155,7 @@ public class RMeSMetadata {
 		}
 	}
 
-	@GET
-	@Path("serie/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get a Serie", notes = "Gets a DDI document with a serie from Colectica repository reference {id}", response = String.class)
-	public Response getSerie(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
-		try {
-			String serie = metadataService.getSerie(id, resourcePackageId);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(serie.getBytes(StandardCharsets.UTF_8));
-
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("operation/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a operation from Colectica repository reference {id}", response = String.class)
-	public Response getOperation(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
-		try {
-			String operation = metadataService.getOperation(id, resourcePackageId);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(operation.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("datacollection/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a data-collection from Colectica repository reference {id}", response = String.class)
-	public Response getDataCollection(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
-		try {
-			String collection = metadataService.getDataCollection(id, resourcePackageId);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(collection.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
+	
 	@GET
 	@Path("sequence/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
@@ -253,10 +184,9 @@ public class RMeSMetadata {
 	@Path("questionnaire/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
-	public Response getQuestionnaire(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+	public Response getQuestionnaire(@PathParam(value = "id") String id) throws Exception {
 		try {
-			String questionnaire = metadataService.getQuestionnaire(id, resourcePackageId);
+			String questionnaire = metadataService.getQuestionnaire(id);
 
 			StreamingOutput stream = output -> {
 				try {
@@ -277,10 +207,9 @@ public class RMeSMetadata {
 	@Path("question/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a question", notes = "Gets a DDI document with a Question from Colectica repository reference {id}", response = String.class)
-	public Response getQuestion(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+	public Response getQuestion(@PathParam(value = "id") String id) throws Exception {
 		try {
-			String questionnaire = metadataService.getQuestion(id, resourcePackageId);
+			String questionnaire = metadataService.getQuestion(id);
 
 			StreamingOutput stream = output -> {
 				try {
