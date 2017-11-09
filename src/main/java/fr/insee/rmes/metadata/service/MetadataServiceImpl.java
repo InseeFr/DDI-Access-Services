@@ -333,6 +333,26 @@ public class MetadataServiceImpl implements MetadataService {
 				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).build().toString();
 	}
+	
+	@Override
+	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope) throws Exception {
+		List<ColecticaItem> items = getItems(getChildrenRef(itemId));
+		Map<String, String> refs = items.stream().filter(item -> null != item)
+				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
+					try {
+						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}));
+		// ResourcePackage resourcePackage =
+		// getResourcePackage(resourcePackageId);
+		// refs.putAll(resourcePackage.getReferences());
+		return new DDIDocumentBuilder(true, nameEnvelope)
+				// .buildResourcePackageDocument(resourcePackage.getId(),
+				// resourcePackage.getReferences())
+				.buildItemDocument(itemId, refs).build().toString();
+	}
 
 	@Override
 	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName)
@@ -383,7 +403,7 @@ public class MetadataServiceImpl implements MetadataService {
 		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
 			res = new StringBuilder();
-			res.append(getDDIDocumentWithoutEnvelope(itemId, ressourcePackageId));
+			res.append(getDDIItemWithEnvelope(itemId, ressourcePackageId,"ddi-envelope-codeListScheme.xml"));
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
 			String categoryIdRes;
@@ -398,11 +418,10 @@ public class MetadataServiceImpl implements MetadataService {
 
 			}
 			logger.debug(categories);
-			formatRes = categories.toString().replaceAll("<Category>", "<l:Category>");
-			formatRes = formatRes.replaceAll("</Category>", "</l:Category>");
+			
 			formatRes = formatRes.replaceAll("<Code>", "<l:Code>");
 			formatRes = formatRes.replaceAll("</Code>", "</l:Code>");
-			formatRes = formatRes.replaceAll("<CodeList>", "<l:CodeList>");
+			formatRes = formatRes.replaceAll("<CodeList", "<l:CodeList");
 			formatRes = formatRes.replaceAll("</CodeList>", "</l:CodeList>");
 			res.append(formatRes);
 
