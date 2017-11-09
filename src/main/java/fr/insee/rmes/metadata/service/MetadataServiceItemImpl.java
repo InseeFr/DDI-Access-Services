@@ -13,25 +13,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.Unit;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
+import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
+import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
-import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
-import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
-public class MetadataServiceImpl implements MetadataService {
+public class MetadataServiceItemImpl implements MetadataServiceItem {
 
-	private final static Logger logger = LogManager.getLogger(MetadataServiceImpl.class);
+	private final static Logger logger = LogManager.getLogger(MetadataServiceItemImpl.class);
 
 	@Autowired
 	MetadataRepository metadataRepository;
-	
-	@Autowired
-	MetadataServiceItem metadataServiceItem;
 
 	@Autowired
 	GroupRepository groupRepository;
@@ -40,15 +37,27 @@ public class MetadataServiceImpl implements MetadataService {
 	XpathProcessor xpathProcessor;
 
 	@Override
-	public List<Unit> getUnits() throws Exception {
-		// getCodeList("a72e6e56-12a1-49b7-96c4-c724da3da5da",
-		// "c265b595-ced2-4526-88dc-151471de885d");
-		return metadataRepository.getUnits();
+	public ColecticaItem getItem(String id) throws Exception {
+		if (id != null && !id.equals("")) {
+			return metadataRepository.findById(id);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public ColecticaItemRefList getChildrenRef(String id) throws Exception {
+		return metadataRepository.getChildrenRef(id);
+	}
+
+	@Override
+	public List<ColecticaItem> getItems(ColecticaItemRefList refs) throws Exception {
+		return metadataRepository.getItems(refs);
 	}
 
 	public ResponseItem getDDIRoot(String id) throws Exception {
 		ResponseItem ddiRoot = new ResponseItem();
-		String fragment = metadataServiceItem.getItem(id).item;
+		String fragment = getItem(id).item;
 		String rootExp = "//*[local-name()='DDIInstance']";
 		String labelExp = "//*[local-name()='Citation']/*[local-name()='Title']/*[local-name()='String']/text()";
 		Node rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
@@ -61,7 +70,7 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	public List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String idRP) throws Exception {
-		String fragment = metadataServiceItem.getItem(idRP).item;
+		String fragment = getItem(idRP).item;
 		String rootExp = "//*[local-name()='Fragment']";
 		Node rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		List<ResponseItem> clsList = new ArrayList<>();
@@ -69,7 +78,7 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(rootNode, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			fragment = metadataServiceItem.getItem(id).item;
+			fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem cls = new ResponseItem();
 			cls.setId(id);
@@ -87,13 +96,13 @@ public class MetadataServiceImpl implements MetadataService {
 	public List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String idGroupRoot) throws Exception {
 		List<ResponseItem> clsList = new ArrayList<>();
 		logger.debug("GroupRoot id : " + idGroupRoot);
-		String fragment = metadataServiceItem.getItem(idGroupRoot).item;
+		String fragment = getItem(idGroupRoot).item;
 		String rootExp = "//*[local-name()='Fragment']";
 		Node rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		String childGroupExp = ".//*[local-name()='GroupReference']/*[local-name()='ID']/text()";
 		String idGroup = xpathProcessor.queryString(rootNode, childGroupExp);
 		logger.debug("Group id : " + idGroup);
-		fragment = metadataServiceItem.getItem(idGroup).item;
+		fragment = getItem(idGroup).item;
 		Node groupNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		String childSubGroupExp = ".//*[local-name()='SubGroupReference']/*[local-name()='ID']/text()";
 		String idSubGroup = xpathProcessor.queryString(groupNode, childSubGroupExp);
@@ -102,19 +111,17 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(rootNode, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String idRP = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			fragment = metadataServiceItem.getItem(idRP).item;
+			fragment = getItem(idRP).item;
 			rootExp = "//*[local-name()='Fragment']";
 			rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 			childExp = ".//*[local-name()='CodeListSchemeReference']";
 			children = xpathProcessor.queryList(rootNode, childExp);
 			for (int j = 0; j < children.getLength(); j++) {
 				String id = xpathProcessor.queryString(children.item(j), ".//*[local-name()='ID']/text()");
-				fragment = metadataServiceItem.getItem(id).item;
+				fragment = getItem(id).item;
 				Node child = xpathProcessor.toDocument(fragment);
 				ResponseItem cls = new ResponseItem();
 				cls.setId(id);
-				// cls.setLabel(xpathProcessor.queryText(child,
-				// ".//*[local-name()='CodeListScheme']/*[local-name()='Label']/*[local-name()='Title']/*[local-name()='String']/text()"));
 				cls.setParent(idRP);
 				cls.setResourcePackageId(idRP);
 				cls.setSubGroupId(idSubGroup);
@@ -133,7 +140,7 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			String fragment = metadataServiceItem.getItem(id).item;
+			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem cl = new ResponseItem();
 			cl.setId(id);
@@ -158,7 +165,7 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			String fragment = metadataServiceItem.getItem(id).item;
+			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem group = new ResponseItem();
 			group.setId(id);
@@ -179,7 +186,7 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			String fragment = metadataServiceItem.getItem(id).item;
+			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem subGroup = new ResponseItem();
 			subGroup.setGroupId(group.getId());
@@ -201,7 +208,7 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			String fragment = metadataServiceItem.getItem(id).item;
+			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem studyUnit = new ResponseItem();
 			studyUnit.setGroupId(subGroup.getGroupId());
@@ -224,7 +231,7 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			String fragment = metadataServiceItem.getItem(id).item;
+			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem dataCollection = new ResponseItem();
 			dataCollection.setId(id);
@@ -248,7 +255,7 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			String fragment = metadataServiceItem.getItem(id).item;
+			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem instrumentScheme = new ResponseItem();
 			instrumentScheme.setId(id);
@@ -270,7 +277,7 @@ public class MetadataServiceImpl implements MetadataService {
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
 			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
-			String fragment = metadataServiceItem.getItem(id).item;
+			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem instrument = new ResponseItem();
 			instrument.setId(id);
@@ -290,244 +297,14 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	@Override
-	public String getDDIDocument(String itemId, String resourcePackageId) throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		ResourcePackage resourcePackage = getResourcePackage(resourcePackageId);
-		refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder()
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(itemId, refs).build().toString();
+	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
+		return metadataRepository.postNewItems(refs);
 	}
 
 	@Override
-	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(itemId, refs).build().toString();
-	}
-
-	
-	@Override
-	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName)
-			throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-//		ResourcePackage resourcePackage = getResourcePackage(resourcePackageId);
-//		refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false,envelopeName)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(itemId, refs).build().toString();
-	}
-
-	public ResourcePackage getResourcePackage(String id) throws Exception {
-		ResourcePackage resourcePackage = new ResourcePackage(id);
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(id));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		resourcePackage.setReferences(refs);
-		return resourcePackage;
-	}
-
-	@Override
-	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-
-		String formatRes = "";
-
-		String fragment = metadataServiceItem.getItem(itemId).item;
-		logger.debug(fragment);
-		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
-		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		StringBuilder categories = new StringBuilder();
-		if (!(res.length() == 0)) {
-			res = new StringBuilder();
-			res.append(getDDIDocumentWithoutEnvelope(itemId, ressourcePackageId));
-			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
-			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-			String categoryIdRes;
-			for (int i = 1; i < children.getLength()+1; i++) {
-
-				String labelExp = "//*[local-name()='Code'][" + i
-						+ "]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
-				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
-
-				logger.warn(categoryIdRes);
-				categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
-				
-			}
-			logger.debug(categories);
-			formatRes = categories.toString().replaceAll("<Category>", "<l:Category>");
-			formatRes = formatRes.replaceAll("</Category>", "</l:Category>");
-			formatRes = formatRes.replaceAll("<Code>", "<l:Code>");
-			formatRes = formatRes.replaceAll("</Code>", "</l:Code>");
-			formatRes = formatRes.replaceAll("<CodeList>", "<l:CodeList>");
-			formatRes = formatRes.replaceAll("</CodeList>", "</l:CodeList>");
-			res.append(formatRes);
-
-			return res.toString();
-		}
-
-		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
+	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
+		return metadataRepository.postUpdateItems(refs);
 
 	}
-
-	@Override
-	public String getSerie(String id, String packageId) throws Exception {
-		String fragment = metadataServiceItem.getItem(id).item;
-		logger.debug(fragment);
-		String res = "";
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='SubGroup']";
-		res = xpathProcessor.queryText(fragment, fragmentExp);
-		logger.debug(res);
-		if (res != "") {
-
-			res = getDDIDocument(id, packageId);
-
-			return res;
-		}
-
-		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
-
-	}
-
-	@Override
-	public String getOperation(String id, String packageId) throws Exception {
-		String fragment = metadataServiceItem.getItem(id).item;
-		logger.debug(fragment);
-		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='StudyUnit']/*[local-name()='Agency']/text()";
-		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		logger.debug(res);
-		if (res.length() > 0) {
-			res = new StringBuilder();
-			res.append(getDDIDocument(id, packageId));
-
-			return res.toString();
-		}
-
-		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
-	}
-
-	@Override
-	public String getDataCollection(String id, String packageId) throws Exception {
-		String fragment = metadataServiceItem.getItem(id).item;
-		logger.debug(fragment);
-		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='DataCollection']/*[local-name()='Agency']/text()";
-		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		logger.debug(res);
-		if (res.length() > 0) {
-			res = new StringBuilder();
-			res.append(getDDIDocument(id, packageId));
-
-			return res.toString();
-		}
-
-		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
-	}
-
-	@Override
-	public String getQuestionnaire(String id, String packageId) throws Exception {
-		String fragment = metadataServiceItem.getItem(id).item;
-		logger.debug(fragment);
-		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='Instrument']/*[local-name()='Agency']/text()";
-		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		logger.debug(res);
-		if (res.length() > 0) {
-			res = new StringBuilder();
-			res.append(getDDIDocument(id, packageId));
-
-			return res.toString();
-		}
-
-		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
-	}
-
-	@Override
-	public String getSequence(String id, String packageId) throws Exception {
-		String fragment = metadataServiceItem.getItem(id).item;
-		logger.debug(fragment);
-		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='Sequence']/*[local-name()='Agency']/text()";
-		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		logger.debug(res);
-		if (res.length() > 0) {
-			res = new StringBuilder();
-			res.append(getDDIDocument(id, packageId));
-
-			return res.toString();
-		}
-
-		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
-	}
-
-	@Override
-	public String getQuestion(String id, String packageId) throws Exception {
-		String fragment = metadataServiceItem.getItem(id).item;
-		logger.debug(fragment);
-		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='QuestionItem']/*[local-name()='Agency']/text()";
-		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		logger.debug(res);
-		if (res.length() > 0) {
-			res = new StringBuilder();
-			res.append(getDDIDocument(id, packageId));
-
-			return res.toString();
-		}
-
-		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
-	}
-
-	@Override
-	public List<String> getGroupIds() throws Exception {
-		return groupRepository.getRootIds();
-	}
-
-	@Override
-	public List<String> getRessourcePackageIds() throws Exception {
-		return groupRepository.getRessourcePackageIds();
-	}
-
-	
-
-	
 
 }

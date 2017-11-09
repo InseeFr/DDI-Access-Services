@@ -1,14 +1,10 @@
 package fr.insee.rmes.webservice.rest;
 
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -24,7 +20,6 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
@@ -33,6 +28,7 @@ import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.ColecticaPostRefDisplayed;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
+import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -50,6 +46,9 @@ public class RMeSMetadata {
 
 	@Autowired
 	MetadataService metadataService;
+	
+	@Autowired
+	MetadataServiceItem metadataServiceItem;
 
 	@GET
 	@Path("item/{id}")
@@ -57,7 +56,7 @@ public class RMeSMetadata {
 	@ApiOperation(value = "Gets the item with id {id}", notes = "Get an item from Colectica Repository, given it's {id}", response = ColecticaItem.class)
 	public Response getItem(@PathParam(value = "id") String id) throws Exception {
 		try {
-			ColecticaItem item = metadataService.getItem(id);
+			ColecticaItem item = metadataServiceItem.getItem(id);
 			return Response.ok().entity(item).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -73,7 +72,7 @@ public class RMeSMetadata {
 			+ "(see /items doc model)", response = ColecticaItemRefList.class)
 	public Response getChildrenRef(@PathParam(value = "id") String id) throws Exception {
 		try {
-			ColecticaItemRefList refs = metadataService.getChildrenRef(id);
+			ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(id);
 			return Response.ok().entity(refs).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -104,7 +103,7 @@ public class RMeSMetadata {
 			@ApiParam(value = "Item references query object", required = true) ColecticaItemRefList query)
 			throws Exception {
 		try {
-			List<ColecticaItem> children = metadataService.getItems(query);
+			List<ColecticaItem> children = metadataServiceItem.getItems(query);
 			return Response.ok().entity(children).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -321,7 +320,7 @@ public class RMeSMetadata {
 			colecticaPostItemRef.setItemFormat("C0CA1BD4-1839-4233-A5B5-906DA0302B89");
 			items.add(colecticaPostItemRef);
 			listOfPostItems.setItems(items);
-			Map<ColecticaItemPostRef, String> results = metadataService.postNewItems(listOfPostItems);
+			Map<ColecticaItemPostRef, String> results = metadataServiceItem.postNewItems(listOfPostItems);
 			StreamingOutput stream = output -> {
 				try {
 					for (ColecticaItemPostRef result : results.keySet()) {
@@ -351,7 +350,7 @@ public class RMeSMetadata {
 	@ApiOperation(value = "update an Item", notes = "Update an Item already present in the Colectica repository reference {id}", response = String.class)
 	public Response postItemsUpdate(@ApiParam(value = "refs") ColecticaItemPostRefList refs) throws Exception {
 		try {
-			Map<ColecticaItemPostRef, String> results = metadataService.postUpdateItems(refs);
+			Map<ColecticaItemPostRef, String> results = metadataServiceItem.postUpdateItems(refs);
 
 			StreamingOutput stream = output -> {
 				try {
