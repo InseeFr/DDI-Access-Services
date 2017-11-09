@@ -1,33 +1,13 @@
 package fr.insee.rmes.metadata.service;
 
 import java.util.List;
-import java.util.Map;
 
-import org.w3c.dom.Node;
-
-import fr.insee.rmes.metadata.model.Code;
-import fr.insee.rmes.metadata.model.CodeList;
-import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
-import fr.insee.rmes.metadata.model.ColecticaItemRef;
-import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
-import fr.insee.rmes.search.model.ResponseItem;
 
 public interface MetadataService {
 
-	ColecticaItem getItem(String id) throws Exception;
-
-	ColecticaItemRefList getChildrenRef(String id) throws Exception;
-
-	List<ColecticaItem> getItems(ColecticaItemRefList refs) throws Exception;
-
-	List<String> getGroupIds() throws Exception;
 
 	String getDDIDocument(String itemId, String groupId) throws Exception;
-
-	ResponseItem getDDIRoot(String id) throws Exception;
 
 	/**
 	 * Get a List of codes with their id, agency and versions
@@ -113,9 +93,7 @@ public interface MetadataService {
 	 */
 	String getQuestion(String id, String packageId) throws Exception;
 
-	Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception;
 
-	Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception;
 
 	/**
 	 * Return a List of Units
@@ -124,12 +102,6 @@ public interface MetadataService {
 	 * @throws Exception
 	 */
 	List<Unit> getUnits() throws Exception;
-
-	List<String> getRessourcePackageIds();
-
-	List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String id) throws Exception;
-
-	List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception;
 	
 	/**
 	 * Get a DDI document for a specific item without the default DDI envelope.

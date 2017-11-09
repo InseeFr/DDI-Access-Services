@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.insee.rmes.metadata.service.MetadataService;
+import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.service.SearchService;
 
@@ -21,6 +22,9 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 	@Autowired
 	MetadataService metadataService;
 
+	@Autowired
+	MetadataServiceItem metadataServiceItem;
+	
 	@Autowired
 	SearchService searchService;
 
@@ -45,14 +49,14 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 		for (String id : rootIds) {
 			if (id != null && !id.equals("")) {
 				logger.debug("Getting data from colectica API for root id " + id);
-				ResponseItem r = metadataService.getDDIRoot(id);
+				ResponseItem r = metadataServiceItem.getDDIRoot(id);
 				logger.debug("Root contains " + r.getChildren().size() + " groups");
 				for (ResponseItem g : r.getChildren()) {
 					searchService.save("group", g);
 					saveSeries(g.getChildren());
 				}
 
-				List<ResponseItem> clsList = metadataService.getDDICodeListSchemeFromGroupRoot(id);
+				List<ResponseItem> clsList = metadataServiceItem.getDDICodeListSchemeFromGroupRoot(id);
 				logger.debug("Root contains contains " + clsList.size() + " CodeListScheme");
 				for (ResponseItem cls : clsList) {
 					searchService.save("code-list-scheme", cls);
@@ -64,7 +68,7 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 		for (String id : ressourcePackageIds) {
 			if (id != null && !id.equals("")) {
 				logger.debug("Getting data from colectica API for ressource package  id " + id);
-				List<ResponseItem> clsList = metadataService.getDDICodeListSchemeFromResourcePackage(id);
+				List<ResponseItem> clsList = metadataServiceItem.getDDICodeListSchemeFromResourcePackage(id);
 				logger.debug("RessourcePackage contains " + clsList.size() + " CodeListScheme");
 				for (ResponseItem cls : clsList) {
 					searchService.save("code-list-scheme", cls);
