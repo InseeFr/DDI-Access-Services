@@ -23,5 +23,7 @@
 			<r:Label>
 				<r:Content xml:lang="fr-FR">CS</r:Content>
 			</r:Label>
+			<contentCategory></contentCategory>
 		</l:CategoryScheme>
+	</g:ResourcePackage>
 </DDIInstance>

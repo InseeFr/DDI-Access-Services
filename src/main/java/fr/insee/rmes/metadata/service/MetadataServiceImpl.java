@@ -23,6 +23,7 @@ import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
+import fr.insee.rmes.utils.ddi.Envelope;
 import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
@@ -32,7 +33,7 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Autowired
 	MetadataRepository metadataRepository;
-	
+
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
 
@@ -333,9 +334,10 @@ public class MetadataServiceImpl implements MetadataService {
 				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).build().toString();
 	}
-	
+
 	@Override
-	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope) throws Exception {
+	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, String nameEnvelope)
+			throws Exception {
 		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
 				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
@@ -403,7 +405,7 @@ public class MetadataServiceImpl implements MetadataService {
 		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
 			res = new StringBuilder();
-			res.append(getDDIItemWithEnvelope(itemId, ressourcePackageId,"ddi-envelope-codeListScheme.xml"));
+			res.append(getDDIItemWithEnvelope(itemId, ressourcePackageId, Envelope.CODE_LIST_SCHEME.toString()));
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
 			String categoryIdRes;
@@ -414,11 +416,12 @@ public class MetadataServiceImpl implements MetadataService {
 				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
 
 				logger.warn(categoryIdRes);
-				categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
+				categories.append(
+						getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId, Envelope.CATEGORY_SCHEME.toString()));
 
 			}
 			logger.debug(categories);
-			
+
 			formatRes = formatRes.replaceAll("<Code>", "<l:Code>");
 			formatRes = formatRes.replaceAll("</Code>", "</l:Code>");
 			formatRes = formatRes.replaceAll("<CodeList", "<l:CodeList");
