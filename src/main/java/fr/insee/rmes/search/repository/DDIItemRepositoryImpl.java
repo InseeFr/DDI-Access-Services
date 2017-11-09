@@ -133,4 +133,10 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 	public void deleteAll() throws Exception {
 		// TODO Auto-generated method stub
 	}
+
+	@Override
+	public DDIItem getItemById(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

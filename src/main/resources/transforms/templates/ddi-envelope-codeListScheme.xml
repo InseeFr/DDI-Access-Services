@@ -1,0 +1,29 @@
+<DDIInstance xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="ddi:instance:3_2 ../../DDI%203.2/DDI%203.2%20PR%202/XMLSchema/instance.xsd"
+	xmlns="ddi:instance:3_2" xmlns:r="ddi:reusable:3_2" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:l="ddi:logicalproduct:3_2"
+	isMaintainable="true" xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<r:Agency>fr.insee</r:Agency>
+	<r:ID>DDIInstance</r:ID>
+	<r:Version>1</r:Version>
+	<r:Citation>
+		<r:Title>
+			<r:String>DDIInstance</r:String>
+		</r:Title>
+	</r:Citation>
+	<g:ResourcePackage isMaintainable="true" versionDate="2017-01-02">
+		<r:Agency>fr.insee</r:Agency>
+		<r:ID>RP</r:ID>
+		<r:Version>1</r:Version>
+		<l:CodeListScheme>
+             <r:Agency>fr.insee</r:Agency>
+            <r:ID>CLS</r:ID>
+            <r:Version>1</r:Version>
+            <r:Label>
+                <r:Content xml:lang="en-IE">Codelists</r:Content>
+            </r:Label>
+		</l:CodeListScheme>
+	</g:ResourcePackage>
+</DDIInstance>
+     

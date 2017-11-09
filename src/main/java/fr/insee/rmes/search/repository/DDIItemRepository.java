@@ -33,4 +33,7 @@ public interface DDIItemRepository {
 			DDIQuery criteria) throws Exception;
 
 	void deleteAll() throws Exception;
+
+	DDIItem getItemById(String id) throws Exception;
+
 }
