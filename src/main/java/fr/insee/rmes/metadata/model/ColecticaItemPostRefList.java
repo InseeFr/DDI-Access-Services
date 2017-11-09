@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.json.simple.JSONObject;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ColecticaItemPostRefList {
@@ -32,7 +34,7 @@ public class ColecticaItemPostRefList {
 	private List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
 
 	@JsonProperty("Options")
-	private Map<String, Object> options = new HashMap<String, Object>();
+	private JSONObject options = new JSONObject();
 
 	public List<ColecticaItemPostRef> getItems() {
 		return items;
@@ -42,12 +44,17 @@ public class ColecticaItemPostRefList {
 		this.items = items;
 	}
 
-	public Map<String, Object> getOptions() {
+	public JSONObject getOptions() {
 		return options;
 	}
 
-	public void setOptions(Map<String, Object> options) {
+	public void setOptions(JSONObject options) {
 		this.options = options;
+	}
+
+	@Override
+	public String toString() {
+		return "ColecticaItemPostRefList [items=" + items + ", options=" + options + "]";
 	}
 
 }

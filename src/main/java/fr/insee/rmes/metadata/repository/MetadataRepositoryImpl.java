@@ -61,7 +61,7 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 
 			colecticaItemPostRef.version = "0";
 			colecticaItemPostRef.agencyId = agencyId;
-			colecticaItemPostRef.setItemType(UUID.fromString("7E47C269-BCAB-40F7-A778-AF7BBC4E3D00"));
+			colecticaItemPostRef.setItemType("7E47C269-BCAB-40F7-A778-AF7BBC4E3D00");
 			colecticaItemPostRef.setVersionResponsibility("Test");
 
 		}

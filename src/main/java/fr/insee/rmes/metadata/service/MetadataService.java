@@ -130,6 +130,23 @@ public interface MetadataService {
 	List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String id) throws Exception;
 
 	List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception;
-
+	
+	/**
+	 * Get a DDI document for a specific item without the default DDI envelope.
+	 * @param itemId : identifier of the item
+	 * @param resourcePackageId : identifier of the DDI package (useless currently but required)
+	 * @return String DDI item
+	 * @throws Exception
+	 */
 	String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception;
+	
+	/**
+	 *  Get a DDI document for a specific item without a specific DDI envelope (envelopeName).
+	 * @param itemId : identifier of the item
+	 * @param resourcePackageId : identifier of the DDI package (useless currently but required)
+	 * @param envelopeName : name of the target envelope
+	 * @return String DDI item
+	 * @throws Exception
+	 */
+	String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName) throws Exception;
 }
