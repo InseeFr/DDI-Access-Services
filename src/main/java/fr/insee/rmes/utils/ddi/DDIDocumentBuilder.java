@@ -29,6 +29,7 @@ public class DDIDocumentBuilder {
 
 	// TODO add a new parameter to use different envelope
 	private Boolean envelope;
+	private String nameEnvelope = "";
 	private Node itemNode;
 	private Node resourcePackageNode;
 	private Document packagedDocument;
@@ -42,10 +43,12 @@ public class DDIDocumentBuilder {
 		}
 	}
 
-	public DDIDocumentBuilder(Boolean envelope) {
+	public DDIDocumentBuilder(Boolean envelope,Enum<Envelope> envelopeName) {
+		this.nameEnvelope = envelopeName.toString();
 		this.envelope = envelope;
 		if (envelope) {
 			try {
+				
 				packagedDocument = buildEnvelope();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -57,24 +60,6 @@ public class DDIDocumentBuilder {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public DDIDocumentBuilder(Boolean enveloppe, String nameEnvelope) {
-			this.envelope = enveloppe;
-			if (enveloppe && !(nameEnvelope.isEmpty())) {
-				try {
-					packagedDocument = buildEnvelope(nameEnvelope);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				try {
-					packagedDocument = buildWithoutEnvelope();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
 	}
 
 	public DDIDocumentBuilder build() {
@@ -142,15 +127,9 @@ public class DDIDocumentBuilder {
 	}
 
 	private Document buildEnvelope() throws Exception {
-		URL url = Resources.getResource("transforms/templates/ddi-enveloppe.xml");
-		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
-		return getDocument(fragment);
-	}
-
-	private Document buildEnvelope(String name) throws Exception {
 		StringBuilder strBuilder = new StringBuilder();
 		strBuilder.append("transforms/templates/");
-		strBuilder.append(name);
+		strBuilder.append(this.nameEnvelope);
 		URL url = Resources.getResource(strBuilder.toString());
 		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
 		return getDocument(fragment);
