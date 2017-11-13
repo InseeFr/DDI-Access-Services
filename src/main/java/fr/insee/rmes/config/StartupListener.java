@@ -17,7 +17,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
     @Override
     public void onApplicationEvent(final ContextRefreshedEvent event) {
         Properties p = System.getProperties();
-        Enumeration keys = p.keys();
+        Enumeration<Object> keys = p.keys();
         logger.debug("Getting application environment");
         while (keys.hasMoreElements()) {
             String key = (String)keys.nextElement();

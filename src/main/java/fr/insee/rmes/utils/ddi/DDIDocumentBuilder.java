@@ -27,7 +27,6 @@ import java.util.Map;
 
 public class DDIDocumentBuilder {
 
-	// TODO add a new parameter to use different envelope
 	private Boolean envelope;
 	private String nameEnvelope = "";
 	private Node itemNode;
@@ -43,12 +42,12 @@ public class DDIDocumentBuilder {
 		}
 	}
 
-	public DDIDocumentBuilder(Boolean envelope,Enum<Envelope> envelopeName) {
+	public DDIDocumentBuilder(Boolean envelope, Enum<Envelope> envelopeName) {
 		this.nameEnvelope = envelopeName.toString();
 		this.envelope = envelope;
 		if (envelope) {
 			try {
-				
+
 				packagedDocument = buildEnvelope();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -65,7 +64,9 @@ public class DDIDocumentBuilder {
 	public DDIDocumentBuilder build() {
 		if (envelope) {
 			if (null != itemNode) {
-				packagedDocument.getDocumentElement().appendChild(itemNode);
+				// packagedDocument.getDocumentElement().appendChild(itemNode);
+				appendChildByParent();
+				refactor(itemNode, packagedDocument);
 			}
 			if (null != resourcePackageNode) {
 				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
@@ -79,6 +80,59 @@ public class DDIDocumentBuilder {
 			}
 		}
 		return this;
+	}
+
+	/**
+	 * Method of refactoring to fix prefix of nodes
+	 * @param node Node to fix (name and namespace)
+	 * @param document DDIDocument
+	 */
+	public void refactor(Node node, Document document) {
+
+		switch (node.getNodeName()) {
+		case "CodeList":
+			changeTagName(document, "CodeList", "l:CodeList", "ddi:logicalproduct:3_2");
+		case "Code":
+			changeTagName(document, "Code", "l:Code", "ddi:logicalproduct:3_2");
+		case "Category":
+			changeTagName(document, "Category", "l:Category", "ddi:logicalproduct:3_2");
+		}
+	}
+	
+	/**
+	 * Method which change the name of a node for a specific document
+	 * @param doc : document concerned
+	 * @param fromTag : initial Tag ---> target
+	 * @param toTag : New tag
+	 * @param namespace : New nameSpace
+	 */
+	public void changeTagName(Document doc, String fromTag, String toTag, String namespace) {
+		NodeList nodes = doc.getElementsByTagName(fromTag);
+		for (int i = 0; i < nodes.getLength(); i++) {
+			if (nodes.item(i) instanceof Element) {
+				Element elem = (Element) nodes.item(i);
+				doc.renameNode(elem, namespace, toTag);
+			}
+		}
+	}
+	
+	/**
+	 * Method of adding the itemNode to the DDIDocument (appendChild)
+	 */
+	public void appendChildByParent() {
+		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
+
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			// TODO: add a constant for the String "g:ResourcePackage"
+			if (node.getNodeName().equals("g:ResourcePackage")) {
+				Node nodeListChild = node.getLastChild();
+				Node finalNode = nodeListChild.getPreviousSibling();
+				finalNode.appendChild(itemNode);
+
+			}
+
+		}
 	}
 
 	public DDIDocumentBuilder buildItemDocument(String rootId, Map<String, String> references) throws Exception {

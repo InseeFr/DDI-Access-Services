@@ -2,7 +2,6 @@ package fr.insee.rmes.metadata.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 

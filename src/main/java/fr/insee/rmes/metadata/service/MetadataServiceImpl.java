@@ -394,9 +394,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-
-		//String formatRes = "";
-
+		
+		String categoryIdRes;
 		String fragment = metadataServiceItem.getItem(itemId).item;
 		logger.debug(fragment);
 		StringBuilder res = new StringBuilder();
@@ -405,10 +404,11 @@ public class MetadataServiceImpl implements MetadataService {
 		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
 			res = new StringBuilder();
+			//TODO: resolve the bug on the secound <code></code>.
 			res.append(getDDIItemWithEnvelope(itemId, ressourcePackageId, Envelope.CODE_LIST_SCHEME));
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-			String categoryIdRes;
+			
 			for (int i = 1; i < children.getLength() + 1; i++) {
 
 				String labelExp = "//*[local-name()='Code'][" + i
@@ -421,13 +421,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 			}
 			logger.debug(categories);
-			//TODO: modify DDIDocumentBuoilder ---> appendChild
-//			formatRes = formatRes.replaceAll("<Code", "<l:Code");
-//			formatRes = formatRes.replaceAll("</Code", "</l:Code");
-//			formatRes = formatRes.replaceAll("<CodeList", "<l:CodeList");
-//			formatRes = formatRes.replaceAll("</CodeList", "</l:CodeList");
-//			res.append(formatRes);
-
+			res.append(categories.toString());
+			
 			return res.toString();
 		}
 

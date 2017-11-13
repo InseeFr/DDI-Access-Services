@@ -15,10 +15,8 @@ import fr.insee.rmes.metadata.client.MetadataClient;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
-import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
-import fr.insee.rmes.metadata.service.MetadataServiceImpl;
 import fr.insee.rmes.utils.ddi.ItemFormat;
 
 @Service

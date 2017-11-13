@@ -4,7 +4,12 @@ package fr.insee.rmes.search.repository;
  * Created by acordier on 04/07/17.
  */
 public class NonUniqueResultException extends Exception {
-    public NonUniqueResultException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3414695419983551130L;
+
+	public NonUniqueResultException() {
         super();
     }
 
