@@ -29,6 +29,7 @@ import fr.insee.rmes.metadata.model.ColecticaPostRefDisplayed;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.utils.ddi.ItemFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -246,7 +247,7 @@ public class RMeSMetadata {
 			 * 3.1 : "34F5DC49-BE0C-4919-9FC2-F84BE994FA34"
 			 * 3.2 : "C0CA1BD4-1839-4233-A5B5-906DA0302B89"
 			 */
-			colecticaPostItemRef.setItemFormat("C0CA1BD4-1839-4233-A5B5-906DA0302B89");
+			colecticaPostItemRef.setItemFormat(ItemFormat.DDI_32);
 			items.add(colecticaPostItemRef);
 			listOfPostItems.setItems(items);
 			Map<ColecticaItemPostRef, String> results = metadataServiceItem.postNewItems(listOfPostItems);
