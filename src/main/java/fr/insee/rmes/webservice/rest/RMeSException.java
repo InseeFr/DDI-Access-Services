@@ -7,6 +7,10 @@ import java.io.IOException;
  */
 public class RMeSException extends IOException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5786486664894878082L;
 	private int status;
 	private String details;
 

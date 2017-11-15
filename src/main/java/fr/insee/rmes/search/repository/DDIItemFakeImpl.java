@@ -5,10 +5,7 @@ import java.util.List;
 
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import fr.insee.rmes.config.DDIItemFakeImplCondition;

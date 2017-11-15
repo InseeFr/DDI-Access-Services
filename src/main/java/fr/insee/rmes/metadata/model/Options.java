@@ -1,15 +1,12 @@
 package fr.insee.rmes.metadata.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Options {
-	
+
 	@JsonProperty("VersionRationale")
 	private Object versionRationale = new Object();
-	
+
 	@JsonProperty("SetName")
 	private String SetName = "";
 
@@ -33,7 +30,5 @@ public class Options {
 	public String toString() {
 		return "Options [versionReversionRationale=" + versionRationale + ", SetName=" + SetName + "]";
 	}
-	
-	
 
 }
