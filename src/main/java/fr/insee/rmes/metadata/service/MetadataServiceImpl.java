@@ -378,7 +378,7 @@ public class MetadataServiceImpl implements MetadataService {
 		String fragment = metadataServiceItem.getItem(itemId).item;
 		logger.debug(fragment);
 		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";		
 		res.append(xpathProcessor.queryText(fragment, fragmentExp));
 		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
