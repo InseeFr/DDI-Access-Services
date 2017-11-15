@@ -19,6 +19,11 @@ import io.swagger.jaxrs.config.BeanConfig;
  */
 public class SwaggerConfig extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7852516054619312011L;
+	
 	private final static Logger logger = LogManager.getLogger(SwaggerConfig.class);
 
 	public void init(ServletConfig config) throws ServletException {

@@ -23,6 +23,7 @@ import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
+import fr.insee.rmes.utils.ddi.Envelope;
 import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
@@ -328,14 +329,35 @@ public class MetadataServiceImpl implements MetadataService {
 		// ResourcePackage resourcePackage =
 		// getResourcePackage(resourcePackageId);
 		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false)
+		return new DDIDocumentBuilder(false,Envelope.DEFAULT)
 				// .buildResourcePackageDocument(resourcePackage.getId(),
 				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).build().toString();
 	}
 
 	@Override
-	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName)
+	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope)
+			throws Exception {
+		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
+		Map<String, String> refs = items.stream().filter(item -> null != item)
+				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
+					try {
+						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}));
+		// ResourcePackage resourcePackage =
+		// getResourcePackage(resourcePackageId);
+		// refs.putAll(resourcePackage.getReferences());
+		return new DDIDocumentBuilder(true, nameEnvelope)
+				// .buildResourcePackageDocument(resourcePackage.getId(),
+				// resourcePackage.getReferences())
+				.buildItemDocument(itemId, refs).build().toString();
+	}
+
+	@Override
+	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, Enum<Envelope> envelopeName)
 			throws Exception {
 		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
@@ -372,9 +394,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-
-		String formatRes = "";
-
+		
+		String categoryIdRes;
 		String fragment = metadataServiceItem.getItem(itemId).item;
 		logger.debug(fragment);
 		StringBuilder res = new StringBuilder();
@@ -383,10 +404,11 @@ public class MetadataServiceImpl implements MetadataService {
 		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
 			res = new StringBuilder();
-			res.append(getDDIDocumentWithoutEnvelope(itemId, ressourcePackageId));
+			//TODO: resolve the bug on the secound <code></code>.
+			res.append(getDDIItemWithEnvelope(itemId, ressourcePackageId, Envelope.CODE_LIST_SCHEME));
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-			String categoryIdRes;
+			
 			for (int i = 1; i < children.getLength() + 1; i++) {
 
 				String labelExp = "//*[local-name()='Code'][" + i
@@ -394,18 +416,13 @@ public class MetadataServiceImpl implements MetadataService {
 				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
 
 				logger.warn(categoryIdRes);
-				categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
+				categories.append(
+						getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId, Envelope.CATEGORY_SCHEME));
 
 			}
 			logger.debug(categories);
-			formatRes = categories.toString().replaceAll("<Category>", "<l:Category>");
-			formatRes = formatRes.replaceAll("</Category>", "</l:Category>");
-			formatRes = formatRes.replaceAll("<Code>", "<l:Code>");
-			formatRes = formatRes.replaceAll("</Code>", "</l:Code>");
-			formatRes = formatRes.replaceAll("<CodeList>", "<l:CodeList>");
-			formatRes = formatRes.replaceAll("</CodeList>", "</l:CodeList>");
-			res.append(formatRes);
-
+			res.append(categories.toString());
+			
 			return res.toString();
 		}
 
@@ -465,7 +482,7 @@ public class MetadataServiceImpl implements MetadataService {
 		// ResourcePackage resourcePackage =
 		// getResourcePackage(resourcePackageId);
 		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false)
+		return new DDIDocumentBuilder(false,Envelope.DEFAULT)
 				// .buildResourcePackageDocument(resourcePackage.getId(),
 				// resourcePackage.getReferences())
 				.buildItemDocument(id, refs).build().toString();

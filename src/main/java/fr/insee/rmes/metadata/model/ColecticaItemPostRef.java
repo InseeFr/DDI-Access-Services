@@ -2,13 +2,13 @@ package fr.insee.rmes.metadata.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.insee.rmes.metadata.model.ColecticaItemRef.Unformatted;
+import fr.insee.rmes.utils.ddi.ItemFormat;
 
 public class ColecticaItemPostRef extends ColecticaPostRefDisplayed {
 
@@ -135,8 +135,8 @@ public class ColecticaItemPostRef extends ColecticaPostRefDisplayed {
 		return itemFormat;
 	}
 
-	public void setItemFormat(String itemFormat) {
-		this.itemFormat = itemFormat;
+	public void setItemFormat(Enum<ItemFormat> itemFormat) {
+		this.itemFormat = itemFormat.toString();
 	}
 
 	@Override
