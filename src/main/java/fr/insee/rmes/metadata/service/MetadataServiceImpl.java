@@ -355,6 +355,27 @@ public class MetadataServiceImpl implements MetadataService {
 				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).build().toString();
 	}
+	
+	@Override
+	public String getDDIItemWithEnvelope(String resourcePackageId, Map <String, Enum<Envelope>> idsAndEnvelopes)
+			throws Exception {
+		DDIDocumentBuilder ddiDocument = new DDIDocumentBuilder(); 
+		for (String itemId : idsAndEnvelopes.keySet()) {
+			ddiDocument = new DDIDocumentBuilder(true,idsAndEnvelopes.get(itemId));
+			List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
+			Map<String, String> refs = items.stream().filter(item -> null != item)
+					.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
+						try {
+							return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					}));
+			ddiDocument.buildItemDocument(itemId, refs).build().toString();
+		}
+		
+		return ddiDocument.build().toString();
+	}
 
 	@Override
 	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, Enum<Envelope> envelopeName)

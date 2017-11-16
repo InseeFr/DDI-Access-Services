@@ -1,6 +1,7 @@
 package fr.insee.rmes.metadata.service;
 
 import java.util.List;
+import java.util.Map;
 
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.utils.ddi.Envelope;
@@ -84,5 +85,8 @@ public interface MetadataService {
 	List<String> getRessourcePackageIds() throws Exception;
 
 	String getDDIItemWithEnvelope(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope) throws Exception;
+
+	String getDDIItemWithEnvelope(String resourcePackageId, Map<String, Enum<Envelope>> idsAndEnvelopes)
+			throws Exception;
 	
 }
