@@ -1,7 +1,12 @@
 package fr.insee.rmes.utils.ddi;
 
 import com.google.common.io.Resources;
+
+import fr.insee.rmes.metadata.utils.XpathProcessor;
+import fr.insee.rmes.metadata.utils.XpathProcessorImpl;
+
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,6 +28,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class DDIDocumentBuilder {
@@ -32,6 +39,8 @@ public class DDIDocumentBuilder {
 	private Node itemNode;
 	private Node resourcePackageNode;
 	private Document packagedDocument;
+
+	private XpathProcessorImpl xpathProcessor = new XpathProcessorImpl();
 
 	public DDIDocumentBuilder() {
 		this.envelope = true;
@@ -65,7 +74,28 @@ public class DDIDocumentBuilder {
 		if (envelope) {
 			if (null != itemNode) {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
-				appendChildByParent();
+				appendChildByParent("g:ResourcePackage", itemNode);
+				refactor(itemNode, packagedDocument);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
+			}
+		} else {
+			if (null != itemNode) {
+				packagedDocument.appendChild(itemNode);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.appendChild(resourcePackageNode);
+			}
+		}
+		return this;
+	}
+	
+	public DDIDocumentBuilder build(Node itemNode) {
+		if (envelope) {
+			if (null != itemNode) {
+				// packagedDocument.getDocumentElement().appendChild(itemNode);
+				appendChildByParent("g:ResourcePackage", itemNode);
 				refactor(itemNode, packagedDocument);
 			}
 			if (null != resourcePackageNode) {
@@ -82,10 +112,24 @@ public class DDIDocumentBuilder {
 		return this;
 	}
 
+	public DDIDocumentBuilder build(DDIFragmentDocumentBuilder ddiFragmentBuilder) throws Exception {
+		
+			Node node;
+			for (String xmlString : ddiFragmentBuilder.getFragments().keySet()) {
+				node = xpathProcessor.toDocument(xmlString);
+				build(node);
+			}
+		return this;
+			
+	}
+
 	/**
 	 * Method of refactoring to fix prefix of nodes
-	 * @param node Node to fix (name and namespace)
-	 * @param document DDIDocument
+	 * 
+	 * @param node
+	 *            Node to fix (name and namespace)
+	 * @param document
+	 *            DDIDocument
 	 */
 	public void refactor(Node node, Document document) {
 
@@ -98,13 +142,33 @@ public class DDIDocumentBuilder {
 			changeTagName(document, "Category", "l:Category", "ddi:logicalproduct:3_2");
 		}
 	}
-	
+
+	/**
+	 * Method of refactoring to fix prefix of nodes
+	 * 
+	 * @param List<nodes>
+	 *            Nodes to fix (name and namespace)
+	 * @param document
+	 *            DDIDocument
+	 */
+	public void refactor(List<Node> nodes, Document document) {
+
+		for (Node node : nodes) {
+			refactor(node, document);
+		}
+	}
+
 	/**
 	 * Method which change the name of a node for a specific document
-	 * @param doc : document concerned
-	 * @param fromTag : initial Tag ---> target
-	 * @param toTag : New tag
-	 * @param namespace : New nameSpace
+	 * 
+	 * @param doc
+	 *            : document concerned
+	 * @param fromTag
+	 *            : initial Tag ---> target
+	 * @param toTag
+	 *            : New tag
+	 * @param namespace
+	 *            : New nameSpace
 	 */
 	public void changeTagName(Document doc, String fromTag, String toTag, String namespace) {
 		NodeList nodes = doc.getElementsByTagName(fromTag);
@@ -115,20 +179,50 @@ public class DDIDocumentBuilder {
 			}
 		}
 	}
-	
+
 	/**
 	 * Method of adding the itemNode to the DDIDocument (appendChild)
+	 * 
+	 * @param parentName
+	 *            : Name of the XML Parent
+	 * @param childNode
+	 *            : node to append
 	 */
-	public void appendChildByParent() {
+	public String appendChildByParent(String parentName, Node childNode) {
 		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
 
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
-			// TODO: add a constant for the String "g:ResourcePackage"
-			if (node.getNodeName().equals("g:ResourcePackage")) {
+			if (node.getNodeName().equals(parentName)) {
 				Node nodeListChild = node.getLastChild();
 				Node finalNode = nodeListChild.getPreviousSibling();
-				finalNode.appendChild(itemNode);
+				finalNode.appendChild(childNode);
+
+			}
+
+		}
+		return this.toString();
+	}
+
+	/**
+	 * Method of adding a list of itemNode to the DDIDocument (appendChild)
+	 * 
+	 * @param parentName
+	 *            : Name of the XML Parent
+	 * @param childNode
+	 *            : node to append
+	 */
+	public void appendChildrenByParent(String parentName, List<Node> childNodes) {
+		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
+
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if (node.getNodeName().equals(parentName)) {
+				Node nodeListChild = node.getLastChild();
+				Node finalNode = nodeListChild.getPreviousSibling();
+				for (Node nodeChild : childNodes) {
+					finalNode.appendChild(nodeChild);
+				}
 
 			}
 

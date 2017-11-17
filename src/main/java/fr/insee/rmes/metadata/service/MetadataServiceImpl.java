@@ -1,6 +1,7 @@
 package fr.insee.rmes.metadata.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.sun.jna.platform.win32.WinDef.WPARAM;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.Unit;
@@ -23,6 +26,7 @@ import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
+import fr.insee.rmes.utils.ddi.DDIFragmentDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
 import fr.insee.rmes.webservice.rest.RMeSException;
 
@@ -329,10 +333,14 @@ public class MetadataServiceImpl implements MetadataService {
 		// ResourcePackage resourcePackage =
 		// getResourcePackage(resourcePackageId);
 		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false,Envelope.DEFAULT)
+		return new DDIDocumentBuilder(false, Envelope.DEFAULT)
 				// .buildResourcePackageDocument(resourcePackage.getId(),
 				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).build().toString();
+	}
+
+	public String appendItemInDDIDocument(String parentName, Node node) {
+		return new DDIDocumentBuilder(false, Envelope.DEFAULT).appendChildByParent(parentName, node).toString();
 	}
 
 	@Override
@@ -355,26 +363,15 @@ public class MetadataServiceImpl implements MetadataService {
 				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).build().toString();
 	}
-	
+
 	@Override
-	public String getDDIItemWithEnvelope(String resourcePackageId, Map <String, Enum<Envelope>> idsAndEnvelopes)
-			throws Exception {
-		DDIDocumentBuilder ddiDocument = new DDIDocumentBuilder(); 
-		for (String itemId : idsAndEnvelopes.keySet()) {
-			ddiDocument = new DDIDocumentBuilder(true,idsAndEnvelopes.get(itemId));
-			List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-			Map<String, String> refs = items.stream().filter(item -> null != item)
-					.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-						try {
-							return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					}));
-			ddiDocument.buildItemDocument(itemId, refs).build().toString();
-		}
-		
-		return ddiDocument.build().toString();
+	public String getDDIItemsWithEnvelope(String resourcePackageId, DDIFragmentDocumentBuilder ddiFragmentBuilder,
+			Enum<Envelope> rootEnvelope) throws Exception {
+
+		return new DDIDocumentBuilder(true, rootEnvelope)
+				// .buildResourcePackageDocument(resourcePackage.getId(),
+				// resourcePackage.getReferences())
+				.build(ddiFragmentBuilder).toString();
 	}
 
 	@Override
@@ -415,7 +412,8 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-		
+		DDIFragmentDocumentBuilder ddiFragmentBuilder = new DDIFragmentDocumentBuilder();
+		ddiFragmentBuilder.setFragments(new HashMap<String, Enum<Envelope>>());
 		String categoryIdRes;
 		String fragment = metadataServiceItem.getItem(itemId).item;
 		logger.debug(fragment);
@@ -425,11 +423,12 @@ public class MetadataServiceImpl implements MetadataService {
 		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
 			res = new StringBuilder();
-			//TODO: resolve the bug on the secound <code></code>.
+			// TODO: resolve the bug on the secound <code></code>.
 			res.append(getDDIItemWithEnvelope(itemId, ressourcePackageId, Envelope.CODE_LIST_SCHEME));
+			ddiFragmentBuilder.getFragments().put(res.toString(), Envelope.CODE_LIST_SCHEME);
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-			
+
 			for (int i = 1; i < children.getLength() + 1; i++) {
 
 				String labelExp = "//*[local-name()='Code'][" + i
@@ -437,16 +436,30 @@ public class MetadataServiceImpl implements MetadataService {
 				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
 
 				logger.warn(categoryIdRes);
-				categories.append(
-						getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId, Envelope.CATEGORY_SCHEME));
+				// categories.append(
+				// getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId,
+				// Envelope.CATEGORY_SCHEME));
+				if (i == 1) {
+					categories.append(getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId,
+							Envelope.CATEGORY_SCHEME_FRAGMENT));
+				} else {
+					NodeList nodelistCategory = xpathProcessor.queryList(fragment, "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code'][" + i
+						+ "]/*[local-name()='CategoryReference']");
+					
+					Node nodeCategory = nodelistCategory.item(0);
+					logger.debug(nodeCategory.getTextContent());
+					String finalDocument = appendItemInDDIDocument("<l:CategoryScheme>", nodeCategory);
+					logger.debug(finalDocument);
+				}
 
 			}
 			logger.debug(categories);
 			res.append(categories.toString());
-			
+			ddiFragmentBuilder.getFragments().put(categories.toString(), Envelope.CATEGORY_SCHEME_FRAGMENT);
+			getDDIItemsWithEnvelope(ressourcePackageId, ddiFragmentBuilder, Envelope.CODE_LIST_SCHEME);
 			return res.toString();
-		}
 
+		}
 		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
 
 	}
@@ -503,7 +516,7 @@ public class MetadataServiceImpl implements MetadataService {
 		// ResourcePackage resourcePackage =
 		// getResourcePackage(resourcePackageId);
 		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false,Envelope.DEFAULT)
+		return new DDIDocumentBuilder(false, Envelope.DEFAULT)
 				// .buildResourcePackageDocument(resourcePackage.getId(),
 				// resourcePackage.getReferences())
 				.buildItemDocument(id, refs).build().toString();

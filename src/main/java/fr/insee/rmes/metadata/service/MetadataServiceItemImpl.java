@@ -19,6 +19,8 @@ import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.ResponseItem;
+import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
+import fr.insee.rmes.utils.ddi.Envelope;
 
 @Service
 public class MetadataServiceItemImpl implements MetadataServiceItem {
@@ -296,11 +298,18 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 
 	@Override
 	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
+		for (ColecticaItemPostRef item : refs.getItems()) {
+			item.setItem(new DDIDocumentBuilder(true, Envelope.FRAGMENT).build().toString());
+		}
+
 		return metadataRepository.postNewItems(refs);
 	}
 
 	@Override
 	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
+		for (ColecticaItemPostRef item : refs.getItems()) {
+			item.setItem(new DDIDocumentBuilder(true, Envelope.FRAGMENT).build().toString());
+		}
 		return metadataRepository.postUpdateItems(refs);
 
 	}

@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import fr.insee.rmes.metadata.model.Unit;
+import fr.insee.rmes.utils.ddi.DDIFragmentDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
 
 public interface MetadataService {
-
 
 	String getDDIDocument(String itemId, String groupId) throws Exception;
 
@@ -60,33 +60,47 @@ public interface MetadataService {
 	 * @throws Exception
 	 */
 	List<Unit> getUnits() throws Exception;
-	
+
 	/**
 	 * Get a DDI document for a specific item without the default DDI envelope.
-	 * @param itemId : identifier of the item
-	 * @param resourcePackageId : identifier of the DDI package (useless currently but required)
+	 * 
+	 * @param itemId
+	 *            : identifier of the item
+	 * @param resourcePackageId
+	 *            : identifier of the DDI package (useless currently but required)
 	 * @return String DDI item
 	 * @throws Exception
 	 */
 	String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception;
-	
+
 	/**
-	 *  Get a DDI document for a specific item without a specific DDI envelope (envelopeName).
-	 * @param itemId : identifier of the item
-	 * @param resourcePackageId : identifier of the DDI package (useless currently but required)
-	 * @param envelopeName : name of the target envelope
+	 * Get a DDI document for a specific item without a specific DDI envelope
+	 * (envelopeName).
+	 * 
+	 * @param itemId
+	 *            : identifier of the item
+	 * @param resourcePackageId
+	 *            : identifier of the DDI package (useless currently but required)
+	 * @param envelopeName
+	 *            : name of the target envelope
 	 * @return String DDI item
 	 * @throws Exception
 	 */
-	String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, Enum<Envelope> envelopeName) throws Exception;
-	
+	String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, Enum<Envelope> envelopeName)
+			throws Exception;
+
 	List<String> getGroupIds() throws Exception;
-	
+
 	List<String> getRessourcePackageIds() throws Exception;
 
-	String getDDIItemWithEnvelope(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope) throws Exception;
-
-	String getDDIItemWithEnvelope(String resourcePackageId, Map<String, Enum<Envelope>> idsAndEnvelopes)
+	String getDDIItemWithEnvelope(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope)
 			throws Exception;
+
+	String getDDIItemsWithEnvelope(String resourcePackageId,
+			DDIFragmentDocumentBuilder ddiFragmentBuilder, Enum<Envelope> rootEnvelope) throws Exception;
+
+
+
 	
+
 }
