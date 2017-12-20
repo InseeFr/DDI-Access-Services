@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class DDIDocumentBuilder {
 
@@ -39,8 +40,6 @@ public class DDIDocumentBuilder {
 	private Node itemNode;
 	private Node resourcePackageNode;
 	private Document packagedDocument;
-
-	private XpathProcessorImpl xpathProcessor = new XpathProcessorImpl();
 
 	public DDIDocumentBuilder() {
 		this.envelope = true;
@@ -90,12 +89,22 @@ public class DDIDocumentBuilder {
 		}
 		return this;
 	}
-	
-	public DDIDocumentBuilder build(Node itemNode) {
+
+	/**
+	 * Build a DDIDocument with a specific node in addition to the main node.
+	 * 
+	 * @param node
+	 *            : node to insert
+	 * @param nameParent
+	 *            : name of the parent ex:CodeListScheme to insert CodeLists
+	 * @return DDIDocumentBuilder ddiDocument
+	 */
+	public DDIDocumentBuilder buildWithCustomNode(Node node, String nameParent) {
 		if (envelope) {
 			if (null != itemNode) {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
 				appendChildByParent("g:ResourcePackage", itemNode);
+				importChildByParent(nameParent, node);
 				refactor(itemNode, packagedDocument);
 			}
 			if (null != resourcePackageNode) {
@@ -112,15 +121,39 @@ public class DDIDocumentBuilder {
 		return this;
 	}
 
-	public DDIDocumentBuilder build(DDIFragmentDocumentBuilder ddiFragmentBuilder) throws Exception {
-		
-			Node node;
-			for (String xmlString : ddiFragmentBuilder.getFragments().keySet()) {
-				node = xpathProcessor.toDocument(xmlString);
-				build(node);
+	/**
+	 * Build a DDIDocument with specific nodes in addition to the main node.
+	 * 
+	 * @param Map<Node,String>
+	 *            nodesWithParentNames
+	 * @return DDIDocumentBuilder ddiDocument
+	 */
+	public DDIDocumentBuilder buildWithCustomNodes(Map<Map<Integer, Node>, String> nodesWithParentNames) {
+		if (envelope) {
+			if (null != itemNode) {
+				// packagedDocument.getDocumentElement().appendChild(itemNode);
+				appendChildByParent("g:ResourcePackage", itemNode);
+				
+				for (Map<Integer, Node> map : nodesWithParentNames.keySet()) {
+					for (Integer index : map.keySet()) {
+						importChildByParent(nodesWithParentNames.get(map), map.get(index));
+					}
+					
+				}
+				refactor(itemNode, packagedDocument);
 			}
+			if (null != resourcePackageNode) {
+				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
+			}
+		} else {
+			if (null != itemNode) {
+				packagedDocument.appendChild(itemNode);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.appendChild(resourcePackageNode);
+			}
+		}
 		return this;
-			
 	}
 
 	/**
@@ -135,11 +168,13 @@ public class DDIDocumentBuilder {
 
 		switch (node.getNodeName()) {
 		case "CodeList":
-			changeTagName(document, "CodeList", "l:CodeList", "ddi:logicalproduct:3_2");
+			changeTagName(document, "CodeList", "l:CodeList", "");
 		case "Code":
-			changeTagName(document, "Code", "l:Code", "ddi:logicalproduct:3_2");
+			changeTagName(document, "Code", "l:Code", "");
 		case "Category":
-			changeTagName(document, "Category", "l:Category", "ddi:logicalproduct:3_2");
+			changeTagName(document, "Category", "l:Category", "");
+		case "CategoryScheme":
+			changeTagName(document, "CategoryScheme", "l:CategoryScheme", "");
 		}
 	}
 
@@ -198,6 +233,24 @@ public class DDIDocumentBuilder {
 				Node finalNode = nodeListChild.getPreviousSibling();
 				finalNode.appendChild(childNode);
 
+			}
+
+		}
+		return this.toString();
+	}
+
+	public String importChildByParent(String parentName, Node childNode) {
+		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
+
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if (node.getNodeName().equals(parentName)) {
+				Node nodeListChild = node.getLastChild();
+				Node finalNode = nodeListChild.getPreviousSibling();
+				Node clonedNode = childNode.cloneNode(true);
+				finalNode.appendChild(packagedDocument.adoptNode(clonedNode));
+				
+				refactor(clonedNode,packagedDocument);
 			}
 
 		}

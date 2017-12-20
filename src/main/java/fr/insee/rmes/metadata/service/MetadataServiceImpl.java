@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.sun.jna.platform.win32.WinDef.WPARAM;
-
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
@@ -26,7 +24,6 @@ import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
-import fr.insee.rmes.utils.ddi.DDIFragmentDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
 import fr.insee.rmes.webservice.rest.RMeSException;
 
@@ -339,10 +336,6 @@ public class MetadataServiceImpl implements MetadataService {
 				.buildItemDocument(itemId, refs).build().toString();
 	}
 
-	public String appendItemInDDIDocument(String parentName, Node node) {
-		return new DDIDocumentBuilder(false, Envelope.DEFAULT).appendChildByParent(parentName, node).toString();
-	}
-
 	@Override
 	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope)
 			throws Exception {
@@ -365,13 +358,24 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	@Override
-	public String getDDIItemsWithEnvelope(String resourcePackageId, DDIFragmentDocumentBuilder ddiFragmentBuilder,
-			Enum<Envelope> rootEnvelope) throws Exception {
-
-		return new DDIDocumentBuilder(true, rootEnvelope)
+	public String getDDIItemWithEnvelopeAndCustomItems(String itemId, String resourcePackageId,
+			Enum<Envelope> nameEnvelope, Map<Map<Integer,Node>, String> nodesWithParentNames) throws Exception {
+		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
+		Map<String, String> refs = items.stream().filter(item -> null != item)
+				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
+					try {
+						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}));
+		// ResourcePackage resourcePackage =
+		// getResourcePackage(resourcePackageId);
+		// refs.putAll(resourcePackage.getReferences());
+		return new DDIDocumentBuilder(true, nameEnvelope)
 				// .buildResourcePackageDocument(resourcePackage.getId(),
 				// resourcePackage.getReferences())
-				.build(ddiFragmentBuilder).toString();
+				.buildItemDocument(itemId, refs).buildWithCustomNodes(nodesWithParentNames).toString();
 	}
 
 	@Override
@@ -412,51 +416,54 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-		DDIFragmentDocumentBuilder ddiFragmentBuilder = new DDIFragmentDocumentBuilder();
-		ddiFragmentBuilder.setFragments(new HashMap<String, Enum<Envelope>>());
-		String categoryIdRes;
-		String fragment = metadataServiceItem.getItem(itemId).item;
-		logger.debug(fragment);
+		String categoryIdRes, categoryFragment, fragment;
+		Map<Map<Integer,Node>, String> categoryCustomItems = new HashMap<Map<Integer,Node>, String>();
+		fragment = metadataServiceItem.getItem(itemId).item;
 		StringBuilder res = new StringBuilder();
 		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
 		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		StringBuilder categories = new StringBuilder();
 		if (!(res.length() == 0)) {
 			res = new StringBuilder();
-			// TODO: resolve the bug on the secound <code></code>.
-			res.append(getDDIItemWithEnvelope(itemId, ressourcePackageId, Envelope.CODE_LIST_SCHEME));
-			ddiFragmentBuilder.getFragments().put(res.toString(), Envelope.CODE_LIST_SCHEME);
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-
+			Map<Integer,Node> mapKey;
 			for (int i = 1; i < children.getLength() + 1; i++) {
 
 				String labelExp = "//*[local-name()='Code'][" + i
 						+ "]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
 				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
-
 				logger.warn(categoryIdRes);
-				// categories.append(
-				// getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId,
-				// Envelope.CATEGORY_SCHEME));
 				if (i == 1) {
-					categories.append(getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId,
-							Envelope.CATEGORY_SCHEME_FRAGMENT));
-				} else {
-					NodeList nodelistCategory = xpathProcessor.queryList(fragment, "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code'][" + i
-						+ "]/*[local-name()='CategoryReference']");
+					String categoryScheme = getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId,
+							Envelope.CATEGORY_SCHEME);
+					logger.warn(categoryScheme);
+					String labelCategory = "//*[local-name()='DDIInstance']/*[local-name()='ResourcePackage']/*[local-name()='CategoryScheme']";
+					NodeList resCategoryScheme = xpathProcessor.queryList(categoryScheme, labelCategory);
+					Node nodeCategoryScheme = resCategoryScheme.item(0);
+					mapKey = new TreeMap<Integer,Node>();
+					mapKey.put(i, nodeCategoryScheme);
+					categoryCustomItems.put(mapKey, "g:ResourcePackage");
 					
-					Node nodeCategory = nodelistCategory.item(0);
-					logger.debug(nodeCategory.getTextContent());
-					String finalDocument = appendItemInDDIDocument("<l:CategoryScheme>", nodeCategory);
-					logger.debug(finalDocument);
+					logger.warn(nodeCategoryScheme.getTextContent());
+				} else {
+					categoryFragment = metadataServiceItem.getItem(categoryIdRes).item;
+					NodeList nodelistCategory = xpathProcessor.queryList(categoryFragment,
+							"//*[local-name()='Fragment']/*[local-name()='Category']");
+					Node nodeCategory;
+					for (int j = 0; j < nodelistCategory.getLength(); j++) {
+						nodeCategory = nodelistCategory.item(j);
+						mapKey = new TreeMap<Integer,Node>();
+						mapKey.put(i, nodeCategory);
+						categoryCustomItems.put(mapKey,"CategoryScheme");
+						logger.warn(nodeCategory.getTextContent());
+					}
 				}
 
+				logger.warn(categoryCustomItems.size());
 			}
-			logger.debug(categories);
-			res.append(categories.toString());
-			ddiFragmentBuilder.getFragments().put(categories.toString(), Envelope.CATEGORY_SCHEME_FRAGMENT);
-			getDDIItemsWithEnvelope(ressourcePackageId, ddiFragmentBuilder, Envelope.CODE_LIST_SCHEME);
+
+			res.append(getDDIItemWithEnvelopeAndCustomItems(itemId, ressourcePackageId, Envelope.CODE_LIST_SCHEME,
+					categoryCustomItems));
 			return res.toString();
 
 		}

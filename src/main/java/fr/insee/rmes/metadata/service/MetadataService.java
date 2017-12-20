@@ -3,6 +3,8 @@ package fr.insee.rmes.metadata.service;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Node;
+
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.utils.ddi.DDIFragmentDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
@@ -67,7 +69,8 @@ public interface MetadataService {
 	 * @param itemId
 	 *            : identifier of the item
 	 * @param resourcePackageId
-	 *            : identifier of the DDI package (useless currently but required)
+	 *            : identifier of the DDI package (useless currently but
+	 *            required)
 	 * @return String DDI item
 	 * @throws Exception
 	 */
@@ -80,7 +83,8 @@ public interface MetadataService {
 	 * @param itemId
 	 *            : identifier of the item
 	 * @param resourcePackageId
-	 *            : identifier of the DDI package (useless currently but required)
+	 *            : identifier of the DDI package (useless currently but
+	 *            required)
 	 * @param envelopeName
 	 *            : name of the target envelope
 	 * @return String DDI item
@@ -96,11 +100,19 @@ public interface MetadataService {
 	String getDDIItemWithEnvelope(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope)
 			throws Exception;
 
-	String getDDIItemsWithEnvelope(String resourcePackageId,
-			DDIFragmentDocumentBuilder ddiFragmentBuilder, Enum<Envelope> rootEnvelope) throws Exception;
-
-
-
-	
+	/**
+	 * 
+	 * @param itemId
+	 * @param resourcePackageId
+	 * @param nameEnvelope
+	 * @param nodesWithParentNames
+	 *            contain a map with the order (mapKey.keySet()) and the Node in
+	 *            value (mapKey.values()) And the value of the rootMap is
+	 *            associated to the parentName.
+	 * @return
+	 * @throws Exception
+	 */
+	String getDDIItemWithEnvelopeAndCustomItems(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope,
+			Map<Map<Integer, Node>, String> nodesWithParentNames) throws Exception;
 
 }
