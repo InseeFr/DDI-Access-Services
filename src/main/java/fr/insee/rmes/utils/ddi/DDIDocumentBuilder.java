@@ -31,6 +31,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class DDIDocumentBuilder {
@@ -128,26 +131,27 @@ public class DDIDocumentBuilder {
 	 *            nodesWithParentNames
 	 * @return DDIDocumentBuilder ddiDocument
 	 */
-	public DDIDocumentBuilder buildWithCustomNodes(Map<Map<Integer, Node>, String> nodesWithParentNames) {
+	public DDIDocumentBuilder buildWithCustomNodes(TreeMap<Integer, Map<Node, String>> nodesWithParentNames) {
 		if (envelope) {
 			if (null != itemNode) {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
 				appendChildByParent("g:ResourcePackage", itemNode);
-				
-				for (Map<Integer, Node> map : nodesWithParentNames.keySet()) {
-					for (Integer index : map.keySet()) {
-						importChildByParent(nodesWithParentNames.get(map), map.get(index));
+
+				for (Integer key : nodesWithParentNames.keySet()) {
+					Map<Node, String> map = nodesWithParentNames.get(key);
+					for (Node node : map.keySet()) {
+						importChildByParent(map.get(node), node);
 					}
-					
 				}
-				refactor(itemNode, packagedDocument);
+
 			}
-			if (null != resourcePackageNode) {
-				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
-			}
+			refactor(itemNode, packagedDocument);
+		}
+		if (null != resourcePackageNode) {
+			packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
 		} else {
 			if (null != itemNode) {
-				packagedDocument.appendChild(itemNode);
+				// packagedDocument.appendChild(itemNode);
 			}
 			if (null != resourcePackageNode) {
 				packagedDocument.appendChild(resourcePackageNode);
@@ -241,16 +245,30 @@ public class DDIDocumentBuilder {
 
 	public String importChildByParent(String parentName, Node childNode) {
 		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
-
+		Node node, nodeChild, clonedNode;
 		for (int i = 0; i < nodeList.getLength(); i++) {
-			Node node = nodeList.item(i);
+			node = nodeList.item(i);
+			System.out.println(node.getNodeName());
+			System.out.println(node.getParentNode().getNodeName());
+
 			if (node.getNodeName().equals(parentName)) {
-				Node nodeListChild = node.getLastChild();
-				Node finalNode = nodeListChild.getPreviousSibling();
-				Node clonedNode = childNode.cloneNode(true);
-				finalNode.appendChild(packagedDocument.adoptNode(clonedNode));
-				
-				refactor(clonedNode,packagedDocument);
+				clonedNode = childNode.cloneNode(true);
+				node.appendChild(packagedDocument.adoptNode(clonedNode));
+
+				refactor(clonedNode, packagedDocument);
+			} else {
+				NodeList nodeListRoot = node.getChildNodes();
+				for (int j = 0; j < nodeListRoot.getLength(); j++) {
+					nodeChild = nodeListRoot.item(j);
+					System.out.println(nodeChild.getNodeName());
+					System.out.println(nodeChild.getParentNode().getNodeName());
+					if (nodeChild.getNodeName().equals(parentName)) {
+						clonedNode = childNode.cloneNode(true);
+						nodeChild.appendChild(packagedDocument.adoptNode(clonedNode));
+
+						refactor(clonedNode, packagedDocument);
+					}
+				}
 			}
 
 		}

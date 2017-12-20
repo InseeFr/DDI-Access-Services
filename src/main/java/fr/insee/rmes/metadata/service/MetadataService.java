@@ -2,6 +2,7 @@ package fr.insee.rmes.metadata.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.w3c.dom.Node;
 
@@ -107,12 +108,12 @@ public interface MetadataService {
 	 * @param nameEnvelope
 	 * @param nodesWithParentNames
 	 *            contain a map with the order (mapKey.keySet()) and the Node in
-	 *            value (mapKey.values()) And the value of the rootMap is
+	 *            value (map.map.KeySet() And the value of the secondMap is
 	 *            associated to the parentName.
-	 * @return
+	 * @return String DDIDocument doc ---> doc.toString();
 	 * @throws Exception
 	 */
-	String getDDIItemWithEnvelopeAndCustomItems(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope,
-			Map<Map<Integer, Node>, String> nodesWithParentNames) throws Exception;
+	String getDDIItemWithEnvelopeAndCustomItems(String itemId, String resourcePackageId,
+			Enum<Envelope> nameEnvelope, TreeMap<Integer,Map<Node, String>> nodesWithParentNames) throws Exception;
 
 }

@@ -359,7 +359,7 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getDDIItemWithEnvelopeAndCustomItems(String itemId, String resourcePackageId,
-			Enum<Envelope> nameEnvelope, Map<Map<Integer,Node>, String> nodesWithParentNames) throws Exception {
+			Enum<Envelope> nameEnvelope, TreeMap<Integer,Map<Node, String>> nodesWithParentNames) throws Exception {
 		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
 				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
@@ -417,7 +417,7 @@ public class MetadataServiceImpl implements MetadataService {
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
 		String categoryIdRes, categoryFragment, fragment;
-		Map<Map<Integer,Node>, String> categoryCustomItems = new HashMap<Map<Integer,Node>, String>();
+		TreeMap<Integer,Map<Node, String>> categoryCustomItems = new TreeMap<Integer,Map<Node, String>>();
 		fragment = metadataServiceItem.getItem(itemId).item;
 		StringBuilder res = new StringBuilder();
 		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
@@ -426,7 +426,7 @@ public class MetadataServiceImpl implements MetadataService {
 			res = new StringBuilder();
 			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
 			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-			Map<Integer,Node> mapKey;
+			Map<Node,String> mapValue;
 			for (int i = 1; i < children.getLength() + 1; i++) {
 
 				String labelExp = "//*[local-name()='Code'][" + i
@@ -440,9 +440,9 @@ public class MetadataServiceImpl implements MetadataService {
 					String labelCategory = "//*[local-name()='DDIInstance']/*[local-name()='ResourcePackage']/*[local-name()='CategoryScheme']";
 					NodeList resCategoryScheme = xpathProcessor.queryList(categoryScheme, labelCategory);
 					Node nodeCategoryScheme = resCategoryScheme.item(0);
-					mapKey = new TreeMap<Integer,Node>();
-					mapKey.put(i, nodeCategoryScheme);
-					categoryCustomItems.put(mapKey, "g:ResourcePackage");
+					mapValue = new HashMap<Node,String>();
+					mapValue.put(nodeCategoryScheme,"g:ResourcePackage");
+					categoryCustomItems.put(i, mapValue);
 					
 					logger.warn(nodeCategoryScheme.getTextContent());
 				} else {
@@ -452,9 +452,9 @@ public class MetadataServiceImpl implements MetadataService {
 					Node nodeCategory;
 					for (int j = 0; j < nodelistCategory.getLength(); j++) {
 						nodeCategory = nodelistCategory.item(j);
-						mapKey = new TreeMap<Integer,Node>();
-						mapKey.put(i, nodeCategory);
-						categoryCustomItems.put(mapKey,"CategoryScheme");
+						mapValue = new HashMap<Node,String>();
+						mapValue.put(nodeCategory,"l:CategoryScheme");
+						categoryCustomItems.put(i, mapValue);
 						logger.warn(nodeCategory.getTextContent());
 					}
 				}
