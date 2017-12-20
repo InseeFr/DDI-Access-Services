@@ -413,7 +413,9 @@ public class MetadataServiceImpl implements MetadataService {
 		resourcePackage.setReferences(refs);
 		return resourcePackage;
 	}
-
+	/**
+	 * Get a codeList
+	 */
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
 		String categoryIdRes, categoryFragment, fragment;
