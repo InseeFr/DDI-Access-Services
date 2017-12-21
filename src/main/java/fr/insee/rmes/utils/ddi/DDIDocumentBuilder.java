@@ -248,9 +248,6 @@ public class DDIDocumentBuilder {
 		Node node, nodeChild, clonedNode;
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			node = nodeList.item(i);
-			System.out.println(node.getNodeName());
-			System.out.println(node.getParentNode().getNodeName());
-
 			if (node.getNodeName().equals(parentName)) {
 				clonedNode = childNode.cloneNode(true);
 				node.appendChild(packagedDocument.adoptNode(clonedNode));
@@ -260,8 +257,6 @@ public class DDIDocumentBuilder {
 				NodeList nodeListRoot = node.getChildNodes();
 				for (int j = 0; j < nodeListRoot.getLength(); j++) {
 					nodeChild = nodeListRoot.item(j);
-					System.out.println(nodeChild.getNodeName());
-					System.out.println(nodeChild.getParentNode().getNodeName());
 					if (nodeChild.getNodeName().equals(parentName)) {
 						clonedNode = childNode.cloneNode(true);
 						nodeChild.appendChild(packagedDocument.adoptNode(clonedNode));

@@ -359,7 +359,7 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public String getDDIItemWithEnvelopeAndCustomItems(String itemId, String resourcePackageId,
-			Enum<Envelope> nameEnvelope, TreeMap<Integer,Map<Node, String>> nodesWithParentNames) throws Exception {
+			Enum<Envelope> nameEnvelope, TreeMap<Integer, Map<Node, String>> nodesWithParentNames) throws Exception {
 		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
 				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
@@ -413,61 +413,73 @@ public class MetadataServiceImpl implements MetadataService {
 		resourcePackage.setReferences(refs);
 		return resourcePackage;
 	}
-	/**
-	 * Get a codeList
-	 */
+
+	public StringBuilder getFragmentCodeList(StringBuilder res, String fragment, String itemId) throws Exception {
+		String fragmentExpresseion = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
+		res.append(xpathProcessor.queryText(fragment, fragmentExpresseion));
+		return res;
+	}
+
+	public TreeMap<Integer, Map<Node, String>> addCategoryScheme(String categoryIdRes, String ressourcePackageId,
+			int indexInMap) throws Exception {
+		TreeMap<Integer, Map<Node, String>> categoryCustomItems = new TreeMap<Integer, Map<Node, String>>();
+		String categoryScheme = getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId, Envelope.CATEGORY_SCHEME);
+		String labelCategory = "//*[local-name()='DDIInstance']/*[local-name()='ResourcePackage']/*[local-name()='CategoryScheme']";
+		NodeList resCategoryScheme = xpathProcessor.queryList(categoryScheme, labelCategory);
+		Node nodeCategoryScheme = resCategoryScheme.item(0);
+		Map<Node, String> mapValue = new HashMap<Node, String>();
+		mapValue.put(nodeCategoryScheme, "g:ResourcePackage");
+		categoryCustomItems.put(indexInMap, mapValue);
+		logger.warn(nodeCategoryScheme.getTextContent());
+		return categoryCustomItems;
+	}
+
+	public TreeMap<Integer, Map<Node, String>> addCategoryById(TreeMap<Integer, Map<Node, String>> categoryCustomItems,
+			String categoryIdRes, int indexInMap) throws Exception {
+		String categoryFragment = metadataServiceItem.getItem(categoryIdRes).item;
+		NodeList nodelistCategory = xpathProcessor.queryList(categoryFragment,
+				"//*[local-name()='Fragment']/*[local-name()='Category']");
+		Node nodeCategory;
+		nodeCategory = nodelistCategory.item(0);
+		Map<Node, String> mapValue = new HashMap<Node, String>();
+		mapValue.put(nodeCategory, "l:CategoryScheme");
+		categoryCustomItems.put(indexInMap, mapValue);
+		logger.warn(nodeCategory.getTextContent());
+		return categoryCustomItems;
+	}
+
+	public TreeMap<Integer, Map<Node, String>> addCategories(String fragment, String ressourcePackageId,
+			TreeMap<Integer, Map<Node, String>> categoryCustomItems) throws Exception {
+		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
+		NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
+		for (int i = 1; i < children.getLength() + 1; i++) {
+			String labelExp = "//*[local-name()='Code'][" + i
+					+ "]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
+			String categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
+			logger.warn(categoryIdRes);
+			if (i == 1) {
+				categoryCustomItems = addCategoryScheme(categoryIdRes, ressourcePackageId, i);
+			} else {
+				categoryCustomItems = addCategoryById(categoryCustomItems, categoryIdRes, i);
+			}
+		}
+		return categoryCustomItems;
+	}
+
 	@Override
 	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-		String categoryIdRes, categoryFragment, fragment;
-		TreeMap<Integer,Map<Node, String>> categoryCustomItems = new TreeMap<Integer,Map<Node, String>>();
+		String fragment = "";
+		TreeMap<Integer, Map<Node, String>> categoryCustomItems = new TreeMap<Integer, Map<Node, String>>();
 		fragment = metadataServiceItem.getItem(itemId).item;
-		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
-		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		if (!(res.length() == 0)) {
-			res = new StringBuilder();
-			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
-			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-			Map<Node,String> mapValue;
-			for (int i = 1; i < children.getLength() + 1; i++) {
+		StringBuilder resRootFragment = new StringBuilder();
+		resRootFragment = getFragmentCodeList(resRootFragment, fragment, itemId);
 
-				String labelExp = "//*[local-name()='Code'][" + i
-						+ "]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
-				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
-				logger.warn(categoryIdRes);
-				if (i == 1) {
-					String categoryScheme = getDDIItemWithEnvelope(categoryIdRes, ressourcePackageId,
-							Envelope.CATEGORY_SCHEME);
-					logger.warn(categoryScheme);
-					String labelCategory = "//*[local-name()='DDIInstance']/*[local-name()='ResourcePackage']/*[local-name()='CategoryScheme']";
-					NodeList resCategoryScheme = xpathProcessor.queryList(categoryScheme, labelCategory);
-					Node nodeCategoryScheme = resCategoryScheme.item(0);
-					mapValue = new HashMap<Node,String>();
-					mapValue.put(nodeCategoryScheme,"g:ResourcePackage");
-					categoryCustomItems.put(i, mapValue);
-					
-					logger.warn(nodeCategoryScheme.getTextContent());
-				} else {
-					categoryFragment = metadataServiceItem.getItem(categoryIdRes).item;
-					NodeList nodelistCategory = xpathProcessor.queryList(categoryFragment,
-							"//*[local-name()='Fragment']/*[local-name()='Category']");
-					Node nodeCategory;
-					for (int j = 0; j < nodelistCategory.getLength(); j++) {
-						nodeCategory = nodelistCategory.item(j);
-						mapValue = new HashMap<Node,String>();
-						mapValue.put(nodeCategory,"l:CategoryScheme");
-						categoryCustomItems.put(i, mapValue);
-						logger.warn(nodeCategory.getTextContent());
-					}
-				}
-
-				logger.warn(categoryCustomItems.size());
-			}
-
-			res.append(getDDIItemWithEnvelopeAndCustomItems(itemId, ressourcePackageId, Envelope.CODE_LIST_SCHEME,
-					categoryCustomItems));
-			return res.toString();
-
+		if (!(resRootFragment.length() == 0)) {
+			resRootFragment = new StringBuilder();
+			categoryCustomItems = addCategories(fragment, ressourcePackageId, categoryCustomItems);
+			resRootFragment.append(getDDIItemWithEnvelopeAndCustomItems(itemId, ressourcePackageId,
+					Envelope.CODE_LIST_SCHEME, categoryCustomItems));
+			return resRootFragment.toString();
 		}
 		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
 
