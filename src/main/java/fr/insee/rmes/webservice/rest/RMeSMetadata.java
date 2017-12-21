@@ -29,6 +29,7 @@ import fr.insee.rmes.metadata.model.ColecticaPostRefDisplayed;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.service.codeList.CodeListService;
 import fr.insee.rmes.utils.ddi.ItemFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,6 +48,9 @@ public class RMeSMetadata {
 
 	@Autowired
 	MetadataService metadataService;
+	
+	@Autowired
+	CodeListService codeListService;
 	
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
@@ -141,7 +145,7 @@ public class RMeSMetadata {
 	public Response getCodeList(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String codeList = metadataService.getCodeList(id, resourcePackageId);
+			String codeList = codeListService.getCodeList(id, resourcePackageId);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(codeList.getBytes(StandardCharsets.UTF_8));
