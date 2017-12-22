@@ -414,19 +414,6 @@ public class MetadataServiceImpl implements MetadataService {
 		return resourcePackage;
 	}
 
-	
-
-	@Override
-	public String getQuestionnaire(String id) throws Exception {
-		DDIItem instrumentDDIItem = searchService.getDDIItemById(id);
-		StringBuilder res = new StringBuilder();
-		String studyUnitFragment = metadataServiceItem.getItem(instrumentDDIItem.getStudyUnitId()).item;
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='StudyUnit']//text()";
-		res.append(xpathProcessor.queryText(studyUnitFragment, fragmentExp));
-		res.append(getItemByType(id, DDIItemType.QUESTIONNAIRE));
-		return res.toString();
-	}
-
 	@Override
 	public String getSequence(String id) throws Exception {
 		return getItemByType(id, DDIItemType.SEQUENCE);
@@ -437,7 +424,7 @@ public class MetadataServiceImpl implements MetadataService {
 		return getItemByType(id, DDIItemType.QUESTION);
 	}
 
-	private String getItemByType(String id, DDIItemType type) throws Exception {
+	public String getItemByType(String id, DDIItemType type) throws Exception {
 		DDIItem instrumentDDIItem = searchService.getDDIItemById(id);
 		if (instrumentDDIItem != null) {
 			if (instrumentDDIItem.getType().equals(type.getType())) {

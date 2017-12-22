@@ -7,23 +7,16 @@ import java.util.TreeMap;
 import org.w3c.dom.Node;
 
 import fr.insee.rmes.metadata.model.Unit;
+import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.utils.ddi.Envelope;
 
 public interface MetadataService {
 
 	String getDDIDocument(String itemId, String groupId) throws Exception;
 	
-	
+	String getItemByType(String id, DDIItemType type) throws Exception;
 
-	/**
-	 * Get a questionnaire with its id, agency and version
-	 * 
-	 * @param id
-	 *            : questionnaireId
-	 * @return Fragment
-	 * @throws Exception
-	 */
-	String getQuestionnaire(String id) throws Exception;
+	
 
 	/**
 	 * Get a sequence with its id, agency and version
