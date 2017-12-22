@@ -129,30 +129,6 @@ public class CodeListServiceImpl implements CodeListService {
 		} catch (Exception e) {
 			throw new RMeSException(404, "This item is not in the Colectica database.", fragment);
 		}
-
-	}
-
-	@Override
-	public String getCodeListBeta(String id, String packageId) throws Exception {
-		String fragment = "";
-		try {
-			TreeMap<Integer, Map<Node, String>> categoryCustomItems = new TreeMap<Integer, Map<Node, String>>();
-			fragment = metadataServiceItem.getItem(id).item;
-			StringBuilder resRootFragment = new StringBuilder();
-			resRootFragment = getFragmentCodeList(resRootFragment, fragment, id);
-
-			if (!(resRootFragment.length() == 0)) {
-				resRootFragment = new StringBuilder();
-				categoryCustomItems = addCategories(fragment, packageId, categoryCustomItems);
-				resRootFragment.append(metadataService.getDDIItemWithEnvelopeAndCustomItems(id, packageId,
-						Envelope.CODE_LIST_SCHEME, categoryCustomItems));
-				return resRootFragment.toString();
-			} else {
-				throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
-			}
-		} catch (Exception e) {
-			throw new RMeSException(404, "This item is not in the Colectica database.", fragment);
-		}
 	}
 
 }

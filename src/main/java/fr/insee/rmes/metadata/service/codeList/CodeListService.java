@@ -65,6 +65,7 @@ public interface CodeListService {
 	TreeMap<Integer, Map<Node, String>> addCategoryById(TreeMap<Integer, Map<Node, String>> categoryCustomItems,
 			ColecticaItem itemCategory, int indexInMap) throws Exception;
 
+	
 	/**
 	 * Get a List of codes with their id, agency and versions
 	 * 
@@ -75,17 +76,5 @@ public interface CodeListService {
 	 * @return Fragments
 	 * @throws Exception
 	 */
-	String getCodeList(String id, String packageId) throws Exception;
-
-	/**
-	 * Get a List of codes with their id, agency and versions
-	 * 
-	 * @param id
-	 *            : id CodeListReference
-	 * @param String
-	 *            packageId : id of sourcePackage
-	 * @return Fragments
-	 * @throws Exception
-	 */
-	String getCodeListBeta(String id, String packageId) throws Exception;
+	String getCodeList(String itemId, String ressourcePackageId) throws Exception;
 }

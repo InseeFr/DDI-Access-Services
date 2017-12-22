@@ -369,12 +369,7 @@ public class MetadataServiceImpl implements MetadataService {
 						throw new RuntimeException(e);
 					}
 				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
 		return new DDIDocumentBuilder(true, nameEnvelope)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
 				.buildItemDocument(itemId, refs).buildWithCustomNodes(nodesWithParentNames).toString();
 	}
 
