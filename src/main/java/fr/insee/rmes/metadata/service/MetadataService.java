@@ -98,4 +98,7 @@ public interface MetadataService {
 	String getDDIItemWithEnvelopeAndCustomItems(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope,
 			TreeMap<Integer, Map<Node, String>> nodesWithParentNames) throws Exception;
 
+	String getRessourcePackageWithEnvelopeAndCustomItems(String itemId, String resourcePackageId,
+			Enum<Envelope> nameEnvelope, TreeMap<Integer, Map<Node, String>> nodesWithParentNames) throws Exception;
+
 }

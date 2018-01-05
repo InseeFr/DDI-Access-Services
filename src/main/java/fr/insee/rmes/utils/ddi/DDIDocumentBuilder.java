@@ -75,9 +75,12 @@ public class DDIDocumentBuilder {
 	public DDIDocumentBuilder build() {
 		if (envelope) {
 			if (null != itemNode) {
-				// packagedDocument.getDocumentElement().appendChild(itemNode);
-				appendChildByParent("g:ResourcePackage", itemNode);
-				refactor(itemNode, packagedDocument);
+				if (this.nameEnvelope.equals(Envelope.DEFAULT.toString())) {
+					packagedDocument.getDocumentElement().appendChild(itemNode);
+				} else {
+					appendChildByParent("g:ResourcePackage", itemNode);
+					refactor(itemNode, packagedDocument);
+				}
 			}
 			if (null != resourcePackageNode) {
 				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
@@ -147,6 +150,50 @@ public class DDIDocumentBuilder {
 			}
 			refactor(itemNode, packagedDocument);
 		}
+
+		if (null != resourcePackageNode) {
+			packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
+		} else {
+			if (null != itemNode) {
+				// packagedDocument.appendChild(itemNode);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.appendChild(resourcePackageNode);
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Build a DDIDocument with specific nodes in addition to the
+	 * ressourcePackageNode.
+	 * 
+	 * @param Map<Node,String>
+	 *            nodesWithParentNames
+	 * @return DDIDocumentBuilder ddiDocument
+	 */
+	public DDIDocumentBuilder buildRessourcePackageWithCustomNodes(
+			TreeMap<Integer, Map<Node, String>> nodesWithParentNames) {
+		if (envelope) {
+			if (null != itemNode) {
+				if (this.nameEnvelope.equals(Envelope.DEFAULT.toString())) {
+					packagedDocument.getDocumentElement().appendChild(itemNode);
+				}
+				for (Integer key : nodesWithParentNames.keySet()) {
+					Map<Node, String> map = nodesWithParentNames.get(key);
+					for (Node node : map.keySet()) {
+						if (key.equals(1)) {
+							importChild(node);
+						} else {
+							importChildByParent(map.get(node), node);
+						}
+					}
+				}
+
+			}
+			refactor(itemNode, packagedDocument);
+		}
+
 		if (null != resourcePackageNode) {
 			packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
 		} else {
@@ -227,7 +274,7 @@ public class DDIDocumentBuilder {
 	 * @param childNode
 	 *            : node to append
 	 */
-	public String appendChildByParent(String parentName, Node childNode) {
+	public void appendChildByParent(String parentName, Node childNode) {
 		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
 
 		for (int i = 0; i < nodeList.getLength(); i++) {
@@ -240,14 +287,15 @@ public class DDIDocumentBuilder {
 			}
 
 		}
-		return this.toString();
+
 	}
 
-	public String importChildByParent(String parentName, Node childNode) {
+	public void importChildByParent(String parentName, Node childNode) {
 		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
 		Node node, nodeChild, clonedNode;
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			node = nodeList.item(i);
+			System.out.println(node.getNodeName());
 			if (node.getNodeName().equals(parentName)) {
 				clonedNode = childNode.cloneNode(true);
 				node.appendChild(packagedDocument.adoptNode(clonedNode));
@@ -267,7 +315,14 @@ public class DDIDocumentBuilder {
 			}
 
 		}
-		return this.toString();
+	}
+
+	public void importChild(Node childNode) {
+		Node node, clonedNode;
+		node = packagedDocument.getLastChild();
+		clonedNode = childNode.cloneNode(true);
+		node.appendChild(packagedDocument.adoptNode(clonedNode));
+		refactor(clonedNode, packagedDocument);
 	}
 
 	/**
