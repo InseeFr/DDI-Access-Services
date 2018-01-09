@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/D:/etgail/Mes%20Documents/DDI/Coltrane/eno-schema-draft.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<DDIInstance xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="ddi:instance:3_2 file:/D:/etgail/Mes%20Documents/DDI/DDI%203.2/DDI%203.2%20PR%202/XMLSchema/instance.xsd"
+	xmlns="ddi:instance:3_2" xmlns:g="ddi:group:3_2" xmlns:d="ddi:datacollection:3_2"
+	xmlns:s="ddi:studyunit:3_2" xmlns:r="ddi:reusable:3_2" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:a="ddi:archive:3_2" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:l="ddi:logicalproduct:3_2" isMaintainable="true">
+	<r:Agency>fr.insee</r:Agency>
+	<r:ID xmlns="">id</r:ID>
+	<r:Version>0</r:Version>
+	<r:Citation>
+		<r:Title>
+			<r:String>Questionnaire</r:String>
+			<r:String>Questionnaire title 2</r:String>
+		</r:Title>
+	</r:Citation>
+			<d:InstrumentScheme>
+			<r:Agency>fr.insee</r:Agency>
+            <r:ID>INSEE Questionaire</r:ID>
+            <r:Version>1</r:Version>
+            <d:InstrumentSchemeName>
+               <r:String xml:lang="en-IE">Instruments</r:String>
+            </d:InstrumentSchemeName>
+            <r:Label>
+               <r:Content xml:lang="en-IE">Set of survey instruments for the a survey</r:Content>
+            </r:Label>
+			</d:InstrumentScheme>
+</DDIInstance>

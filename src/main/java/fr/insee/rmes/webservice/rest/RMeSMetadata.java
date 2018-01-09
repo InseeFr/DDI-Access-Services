@@ -29,6 +29,8 @@ import fr.insee.rmes.metadata.model.ColecticaPostRefDisplayed;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.service.codeList.CodeListService;
+import fr.insee.rmes.metadata.service.questionnaire.QuestionnaireService;
 import fr.insee.rmes.utils.ddi.ItemFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,7 +49,13 @@ public class RMeSMetadata {
 
 	@Autowired
 	MetadataService metadataService;
-	
+
+	@Autowired
+	QuestionnaireService questionnaireService;
+
+	@Autowired
+	CodeListService codeListService;
+
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
 
@@ -141,7 +149,7 @@ public class RMeSMetadata {
 	public Response getCodeList(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String codeList = metadataService.getCodeList(id, resourcePackageId);
+			String codeList = codeListService.getCodeList(id, resourcePackageId);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(codeList.getBytes(StandardCharsets.UTF_8));
@@ -156,7 +164,6 @@ public class RMeSMetadata {
 		}
 	}
 
-	
 	@GET
 	@Path("sequence/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
@@ -185,9 +192,10 @@ public class RMeSMetadata {
 	@Path("questionnaire/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
-	public Response getQuestionnaire(@PathParam(value = "id") String id) throws Exception {
+	public Response getQuestionnaire(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String questionnaire = metadataService.getQuestionnaire(id);
+			String questionnaire = questionnaireService.getQuestionnaire(id, resourcePackageId);
 
 			StreamingOutput stream = output -> {
 				try {
@@ -239,13 +247,14 @@ public class RMeSMetadata {
 			List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
 			ColecticaItemPostRef colecticaPostItemRef = new ColecticaItemPostRef();
 			colecticaPostItemRef.setItem(refsDisplayed.getItem());
-			// TODO: Create a Map with each UUID as key and the name of the item as value
+			// TODO: Create a Map with each UUID as key and the name of the item
+			// as value
 			// colecticaPostItemRef.setItemFormat(metadataService.getItemFormatrepository());
 			colecticaPostItemRef.setVersionDate(LocalDateTime.now().toString());
 			/*
-			 * set the DDI version of the item 
-			 * 3.1 : "34F5DC49-BE0C-4919-9FC2-F84BE994FA34"
-			 * 3.2 : "C0CA1BD4-1839-4233-A5B5-906DA0302B89"
+			 * set the DDI version of the item 3.1 :
+			 * "34F5DC49-BE0C-4919-9FC2-F84BE994FA34" 3.2 :
+			 * "C0CA1BD4-1839-4233-A5B5-906DA0302B89"
 			 */
 			colecticaPostItemRef.setItemFormat(ItemFormat.DDI_32);
 			items.add(colecticaPostItemRef);
