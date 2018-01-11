@@ -8,38 +8,29 @@ import org.w3c.dom.Node;
 public interface QuestionnaireService {
 
 	/**
-	 * Get a questionnaire with its id, agency and version
+	 * Get a questionnaire using the DDI format
 	 * 
 	 * @param id
 	 *            : questionnaireId
+	 * @param ressourcePackageId
+	 * @param dataCollectionId
+	 * @param subGroupId
+	 * @param groupId
 	 * @return Fragment
 	 * @throws Exception
 	 */
-	String getQuestionnaire(String id, String ressourcePackageId) throws Exception;
-	
+	String getQuestionnaire(String id, String ressourcePackageId, String dataCollectionId, String subGroupId,
+			String groupId) throws Exception;
+
+
+
 	/**
-	 * add the Study Unit Node to the map used as a parameter in mapStudyUnit.
-	 * @param map
-	 * @param node
-	 * @param mapStudyUnit
+	 * Get the Instrument Node thanks to the id of this Instrument.
+	 * 
+	 * @param id
+	 *            : id of the Instrument expected
+	 * @return Node resultInstrumentNode
 	 * @throws Exception
 	 */
-	void addStudyUnit(Map<Node, String> map, Node node, TreeMap<Integer, Map<Node, String>> mapStudyUnit)
-			throws Exception;
-	/**
-	 * add the DataCollection Node to the map used as a parameter in mapStudyUnit.
-	 * @param map
-	 * @param node
-	 * @param mapStudyUnit
-	 * @throws Exception
-	 */
-	void addDataCollection(Map<Node, String> map, Node node, TreeMap<Integer, Map<Node, String>> mapStudyUnit)
-			throws Exception;
-	/**
-	 * Get the studyUnit Node thanks to the id of this StudyUnit.
-	 * @param id : id of the study unit expected
-	 * @return Node resultStudyUnitNode
-	 * @throws Exception
-	 */
-	Node getStudyUnitNode(String id) throws Exception;
+	Node getInstrumentNode(String id) throws Exception;
 }

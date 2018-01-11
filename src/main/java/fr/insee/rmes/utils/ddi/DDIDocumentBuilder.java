@@ -115,6 +115,7 @@ public class DDIDocumentBuilder {
 			}
 			if (null != resourcePackageNode) {
 				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
+				refactor(resourcePackageNode, packagedDocument);
 			}
 		} else {
 			if (null != itemNode) {
@@ -140,15 +141,15 @@ public class DDIDocumentBuilder {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
 				appendChildByParent("g:ResourcePackage", itemNode);
 
-				for (Integer key : nodesWithParentNames.keySet()) {
-					Map<Node, String> map = nodesWithParentNames.get(key);
-					for (Node node : map.keySet()) {
-						importChildByParent(map.get(node), node);
-					}
-				}
-
+				refactor(itemNode, packagedDocument);
 			}
-			refactor(itemNode, packagedDocument);
+			for (Integer key : nodesWithParentNames.keySet()) {
+				Map<Node, String> map = nodesWithParentNames.get(key);
+				for (Node node : map.keySet()) {
+					importChildByParent(map.get(node), node);
+				}
+			}
+
 		}
 
 		if (null != resourcePackageNode) {
@@ -281,8 +282,12 @@ public class DDIDocumentBuilder {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals(parentName)) {
 				Node nodeListChild = node.getLastChild();
-				Node finalNode = nodeListChild.getPreviousSibling();
-				finalNode.appendChild(childNode);
+				try {
+					Node finalNode = nodeListChild.getPreviousSibling();
+					finalNode.appendChild(childNode);
+				} catch (Exception e) {
+					node.appendChild(childNode);
+				}
 
 			}
 
@@ -291,29 +296,13 @@ public class DDIDocumentBuilder {
 	}
 
 	public void importChildByParent(String parentName, Node childNode) {
-		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
-		Node node, nodeChild, clonedNode;
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			node = nodeList.item(i);
-			System.out.println(node.getNodeName());
-			if (node.getNodeName().equals(parentName)) {
-				clonedNode = childNode.cloneNode(true);
-				node.appendChild(packagedDocument.adoptNode(clonedNode));
+		NodeList nodeList = packagedDocument.getElementsByTagName(parentName);
+		Node node = nodeList.item(0);
+		if (node.getNodeName().equals(parentName)) {
+			Node clonedNode = childNode.cloneNode(true);
+			node.appendChild(packagedDocument.adoptNode(clonedNode));
 
-				refactor(clonedNode, packagedDocument);
-			} else {
-				NodeList nodeListRoot = node.getChildNodes();
-				for (int j = 0; j < nodeListRoot.getLength(); j++) {
-					nodeChild = nodeListRoot.item(j);
-					if (nodeChild.getNodeName().equals(parentName)) {
-						clonedNode = childNode.cloneNode(true);
-						nodeChild.appendChild(packagedDocument.adoptNode(clonedNode));
-
-						refactor(clonedNode, packagedDocument);
-					}
-				}
-			}
-
+			refactor(clonedNode, packagedDocument);
 		}
 	}
 
