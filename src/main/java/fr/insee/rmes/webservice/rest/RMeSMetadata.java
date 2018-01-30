@@ -193,9 +193,13 @@ public class RMeSMetadata {
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
 	public Response getQuestionnaire(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+			@QueryParam(value = "resourcePackageId") String resourcePackageId,
+			@QueryParam(value = "idDataCollection") String datacollectionId,
+			@QueryParam(value = "idGroup") String groupId, @QueryParam(value = "idSubGroup") String subGroupId)
+			throws Exception {
 		try {
-			String questionnaire = questionnaireService.getQuestionnaire(id, resourcePackageId);
+			String questionnaire = questionnaireService.getQuestionnaire(id, resourcePackageId, datacollectionId,
+					subGroupId, groupId);
 
 			StreamingOutput stream = output -> {
 				try {
