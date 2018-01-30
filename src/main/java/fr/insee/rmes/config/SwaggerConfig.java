@@ -34,9 +34,8 @@ public class SwaggerConfig extends HttpServlet {
 			beanConfig.setTitle("DDI Access services");
 			beanConfig.setVersion("0.1");
 			beanConfig.setDescription("DDI Access API endpoints");
-			beanConfig.setSchemes(new String[] { "http" });
-			// TODO Externalize the parameter
-			beanConfig.setBasePath("/ddi-access-services/api");
+            beanConfig.setSchemes(new String[]{props.getProperty("fr.insee.rmes.api.scheme")});
+            beanConfig.setBasePath(props.getProperty("fr.insee.rmes.api.name"));
 			beanConfig.setHost(props.getProperty("fr.insee.rmes.api.host"));
 			beanConfig.setResourcePackage("fr.insee.rmes.webservice.rest");
 			beanConfig.setScan(true);
@@ -50,7 +49,7 @@ public class SwaggerConfig extends HttpServlet {
 		Properties props = new Properties();
 		String env = System.getProperty("fr.insee.rmes.env");
 		if (null == env) {
-			env = "dv";
+			env = "dev";
 		}
 		String propsPath = String.format("env/%s/ddi-access-services.properties", env);
 		props.load(getClass().getClassLoader().getResourceAsStream(propsPath));
@@ -62,11 +61,18 @@ public class SwaggerConfig extends HttpServlet {
 			r.close();
 		}
 		File f2 = new File(
-				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "ddi-access-services.properties"));
+				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "rmspogbo.properties"));
 		if (f2.exists() && !f2.isDirectory()) {
 			FileReader r2 = new FileReader(f2);
 			props.load(r2);
 			r2.close();
+		}
+		File f3 = new File(
+				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "rmespogbo.properties"));
+		if (f3.exists() && !f3.isDirectory()) {
+			FileReader r3 = new FileReader(f3);
+			props.load(r3);
+			r3.close();
 		}
 		return props;
 	}
