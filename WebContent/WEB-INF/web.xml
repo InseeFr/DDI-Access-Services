@@ -65,7 +65,7 @@
 		<filter-name>CorsFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	 <security-constraint>
+	<!--  <security-constraint>
 		<web-resource-collection>
 			<web-resource-name>DDI-Access-Services</web-resource-name>
 			<url-pattern>/*</url-pattern>
@@ -73,5 +73,5 @@
 		<user-data-constraint>
 			<transport-guarantee>CONFIDENTIAL</transport-guarantee>
 		</user-data-constraint>
-	</security-constraint>
+	</security-constraint> -->
 </web-app>
