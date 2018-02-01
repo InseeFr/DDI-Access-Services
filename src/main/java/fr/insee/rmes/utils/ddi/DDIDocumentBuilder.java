@@ -1,17 +1,13 @@
 package fr.insee.rmes.utils.ddi;
 
-import com.google.common.io.Resources;
-
-import fr.insee.rmes.metadata.utils.XpathProcessor;
-import fr.insee.rmes.metadata.utils.XpathProcessorImpl;
-
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,23 +19,20 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
+
+import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import com.google.common.io.Resources;
 
 public class DDIDocumentBuilder {
 
 	private Boolean envelope;
-	private String nameEnvelope = "";
+	private String nameEnvelope = Envelope.DEFAULT.toString();
 	private Node itemNode;
 	private Node resourcePackageNode;
 	private Document packagedDocument;
@@ -53,6 +46,10 @@ public class DDIDocumentBuilder {
 		}
 	}
 
+	public void setEnvelope(Boolean envelope){
+		this.envelope=envelope;
+	}
+	
 	public DDIDocumentBuilder(Boolean envelope, Enum<Envelope> envelopeName) {
 		this.nameEnvelope = envelopeName.toString();
 		this.envelope = envelope;
@@ -267,6 +264,16 @@ public class DDIDocumentBuilder {
 		}
 	}
 
+	/**
+	 * Method of adding the itemNode to the DDIDocument (appendChild)
+	 * 
+	 * @param childNode
+	 *            : node to append
+	 */
+	public void appendChild(Node childNode) {
+		packagedDocument.getDocumentElement().appendChild(childNode);
+	}
+	
 	/**
 	 * Method of adding the itemNode to the DDIDocument (appendChild)
 	 * 

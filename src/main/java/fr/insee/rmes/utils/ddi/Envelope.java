@@ -7,8 +7,8 @@ public enum Envelope {
 	CATEGORY_SCHEME_FRAGMENT("ddi-envelope-fragmentDocument-categoryScheme.xml"),
 	DEFAULT("ddi-enveloppe.xml"),
 	FRAGMENT("ddi-fragment-enveloppe.xml"),
-	INSTRUMENTSCHEME("ddi-envelope-instrumentScheme.xml");
-	
+	INSTRUMENTSCHEME("ddi-envelope-instrumentScheme.xml"),
+	ROOT("root.xml");
 	
 	
 	

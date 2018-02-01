@@ -1,10 +1,8 @@
 package fr.insee.rmes.metadata.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -13,19 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
-import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
-import fr.insee.rmes.utils.ddi.Envelope;
-import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
@@ -298,7 +294,7 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	@Override
-	public String getDDIDocument(String itemId, String resourcePackageId) throws Exception {
+	public String getDerefDDIDocumentWithExternalRP(String itemId, String resourcePackageId) throws Exception {
 		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
 				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
@@ -317,7 +313,7 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	@Override
-	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception {
+	public String getDerefDDIDocument(String itemId) throws Exception {
 		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
 				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
@@ -327,87 +323,7 @@ public class MetadataServiceImpl implements MetadataService {
 						throw new RuntimeException(e);
 					}
 				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false, Envelope.DEFAULT)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(itemId, refs).build().toString();
-	}
-
-	@Override
-	public String getDDIItemWithEnvelope(String itemId, String resourcePackageId, Enum<Envelope> nameEnvelope)
-			throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(true, nameEnvelope)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(itemId, refs).build().toString();
-	}
-
-	@Override
-	public String getDDIItemWithEnvelopeAndCustomItems(String itemId, String resourcePackageId,
-			Enum<Envelope> nameEnvelope, TreeMap<Integer, Map<Node, String>> nodesWithParentNames) throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		return new DDIDocumentBuilder(true, nameEnvelope)
-				.buildItemDocument(itemId, refs).buildWithCustomNodes(nodesWithParentNames).toString();
-	}
-	
-	@Override
-	public String getRessourcePackageWithEnvelopeAndCustomItems(String itemId, String resourcePackageId,
-			Enum<Envelope> nameEnvelope, TreeMap<Integer, Map<Node, String>> nodesWithParentNames) throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		return new DDIDocumentBuilder(true, nameEnvelope)
-				.buildItemDocument(itemId, refs).buildRessourcePackageWithCustomNodes(nodesWithParentNames).toString();
-	}
-
-	@Override
-	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, Enum<Envelope> envelopeName)
-			throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false, envelopeName)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(itemId, refs).build().toString();
+		return new DDIDocumentBuilder().buildItemDocument(itemId, refs).build().toString();
 	}
 
 	public ResourcePackage getResourcePackage(String id) throws Exception {
@@ -425,53 +341,7 @@ public class MetadataServiceImpl implements MetadataService {
 		return resourcePackage;
 	}
 
-	@Override
-	public String getSequence(String id) throws Exception {
-		return getItemByType(id, DDIItemType.SEQUENCE);
-	}
-
-	@Override
-	public String getQuestion(String id) throws Exception {
-		return getItemByType(id, DDIItemType.QUESTION);
-	}
-
-	public String getItemByType(String id, DDIItemType type) throws Exception {
-		DDIItem instrumentDDIItem = searchService.getDDIItemById(id);
-		if (instrumentDDIItem != null) {
-			if (instrumentDDIItem.getType().equals(type.getType())) {
-				StringBuilder res = new StringBuilder();
-				res = new StringBuilder();
-				res.append(getDDIDocumentWithExternalResource(id, instrumentDDIItem.getResourcePackageId()));
-				return res.toString();
-
-			} else {
-				throw new RMeSException(404, "The type of this item isn't a " + type + " but a ",
-						instrumentDDIItem.getType());
-			}
-		} else {
-			throw new RMeSException(404, "The item isn't exist", id);
-		}
-	}
-
-	private String getDDIDocumentWithExternalResource(String id, String resourcePackageId) throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(id));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false, Envelope.DEFAULT)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(id, refs).build().toString();
-	}
-
+	
 	@Override
 	public List<String> getGroupIds() throws Exception {
 		return groupRepository.getRootIds();
@@ -481,5 +351,37 @@ public class MetadataServiceImpl implements MetadataService {
 	public List<String> getRessourcePackageIds() throws Exception {
 		return groupRepository.getRessourcePackageIds();
 	}
+
+	@Override
+	public String getDDIDocument(String itemId) throws Exception {
+		// TODO Auto-generated method stub
+		return "Test";
+	}
+
+	@Override
+	public String getItemByType(String id, DDIItemType type) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDDIInstance(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getSequence(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getQuestion(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 
 }

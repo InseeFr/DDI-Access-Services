@@ -77,4 +77,5 @@ public interface CodeListService {
 	 * @throws Exception
 	 */
 	String getCodeList(String itemId, String ressourcePackageId) throws Exception;
+	
 }
