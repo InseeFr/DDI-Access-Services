@@ -103,9 +103,6 @@ public class RMeSSearch {
 	@ApiOperation(value = "Get all sub-group (series)", notes = "Retrieve all operations with a parent id matching with a group Id given in parameters file", response = String.class)
 	public List<DDIItem> getSubGroups() throws Exception {
 		try {
-			
-			logger.debug("Search Serie - test debug");
-			logger.info("Search Serie - test info");
 			return searchService.getSubGroups();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
