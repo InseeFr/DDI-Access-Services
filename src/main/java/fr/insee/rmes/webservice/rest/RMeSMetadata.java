@@ -1,5 +1,6 @@
 package fr.insee.rmes.webservice.rest;
 
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ import fr.insee.rmes.metadata.model.ColecticaPostRefDisplayed;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.service.codeList.CodeListService;
+import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
+import fr.insee.rmes.metadata.service.questionnaire.QuestionnaireService;
+import fr.insee.rmes.utils.ddi.ItemFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -46,14 +51,23 @@ public class RMeSMetadata {
 
 	@Autowired
 	MetadataService metadataService;
-	
+
+	@Autowired
+	QuestionnaireService questionnaireService;
+
+	@Autowired
+	DDIInstanceService ddiInstanceService;
+
+	@Autowired
+	CodeListService codeListService;
+
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
 
 	@GET
-	@Path("item/{id}")
+	@Path("colectica-item/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Gets the item with id {id}", notes = "Get an item from Colectica Repository, given it's {id}", response = ColecticaItem.class)
+	@ApiOperation(value = "Get the item with id {id}", notes = "Get an item from Colectica Repository, given it's {id}", response = ColecticaItem.class)
 	public Response getItem(@PathParam(value = "id") String id) throws Exception {
 		try {
 			ColecticaItem item = metadataServiceItem.getItem(id);
@@ -65,9 +79,9 @@ public class RMeSMetadata {
 	}
 
 	@GET
-	@Path("item/{id}/refs/")
+	@Path("colectica-item/{id}/refs/")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get the children refs with parent id {id}", notes = "This will give a list of object containing a reference id, version and agency. Note that you will"
+	@ApiOperation(value = "Get the colectica item children refs with parent id {id}", notes = "This will give a list of object containing a reference id, version and agency. Note that you will"
 			+ "need to map response objects keys to be able to use it for querying items "
 			+ "(see /items doc model)", response = ColecticaItemRefList.class)
 	public Response getChildrenRef(@PathParam(value = "id") String id) throws Exception {
@@ -95,7 +109,7 @@ public class RMeSMetadata {
 	}
 
 	@POST
-	@Path("items")
+	@Path("colectica-items")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiOperation(value = "Get all de-referenced items", notes = "Maps a list of ColecticaItemRef given as a payload to a list of actual full ColecticaItem objects", response = ColecticaItem.class, responseContainer = "List")
@@ -112,13 +126,55 @@ public class RMeSMetadata {
 	}
 
 	@GET
+	@Path("item/{id}/rp/{resourcePackageId}/deref-ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get Deref DDI document (external resource package)", notes = "Get a full Deref DDI document from Colectica repository reference {id} with an external resource package", response = String.class)
+	public Response getFullDDIWithExternalRP(@PathParam(value = "id") String id,
+			@PathParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+		try {
+			String ddiDocument = metadataService.getDerefDDIDocumentWithExternalRP(id, resourcePackageId);
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("item/{id}/deref-ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get Deref DDI document", notes = "Gets a full DDI document from Colectica repository reference {id}", response = String.class)
+	public Response getFullDDI(@PathParam(value = "id") String id) throws Exception {
+		try {
+			String ddiDocument = metadataService.getDDIDocument(id);
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
 	@Path("item/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Gets a full DDI document from Colectica repository reference {id}", response = String.class)
-	public Response getFullDDI(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository reference {id}", response = String.class)
+	public Response getDDIDocument(@PathParam(value = "id") String id) throws Exception {
 		try {
-			String ddiDocument = metadataService.getDDIDocument(id, resourcePackageId);
+			String ddiDocument = metadataService.getDDIDocument(id);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
@@ -136,11 +192,11 @@ public class RMeSMetadata {
 	@GET
 	@Path("codeList/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get the codeList", notes = "Gets a DDI document with a codeList from Colectica repository reference {id}", response = String.class)
+	@ApiOperation(value = "Get the codeList", notes = "Get a DDI document with a codeList from Colectica repository reference {id}", response = String.class)
 	public Response getCodeList(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String codeList = metadataService.getCodeList(id, resourcePackageId);
+			String codeList = codeListService.getCodeList(id, resourcePackageId);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(codeList.getBytes(StandardCharsets.UTF_8));
@@ -155,7 +211,6 @@ public class RMeSMetadata {
 		}
 	}
 
-	
 	@GET
 	@Path("sequence/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
@@ -163,7 +218,7 @@ public class RMeSMetadata {
 	public Response getSequence(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
-			String sequence = metadataService.getSequence(id, resourcePackageId);
+			String sequence = metadataService.getSequence(id);
 
 			StreamingOutput stream = output -> {
 				try {
@@ -184,9 +239,14 @@ public class RMeSMetadata {
 	@Path("questionnaire/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
-	public Response getQuestionnaire(@PathParam(value = "id") String id) throws Exception {
+	public Response getQuestionnaire(@PathParam(value = "id") String id,
+			@QueryParam(value = "resourcePackageId") String resourcePackageId,
+			@QueryParam(value = "idDataCollection") String datacollectionId,
+			@QueryParam(value = "idGroup") String groupId, @QueryParam(value = "idSubGroup") String subGroupId)
+			throws Exception {
 		try {
-			String questionnaire = metadataService.getQuestionnaire(id);
+			String questionnaire = questionnaireService.getQuestionnaire(id, resourcePackageId, datacollectionId,
+					subGroupId, groupId);
 
 			StreamingOutput stream = output -> {
 				try {
@@ -195,6 +255,23 @@ public class RMeSMetadata {
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("ddi-instance/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document of a DDI instance", notes = "Get a DDI document of a DDI Instance from Colectica repository reference {id}", response = String.class)
+	public Response getDDIInstance(@PathParam(value = "id") String id) throws Exception {
+		try {
+			String questionnaire = ddiInstanceService.getDDIInstance(id);
+			StreamingOutput stream = output -> {
+				output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
 			};
 			return Response.ok(stream).build();
 		} catch (Exception e) {
@@ -215,82 +292,6 @@ public class RMeSMetadata {
 				try {
 					output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
 
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@POST
-	@Path("item/ddi/")
-	@Produces(MediaType.TEXT_HTML)
-	@ApiOperation(value = "add a new Item", notes = "Add a new Item in the Colectica repository reference {id}", response = String.class)
-	public Response postItems(@ApiParam(value = "refsDisplayed") ColecticaPostRefDisplayed refsDisplayed)
-			throws Exception {
-		try {
-			// TODO: add @PUT instead of @POST
-			ColecticaItemPostRefList listOfPostItems = new ColecticaItemPostRefList();
-			List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
-			ColecticaItemPostRef colecticaPostItemRef = new ColecticaItemPostRef();
-			colecticaPostItemRef.setItem(refsDisplayed.getItem());
-			// TODO: Create a Map with each UUID as key and the name of the item as value
-			// colecticaPostItemRef.setItemFormat(metadataService.getItemFormatrepository());
-			colecticaPostItemRef.setVersionDate(LocalDateTime.now().toString());
-			/*
-			 * set the DDI version of the item 
-			 * 3.1 : "34F5DC49-BE0C-4919-9FC2-F84BE994FA34"
-			 * 3.2 : "C0CA1BD4-1839-4233-A5B5-906DA0302B89"
-			 */
-			colecticaPostItemRef.setItemFormat("C0CA1BD4-1839-4233-A5B5-906DA0302B89");
-			items.add(colecticaPostItemRef);
-			listOfPostItems.setItems(items);
-			Map<ColecticaItemPostRef, String> results = metadataServiceItem.postNewItems(listOfPostItems);
-			StreamingOutput stream = output -> {
-				try {
-					for (ColecticaItemPostRef result : results.keySet()) {
-						if (!(results.get(result).equals("200"))) {
-							throw new RMeSException(Integer.valueOf(results.get(result)),
-									"An error Occured from the Repository",
-									"The item identifier is : " + result.identifier);
-						}
-
-					}
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
-			return Response.ok(stream).build();
-		} catch (
-
-		Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@POST
-	@Path("item/ddi/update")
-	@Produces(MediaType.TEXT_HTML)
-	@ApiOperation(value = "update an Item", notes = "Update an Item already present in the Colectica repository reference {id}", response = String.class)
-	public Response postItemsUpdate(@ApiParam(value = "refs") ColecticaItemPostRefList refs) throws Exception {
-		try {
-			Map<ColecticaItemPostRef, String> results = metadataServiceItem.postUpdateItems(refs);
-
-			StreamingOutput stream = output -> {
-				try {
-					for (ColecticaItemPostRef result : results.keySet()) {
-						if (!(results.get(result).equals("200"))) {
-							throw new RMeSException(Integer.valueOf(results.get(result)),
-									"An error Occured from the Repository",
-									"The item identifier is : " + result.identifier);
-						}
-
-					}
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());
 				}

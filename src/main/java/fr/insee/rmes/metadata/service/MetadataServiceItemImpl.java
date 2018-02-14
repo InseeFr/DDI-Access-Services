@@ -1,9 +1,9 @@
 package fr.insee.rmes.metadata.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,8 +19,11 @@ import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
-import fr.insee.rmes.search.model.ResourcePackage;
+import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.model.ResponseItem;
+import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
+import fr.insee.rmes.utils.ddi.Envelope;
+import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
 public class MetadataServiceItemImpl implements MetadataServiceItem {
@@ -46,6 +49,37 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	}
 
 	@Override
+	public ColecticaItem getSequence(String id) throws Exception {
+		return getItemByType(id, DDIItemType.SEQUENCE);
+	}
+
+	@Override
+	public ColecticaItem getQuestion(String id) throws Exception {
+		return getItemByType(id, DDIItemType.QUESTION);
+	}
+
+	@Override
+	public ColecticaItem getDDIInstance(String id) throws Exception {
+		return getItemByType(id, DDIItemType.DDI_INSTANCE);
+	}
+	
+	public ColecticaItem getItemByType(String id, DDIItemType type) throws Exception {
+		ColecticaItem item = metadataRepository.findById(id);
+		DDIItemType typeItem = item.getType(); 
+		if (item != null) {
+			if (typeItem.getName().equals(type.getName())) {
+				return item;
+			} else {
+				throw new RMeSException(404, "The type of this item isn't a " + type.getName() + " but a ",
+						typeItem.getName());
+			}
+		} else {
+			throw new RMeSException(404, "The item isn't exist", id);
+		}
+	}
+
+	
+	@Override
 	public ColecticaItemRefList getChildrenRef(String id) throws Exception {
 		return metadataRepository.getChildrenRef(id);
 	}
@@ -53,6 +87,15 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	@Override
 	public List<ColecticaItem> getItems(ColecticaItemRefList refs) throws Exception {
 		return metadataRepository.getItems(refs);
+	}
+	
+	@Override
+	public Map<String,ColecticaItem> getMapItems(ColecticaItemRefList refs) throws Exception {
+		Map<String,ColecticaItem> items = new HashMap<String,ColecticaItem>();
+		for(ColecticaItem item : this.getItems(refs)){
+			items.put(item.getIdentifier(), item);
+		}
+		return items;
 	}
 
 	public ResponseItem getDDIRoot(String id) throws Exception {
@@ -298,11 +341,18 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 
 	@Override
 	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
+		for (ColecticaItemPostRef item : refs.getItems()) {
+			item.setItem(new DDIDocumentBuilder(true, Envelope.FRAGMENT).build().toString());
+		}
+
 		return metadataRepository.postNewItems(refs);
 	}
 
 	@Override
 	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
+		for (ColecticaItemPostRef item : refs.getItems()) {
+			item.setItem(new DDIDocumentBuilder(true, Envelope.FRAGMENT).build().toString());
+		}
 		return metadataRepository.postUpdateItems(refs);
 
 	}

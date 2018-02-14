@@ -1,12 +1,13 @@
 package fr.insee.rmes.utils.ddi;
 
-import com.google.common.io.Resources;
-import org.apache.commons.io.FileUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,17 +19,20 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import com.google.common.io.Resources;
 
 public class DDIDocumentBuilder {
 
-	// TODO add a new parameter to use different envelope
 	private Boolean envelope;
+	private String nameEnvelope = Envelope.DEFAULT.toString();
 	private Node itemNode;
 	private Node resourcePackageNode;
 	private Document packagedDocument;
@@ -42,10 +46,16 @@ public class DDIDocumentBuilder {
 		}
 	}
 
-	public DDIDocumentBuilder(Boolean envelope) {
+	public void setEnvelope(Boolean envelope){
+		this.envelope=envelope;
+	}
+	
+	public DDIDocumentBuilder(Boolean envelope, Enum<Envelope> envelopeName) {
+		this.nameEnvelope = envelopeName.toString();
 		this.envelope = envelope;
 		if (envelope) {
 			try {
+
 				packagedDocument = buildEnvelope();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -59,28 +69,15 @@ public class DDIDocumentBuilder {
 		}
 	}
 
-	public DDIDocumentBuilder(Boolean enveloppe, String nameEnvelope) {
-			this.envelope = enveloppe;
-			if (enveloppe && !(nameEnvelope.isEmpty())) {
-				try {
-					packagedDocument = buildEnvelope(nameEnvelope);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				try {
-					packagedDocument = buildWithoutEnvelope();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-	}
-
 	public DDIDocumentBuilder build() {
 		if (envelope) {
 			if (null != itemNode) {
-				packagedDocument.getDocumentElement().appendChild(itemNode);
+				if (this.nameEnvelope.equals(Envelope.DEFAULT.toString())) {
+					packagedDocument.getDocumentElement().appendChild(itemNode);
+				} else {
+					appendChildByParent("g:ResourcePackage", itemNode);
+					refactor(itemNode, packagedDocument);
+				}
 			}
 			if (null != resourcePackageNode) {
 				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
@@ -94,6 +91,259 @@ public class DDIDocumentBuilder {
 			}
 		}
 		return this;
+	}
+
+	/**
+	 * Build a DDIDocument with a specific node in addition to the main node.
+	 * 
+	 * @param node
+	 *            : node to insert
+	 * @param nameParent
+	 *            : name of the parent ex:CodeListScheme to insert CodeLists
+	 * @return DDIDocumentBuilder ddiDocument
+	 */
+	public DDIDocumentBuilder buildWithCustomNode(Node node, String nameParent) {
+		if (envelope) {
+			if (null != itemNode) {
+				// packagedDocument.getDocumentElement().appendChild(itemNode);
+				appendChildByParent("g:ResourcePackage", itemNode);
+				importChildByParent(nameParent, node);
+				refactor(itemNode, packagedDocument);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
+				refactor(resourcePackageNode, packagedDocument);
+			}
+		} else {
+			if (null != itemNode) {
+				packagedDocument.appendChild(itemNode);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.appendChild(resourcePackageNode);
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Build a DDIDocument with specific nodes in addition to the main node.
+	 * 
+	 * @param Map<Node,String>
+	 *            nodesWithParentNames
+	 * @return DDIDocumentBuilder ddiDocument
+	 */
+	public DDIDocumentBuilder buildWithCustomNodes(TreeMap<Integer, Map<Node, String>> nodesWithParentNames) {
+		if (envelope) {
+			if (null != itemNode) {
+				// packagedDocument.getDocumentElement().appendChild(itemNode);
+				appendChildByParent("g:ResourcePackage", itemNode);
+
+				refactor(itemNode, packagedDocument);
+			}
+			for (Integer key : nodesWithParentNames.keySet()) {
+				Map<Node, String> map = nodesWithParentNames.get(key);
+				for (Node node : map.keySet()) {
+					importChildByParent(map.get(node), node);
+				}
+			}
+
+		}
+
+		if (null != resourcePackageNode) {
+			packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
+		} else {
+			if (null != itemNode) {
+				// packagedDocument.appendChild(itemNode);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.appendChild(resourcePackageNode);
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Build a DDIDocument with specific nodes in addition to the
+	 * ressourcePackageNode.
+	 * 
+	 * @param Map<Node,String>
+	 *            nodesWithParentNames
+	 * @return DDIDocumentBuilder ddiDocument
+	 */
+	public DDIDocumentBuilder buildRessourcePackageWithCustomNodes(
+			TreeMap<Integer, Map<Node, String>> nodesWithParentNames) {
+		if (envelope) {
+			if (null != itemNode) {
+				if (this.nameEnvelope.equals(Envelope.DEFAULT.toString())) {
+					packagedDocument.getDocumentElement().appendChild(itemNode);
+				}
+				for (Integer key : nodesWithParentNames.keySet()) {
+					Map<Node, String> map = nodesWithParentNames.get(key);
+					for (Node node : map.keySet()) {
+						if (key.equals(1)) {
+							importChild(node);
+						} else {
+							importChildByParent(map.get(node), node);
+						}
+					}
+				}
+
+			}
+			refactor(itemNode, packagedDocument);
+		}
+
+		if (null != resourcePackageNode) {
+			packagedDocument.getDocumentElement().appendChild(resourcePackageNode);
+		} else {
+			if (null != itemNode) {
+				// packagedDocument.appendChild(itemNode);
+			}
+			if (null != resourcePackageNode) {
+				packagedDocument.appendChild(resourcePackageNode);
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Method of refactoring to fix prefix of nodes
+	 * 
+	 * @param node
+	 *            Node to fix (name and namespace)
+	 * @param document
+	 *            DDIDocument
+	 */
+	public void refactor(Node node, Document document) {
+
+		switch (node.getNodeName()) {
+		case "CodeList":
+			changeTagName(document, "CodeList", "l:CodeList", "");
+		case "Code":
+			changeTagName(document, "Code", "l:Code", "");
+		case "Category":
+			changeTagName(document, "Category", "l:Category", "");
+		case "CategoryScheme":
+			changeTagName(document, "CategoryScheme", "l:CategoryScheme", "");
+		}
+	}
+
+	/**
+	 * Method of refactoring to fix prefix of nodes
+	 * 
+	 * @param List<nodes>
+	 *            Nodes to fix (name and namespace)
+	 * @param document
+	 *            DDIDocument
+	 */
+	public void refactor(List<Node> nodes, Document document) {
+
+		for (Node node : nodes) {
+			refactor(node, document);
+		}
+	}
+
+	/**
+	 * Method which change the name of a node for a specific document
+	 * 
+	 * @param doc
+	 *            : document concerned
+	 * @param fromTag
+	 *            : initial Tag ---> target
+	 * @param toTag
+	 *            : New tag
+	 * @param namespace
+	 *            : New nameSpace
+	 */
+	public void changeTagName(Document doc, String fromTag, String toTag, String namespace) {
+		NodeList nodes = doc.getElementsByTagName(fromTag);
+		for (int i = 0; i < nodes.getLength(); i++) {
+			if (nodes.item(i) instanceof Element) {
+				Element elem = (Element) nodes.item(i);
+				doc.renameNode(elem, namespace, toTag);
+			}
+		}
+	}
+
+	/**
+	 * Method of adding the itemNode to the DDIDocument (appendChild)
+	 * 
+	 * @param childNode
+	 *            : node to append
+	 */
+	public void appendChild(Node childNode) {
+		packagedDocument.getDocumentElement().appendChild(childNode);
+	}
+	
+	/**
+	 * Method of adding the itemNode to the DDIDocument (appendChild)
+	 * 
+	 * @param parentName
+	 *            : Name of the XML Parent
+	 * @param childNode
+	 *            : node to append
+	 */
+	public void appendChildByParent(String parentName, Node childNode) {
+		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
+
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if (node.getNodeName().equals(parentName)) {
+				Node nodeListChild = node.getLastChild();
+				try {
+					Node finalNode = nodeListChild.getPreviousSibling();
+					finalNode.appendChild(childNode);
+				} catch (Exception e) {
+					node.appendChild(childNode);
+				}
+
+			}
+
+		}
+
+	}
+
+	public void importChildByParent(String parentName, Node childNode) {
+		NodeList nodeList = packagedDocument.getElementsByTagName(parentName);
+		Node node = nodeList.item(0);
+		if (node.getNodeName().equals(parentName)) {
+			Node clonedNode = childNode.cloneNode(true);
+			node.appendChild(packagedDocument.adoptNode(clonedNode));
+
+			refactor(clonedNode, packagedDocument);
+		}
+	}
+
+	public void importChild(Node childNode) {
+		Node node, clonedNode;
+		node = packagedDocument.getLastChild();
+		clonedNode = childNode.cloneNode(true);
+		node.appendChild(packagedDocument.adoptNode(clonedNode));
+		refactor(clonedNode, packagedDocument);
+	}
+
+	/**
+	 * Method of adding a list of itemNode to the DDIDocument (appendChild)
+	 * 
+	 * @param parentName
+	 *            : Name of the XML Parent
+	 * @param childNode
+	 *            : node to append
+	 */
+	public void appendChildrenByParent(String parentName, List<Node> childNodes) {
+		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
+
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if (node.getNodeName().equals(parentName)) {
+				Node nodeListChild = node.getLastChild();
+				Node finalNode = nodeListChild.getPreviousSibling();
+				for (Node nodeChild : childNodes) {
+					finalNode.appendChild(nodeChild);
+				}
+
+			}
+
+		}
 	}
 
 	public DDIDocumentBuilder buildItemDocument(String rootId, Map<String, String> references) throws Exception {
@@ -142,15 +392,9 @@ public class DDIDocumentBuilder {
 	}
 
 	private Document buildEnvelope() throws Exception {
-		URL url = Resources.getResource("transforms/templates/ddi-enveloppe.xml");
-		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
-		return getDocument(fragment);
-	}
-
-	private Document buildEnvelope(String name) throws Exception {
 		StringBuilder strBuilder = new StringBuilder();
 		strBuilder.append("transforms/templates/");
-		strBuilder.append(name);
+		strBuilder.append(this.nameEnvelope);
 		URL url = Resources.getResource(strBuilder.toString());
 		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
 		return getDocument(fragment);

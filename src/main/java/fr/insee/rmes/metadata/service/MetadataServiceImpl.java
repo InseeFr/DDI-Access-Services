@@ -17,13 +17,11 @@ import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
-import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
-import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
@@ -296,7 +294,7 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	@Override
-	public String getDDIDocument(String itemId, String resourcePackageId) throws Exception {
+	public String getDerefDDIDocumentWithExternalRP(String itemId, String resourcePackageId) throws Exception {
 		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
 				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
@@ -315,7 +313,7 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 
 	@Override
-	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId) throws Exception {
+	public String getDerefDDIDocument(String itemId) throws Exception {
 		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
 		Map<String, String> refs = items.stream().filter(item -> null != item)
 				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
@@ -325,34 +323,7 @@ public class MetadataServiceImpl implements MetadataService {
 						throw new RuntimeException(e);
 					}
 				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(itemId, refs).build().toString();
-	}
-
-	@Override
-	public String getDDIDocumentWithoutEnvelope(String itemId, String resourcePackageId, String envelopeName)
-			throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(itemId));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false, envelopeName)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(itemId, refs).build().toString();
+		return new DDIDocumentBuilder().buildItemDocument(itemId, refs).build().toString();
 	}
 
 	public ResourcePackage getResourcePackage(String id) throws Exception {
@@ -370,107 +341,7 @@ public class MetadataServiceImpl implements MetadataService {
 		return resourcePackage;
 	}
 
-	@Override
-	public String getCodeList(String itemId, String ressourcePackageId) throws Exception {
-
-		String formatRes = "";
-
-		String fragment = metadataServiceItem.getItem(itemId).item;
-		logger.debug(fragment);
-		StringBuilder res = new StringBuilder();
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']";
-		res.append(xpathProcessor.queryText(fragment, fragmentExp));
-		StringBuilder categories = new StringBuilder();
-		if (!(res.length() == 0)) {
-			res = new StringBuilder();
-			res.append(getDDIDocumentWithoutEnvelope(itemId, ressourcePackageId));
-			fragmentExp = "//*[local-name()='Fragment']/*[local-name()='CodeList']/*[local-name()='Code']";
-			NodeList children = xpathProcessor.queryList(fragment, fragmentExp);
-			String categoryIdRes;
-			for (int i = 1; i < children.getLength() + 1; i++) {
-
-				String labelExp = "//*[local-name()='Code'][" + i
-						+ "]/*[local-name()='CategoryReference']/*[local-name()='ID']/text()";
-				categoryIdRes = xpathProcessor.queryText(fragment, labelExp);
-
-				logger.warn(categoryIdRes);
-				categories.append(getDDIDocumentWithoutEnvelope(categoryIdRes, ressourcePackageId));
-
-			}
-			logger.debug(categories);
-			formatRes = categories.toString().replaceAll("<Category>", "<l:Category>");
-			formatRes = formatRes.replaceAll("</Category>", "</l:Category>");
-			formatRes = formatRes.replaceAll("<Code>", "<l:Code>");
-			formatRes = formatRes.replaceAll("</Code>", "</l:Code>");
-			formatRes = formatRes.replaceAll("<CodeList>", "<l:CodeList>");
-			formatRes = formatRes.replaceAll("</CodeList>", "</l:CodeList>");
-			res.append(formatRes);
-
-			return res.toString();
-		}
-
-		throw new RMeSException(404, "The type of this item isn't a CodeList.", fragment);
-
-	}
-
-	@Override
-	public String getQuestionnaire(String id) throws Exception {
-		DDIItem instrumentDDIItem = searchService.getDDIItemById(id);
-		StringBuilder res = new StringBuilder();
-		String studyUnitFragment = metadataServiceItem.getItem(instrumentDDIItem.getStudyUnitId()).item;
-		String fragmentExp = "//*[local-name()='Fragment']/*[local-name()='StudyUnit']//text()";
-		res.append(xpathProcessor.queryText(studyUnitFragment, fragmentExp));
-		res.append(getItemByType(id, DDIItemType.QUESTIONNAIRE));
-		return res.toString();
-	}
-
-	@Override
-	public String getSequence(String id) throws Exception {
-		return getItemByType(id, DDIItemType.SEQUENCE);
-	}
-
-	@Override
-	public String getQuestion(String id) throws Exception {
-		return getItemByType(id, DDIItemType.QUESTION);
-	}
-
-	private String getItemByType(String id, DDIItemType type) throws Exception {
-		DDIItem instrumentDDIItem = searchService.getDDIItemById(id);
-		if (instrumentDDIItem != null) {
-			if (instrumentDDIItem.getType().equals(type.getType())) {
-				StringBuilder res = new StringBuilder();
-				res = new StringBuilder();
-				res.append(getDDIDocumentWithExternalResource(id, instrumentDDIItem.getResourcePackageId()));
-				return res.toString();
-
-			} else {
-				throw new RMeSException(404, "The type of this item isn't a " + type + " but a ",
-						instrumentDDIItem.getType());
-			}
-		} else {
-			throw new RMeSException(404, "The item isn't exist", id);
-		}
-	}
-
-	private String getDDIDocumentWithExternalResource(String id, String resourcePackageId) throws Exception {
-		List<ColecticaItem> items = metadataServiceItem.getItems(metadataServiceItem.getChildrenRef(id));
-		Map<String, String> refs = items.stream().filter(item -> null != item)
-				.collect(Collectors.toMap(ColecticaItem::getIdentifier, item -> {
-					try {
-						return xpathProcessor.queryString(item.getItem(), "/Fragment/*");
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}));
-		// ResourcePackage resourcePackage =
-		// getResourcePackage(resourcePackageId);
-		// refs.putAll(resourcePackage.getReferences());
-		return new DDIDocumentBuilder(false)
-				// .buildResourcePackageDocument(resourcePackage.getId(),
-				// resourcePackage.getReferences())
-				.buildItemDocument(id, refs).build().toString();
-	}
-
+	
 	@Override
 	public List<String> getGroupIds() throws Exception {
 		return groupRepository.getRootIds();
@@ -480,5 +351,37 @@ public class MetadataServiceImpl implements MetadataService {
 	public List<String> getRessourcePackageIds() throws Exception {
 		return groupRepository.getRessourcePackageIds();
 	}
+
+	@Override
+	public String getDDIDocument(String itemId) throws Exception {
+		// TODO Auto-generated method stub
+		return "Test";
+	}
+
+	@Override
+	public String getItemByType(String id, DDIItemType type) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDDIInstance(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getSequence(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getQuestion(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 
 }

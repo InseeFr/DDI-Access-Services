@@ -15,10 +15,9 @@ import fr.insee.rmes.metadata.client.MetadataClient;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
-import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
-import fr.insee.rmes.metadata.service.MetadataServiceImpl;
+import fr.insee.rmes.utils.ddi.ItemFormat;
 
 @Service
 public class MetadataRepositoryImpl implements MetadataRepository {
@@ -30,6 +29,9 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 
 	@Value("${fr.insee.rmes.api.remote.metadata.agency}")
 	public String agencyId;
+	
+	@Value("${fr.insee.rmes.api.remote.metadata.user}")
+	private String versionResponsability;
 
 	@Override
 	public ColecticaItem findById(String id) throws Exception {
@@ -62,7 +64,8 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 			colecticaItemPostRef.version = "0";
 			colecticaItemPostRef.agencyId = agencyId;
 			colecticaItemPostRef.setItemType("7E47C269-BCAB-40F7-A778-AF7BBC4E3D00");
-			colecticaItemPostRef.setVersionResponsibility("Test");
+			colecticaItemPostRef.setVersionResponsibility(versionResponsability);
+			colecticaItemPostRef.setItemFormat(ItemFormat.DDI_32);
 
 		}
 		logger.debug(refs.toString());

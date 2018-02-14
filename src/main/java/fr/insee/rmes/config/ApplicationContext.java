@@ -34,8 +34,8 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@PropertySource(value = { "classpath:env/${fr.insee.rmes.env:dv}/ddi-access-services.properties",
-		"file:${catalina.base}/webapps/ddi-access-services.properties" }, ignoreResourceNotFound = true)
+@PropertySource(value = { "classpath:env/${fr.insee.rmes.env:dev}/ddi-access-services.properties",
+		"file:${catalina.base}/webapps/ddi-access-services.properties" ,"file:${catalina.base}/webapps/rmspogbo.properties","file:${catalina.base}/webapps/rmespogbo.properties" }, ignoreResourceNotFound = true)
 public class ApplicationContext {
 
 	@Value("${fr.insee.rmes.search.db.host}")

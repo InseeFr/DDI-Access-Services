@@ -9,8 +9,8 @@ public enum DDIItemType {
 	STUDY_UNIT("Study Unit","study-unit"),
 	CODE_LIST("Code List","code-list"),
 	GROUP("Group","group"),
-	SUB_GROUP("Sub Group","sub-group");
-	
+	SUB_GROUP("Sub Group","sub-group"),
+	DDI_INSTANCE("DDIInstance","DDIInstance");
 	
 	private String name = "" ; 
 	private String type ="";
