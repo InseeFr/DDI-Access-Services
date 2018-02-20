@@ -1,8 +1,6 @@
 package fr.insee.rmes.metadata.service.ddiinstance;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,6 +54,9 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		// Step 4 : Get the ColecticaItem Study-unit
 		String idStudyUnit = xpathProcessor.queryString(subGroupItem.getItem(), "/Fragment[1]/SubGroup[1]/StudyUnitReference[1]/ID[1]/text()");
 		ColecticaItem studyUnitItem = metadataServiceItem.getItem(idStudyUnit); 
+		// Step 5 : Get the ColecticaItem PhysicalDataProduct
+		String idPhysicalDataProduct = xpathProcessor.queryString(subGroupItem.getItem(), "/Fragment[1]/SubGroup[1]/PhysicalDataProductReference[1]/ID[1]/text()");
+		ColecticaItem physicalDataProductItem = metadataServiceItem.getItem(idPhysicalDataProduct); 
 		// Step : Build the group, from the studyUnit to the group
 		DDIDocumentBuilder docBuilder = new DDIDocumentBuilder();
 		
@@ -67,6 +68,11 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 				Node studyUnitNode = getNode(UtilXML.nodeToString(xpathProcessor.queryList(studyUnitItem.getItem(),"/Fragment[1]/*").item(0)),docBuilder.getDocument());
 				subGroupNode.removeChild(node);
 				subGroupNode.appendChild(studyUnitNode);
+			}
+			if (node.getNodeName().contains("PhysicalDataProductReference")) {
+				Node physicalDataProductNode = getNode(UtilXML.nodeToString(xpathProcessor.queryList(physicalDataProductItem.getItem(),"/Fragment[1]/*").item(0)),docBuilder.getDocument());
+				subGroupNode.removeChild(node);
+				subGroupNode.appendChild(physicalDataProductNode);
 			}
 		}
 		subGroupNode = getNode(UtilXML.nodeToString(subGroupNode),docBuilder.getDocument());
@@ -89,10 +95,30 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		String rpString2 = xpathProcessor.queryString(metadataService.getDerefDDIDocument(idRP2),"/DDIInstance[1]/*");
 		Node RP2 = getNode(rpString2,docBuilder.getDocument());
 		
+		// Step : Get DDI Instance informations on root : r:URN, r:Agency, r:ID, r:Version, r:UserID, r:Citation
+		String urnString = xpathProcessor.queryString(ddiInstance.getItem(), "/Fragment[1]/DDIInstance[1]/URN[1]");
+		Node urnNode = getNode(urnString.trim(),docBuilder.getDocument());
+		String agencyString = xpathProcessor.queryString(ddiInstance.getItem(), "/Fragment[1]/DDIInstance[1]/Agency[1]");
+		Node agencyNode = getNode(agencyString,docBuilder.getDocument());
+		String idString = xpathProcessor.queryString(ddiInstance.getItem(), "/Fragment[1]/DDIInstance[1]/ID[1]");
+		Node idNode = getNode(idString,docBuilder.getDocument());
+		String versionString = xpathProcessor.queryString(ddiInstance.getItem(), "/Fragment[1]/DDIInstance[1]/Version[1]");
+		Node versionNode = getNode(versionString,docBuilder.getDocument());
+		String userIDString = xpathProcessor.queryString(ddiInstance.getItem(), "/Fragment[1]/DDIInstance[1]/UserID[1]");
+		Node userIDNode = getNode(userIDString,docBuilder.getDocument());
+		String citationString = xpathProcessor.queryString(ddiInstance.getItem(), "/Fragment[1]/DDIInstance[1]/Citation[1]");
+		Node citationNode = getNode(citationString,docBuilder.getDocument());
+
+		// Final step add Child on root
+		docBuilder.appendChild(urnNode);
+		docBuilder.appendChild(agencyNode);
+		docBuilder.appendChild(idNode);
+		docBuilder.appendChild(versionNode);
+		docBuilder.appendChild(userIDNode);
+		docBuilder.appendChild(citationNode);
 		docBuilder.appendChild(groupNode);
 		docBuilder.appendChild(RP1);
 		docBuilder.appendChild(RP2);
-		
 		return docBuilder.toString();
 		
 	}

@@ -268,6 +268,7 @@ public class RMeSMetadata {
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a DDI instance", notes = "Get a DDI document of a DDI Instance from Colectica repository reference {id}", response = String.class)
 	public Response getDDIInstance(@PathParam(value = "id") String id) throws Exception {
+	
 		try {
 			String questionnaire = ddiInstanceService.getDDIInstance(id);
 			StreamingOutput stream = output -> {
@@ -276,6 +277,7 @@ public class RMeSMetadata {
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+			e.printStackTrace();
 			throw e;
 		}
 	}
