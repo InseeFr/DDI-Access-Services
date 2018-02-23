@@ -1,11 +1,7 @@
 package fr.insee.rmes.webservice.rest;
 
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -23,17 +19,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
-import fr.insee.rmes.metadata.model.ColecticaPostRefDisplayed;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.metadata.service.codeList.CodeListService;
 import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
 import fr.insee.rmes.metadata.service.questionnaire.QuestionnaireService;
-import fr.insee.rmes.utils.ddi.ItemFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -239,14 +231,10 @@ public class RMeSMetadata {
 	@Path("questionnaire/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
-	public Response getQuestionnaire(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId,
-			@QueryParam(value = "idDataCollection") String datacollectionId,
-			@QueryParam(value = "idGroup") String groupId, @QueryParam(value = "idSubGroup") String subGroupId)
-			throws Exception {
+	public Response getQuestionnaire(@PathParam(value = "idDdiInstance") String idDdiInstance,
+			@PathParam(value = "idDdiInstrument") String idDdiInstrument) throws Exception {
 		try {
-			String questionnaire = questionnaireService.getQuestionnaire(id, resourcePackageId, datacollectionId,
-					subGroupId, groupId);
+			String questionnaire = questionnaireService.getQuestionnaire(idDdiInstance, idDdiInstrument);
 
 			StreamingOutput stream = output -> {
 				try {
@@ -268,7 +256,7 @@ public class RMeSMetadata {
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a DDI instance", notes = "Get a DDI document of a DDI Instance from Colectica repository reference {id}", response = String.class)
 	public Response getDDIInstance(@PathParam(value = "id") String id) throws Exception {
-	
+
 		try {
 			String questionnaire = ddiInstanceService.getDDIInstance(id);
 			StreamingOutput stream = output -> {

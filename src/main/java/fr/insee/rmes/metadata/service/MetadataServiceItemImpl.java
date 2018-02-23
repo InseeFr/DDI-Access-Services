@@ -66,7 +66,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	public ColecticaItem getItemByType(String id, DDIItemType type) throws Exception {
 		ColecticaItem item = metadataRepository.findById(id);
 		DDIItemType typeItem = item.getType(); 
-		if (item != null) {
+		if (item != null && typeItem!=null) {
 			if (typeItem.getName().equals(type.getName())) {
 				return item;
 			} else {

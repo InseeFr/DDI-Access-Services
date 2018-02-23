@@ -3,7 +3,7 @@ package fr.insee.rmes.search.model;
 public enum DDIItemType {
 
 	QUESTION("Question","question"),
-	QUESTIONNAIRE("Questionnaire","instrument"),
+	QUESTIONNAIRE("Instrument","instrument"),
 	SEQUENCE("Sequence","sequence"),
 	DATA_COLLECTION("Data Collection","data-collection"),
 	STUDY_UNIT("Study Unit","study-unit"),
