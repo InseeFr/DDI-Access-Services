@@ -20,8 +20,6 @@ import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
-import fr.insee.rmes.utils.ddi.Envelope;
-import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
 public class CodeListServiceImpl implements CodeListService {

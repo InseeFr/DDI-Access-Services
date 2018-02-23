@@ -1,27 +1,18 @@
 package fr.insee.rmes.metadata.client;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static io.restassured.RestAssured.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import fr.insee.rmes.metadata.client.MetadataClientImpl;
-import fr.insee.rmes.metadata.model.ColecticaItemRef;
-import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Unit;
-import fr.insee.rmes.metadata.repository.MetadataRepository;
 
 public class MetadataClientImplTest {
 	
