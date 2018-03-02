@@ -36,4 +36,6 @@ public interface DDIItemRepository {
 
 	DDIItem getItemById(String id) throws Exception;
 
+	List<DDIItem> getGroups() throws Exception;
+
 }

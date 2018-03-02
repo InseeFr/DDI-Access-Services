@@ -49,6 +49,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 		return null;
 	}
 
+	@Override
 	public List<DDIItem> findByLabelInSubGroup(String label, String subgroupId, String... types) throws Exception {
 		return null;
 	}
@@ -65,11 +66,16 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 	}
 
 	@Override
-	public List<DDIItem> getStudyUnits(String subgGroupId) throws Exception {
+	public List<DDIItem> getStudyUnits(String subGroupId) throws Exception {
+		List<DDIItem> ddiItems;
 		try {
-			List<DDIItem> ddiItems = jdbcTemplate.query(
-					"SELECT * FROM ddi_item WHERE type='study-unit' and subgroupid=?",
-					new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgGroupId);
+			String query = "SELECT * FROM ddi_item WHERE type='study-unit' ";
+			if (subGroupId != null) {
+				query = query.concat("and subgroupid=?");
+				ddiItems = jdbcTemplate.query(query, new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subGroupId);
+			} else {
+				ddiItems = jdbcTemplate.query(query, new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
+			}
 			return ddiItems;
 		} catch (EmptyResultDataAccessException e) {
 			return null;
@@ -171,7 +177,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 					rsi.setSubgroupId(getItemById(ddiItem.getSubGroupId()).getLabel());
 					rsi.setVersion("1");
 					responses.add(rsi);
-				}	
+				}
 			}
 
 			if (type.toLowerCase().equals("codelist")) {
@@ -180,16 +186,15 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 						ddiItems = jdbcTemplate.query(
 								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=? and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId, criteriaFilter);
-						
+
 						ddiItems.addAll(jdbcTemplate.query(
 								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter));
-						
+
 					} else {
-						ddiItems = jdbcTemplate.query(
-								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=?",
+						ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='code-list' and subgroupid=?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subgroupId);
-						
+
 						ddiItems.addAll(jdbcTemplate.query(
 								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL ",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class)));
@@ -199,16 +204,18 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 						ddiItems = jdbcTemplate.query(
 								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter);
-						
+
 						ddiItems.addAll(jdbcTemplate.query(
 								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NOT NULL and LOWER(label) like ?",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class), criteriaFilter));
-						
+
 					} else {
-						ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL",
+						ddiItems = jdbcTemplate.query(
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NULL",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
-						
-						ddiItems.addAll(jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NOT NULL",
+
+						ddiItems.addAll(jdbcTemplate.query(
+								"SELECT * FROM ddi_item WHERE type='code-list' and subgroupid IS NOT NULL",
 								new BeanPropertyRowMapper<DDIItem>(DDIItem.class)));
 					}
 				}
@@ -216,19 +223,18 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 					ResponseSearchItem rsi = new ResponseSearchItem();
 					rsi.setId(ddiItem.getId());
 					rsi.setTitle(ddiItem.getLabel());
-					if(ddiItem.getSubGroupId()!=null){
+					if (ddiItem.getSubGroupId() != null) {
 						rsi.setSubgroupId(getItemById(ddiItem.getSubGroupId()).getLabel());
-					}else{
+					} else {
 						rsi.setSubgroupId("COMMUN");
 					}
 					rsi.setVersion("1");
 					responses.add(rsi);
-				}	
+				}
 			}
-			
+
 		}
 
-		
 		if (responses.size() > 0) {
 			return responses;
 		} else {
@@ -236,6 +242,7 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 		}
 	}
 
+	@Override
 	public DDIItem getItemById(String id) throws Exception {
 		try {
 			List<DDIItem> ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE id=?",
@@ -257,6 +264,15 @@ public class DDIItemRepositoryDBImpl implements DDIItemRepository {
 		jdbcTemplate.update(qString);
 	}
 
-	
+	@Override
+	public List<DDIItem> getGroups() throws Exception {
+		try {
+			List<DDIItem> ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='group'",
+					new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
+			return ddiItems;
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+	}
 
 }
