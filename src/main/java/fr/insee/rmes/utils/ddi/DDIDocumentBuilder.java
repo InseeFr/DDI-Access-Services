@@ -46,10 +46,10 @@ public class DDIDocumentBuilder {
 		}
 	}
 
-	public void setEnvelope(Boolean envelope){
-		this.envelope=envelope;
+	public void setEnvelope(Boolean envelope) {
+		this.envelope = envelope;
 	}
-	
+
 	public DDIDocumentBuilder(Boolean envelope, Enum<Envelope> envelopeName) {
 		this.nameEnvelope = envelopeName.toString();
 		this.envelope = envelope;
@@ -273,7 +273,7 @@ public class DDIDocumentBuilder {
 	public void appendChild(Node childNode) {
 		packagedDocument.getDocumentElement().appendChild(childNode);
 	}
-	
+
 	/**
 	 * Method of adding the itemNode to the DDIDocument (appendChild)
 	 * 
@@ -283,15 +283,13 @@ public class DDIDocumentBuilder {
 	 *            : node to append
 	 */
 	public void appendChildByParent(String parentName, Node childNode) {
-		NodeList nodeList = packagedDocument.getDocumentElement().getChildNodes();
+		NodeList nodeList = packagedDocument.getElementsByTagName(parentName);
 
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals(parentName)) {
-				Node nodeListChild = node.getLastChild();
 				try {
-					Node finalNode = nodeListChild.getPreviousSibling();
-					finalNode.appendChild(childNode);
+					node.appendChild(childNode);
 				} catch (Exception e) {
 					node.appendChild(childNode);
 				}
@@ -311,6 +309,11 @@ public class DDIDocumentBuilder {
 
 			refactor(clonedNode, packagedDocument);
 		}
+	}
+
+	public NodeList getElementByTagName(String name) {
+		NodeList nodeList = packagedDocument.getElementsByTagName(name);
+		return nodeList;
 	}
 
 	public void importChild(Node childNode) {
