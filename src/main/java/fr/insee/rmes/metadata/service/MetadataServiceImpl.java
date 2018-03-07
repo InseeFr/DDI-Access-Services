@@ -13,6 +13,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.Relationship;
+import fr.insee.rmes.metadata.model.RelationshipPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
@@ -341,7 +343,6 @@ public class MetadataServiceImpl implements MetadataService {
 		return resourcePackage;
 	}
 
-	
 	@Override
 	public List<String> getGroupIds() throws Exception {
 		return groupRepository.getRootIds();
@@ -382,6 +383,9 @@ public class MetadataServiceImpl implements MetadataService {
 		return null;
 	}
 
-	
+	@Override
+	public Relationship postRelationship(RelationshipPost relationshipPost) throws Exception {
+		return metadataRepository.postRelationship(relationshipPost);
+	}
 
 }
