@@ -57,19 +57,22 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 	@Override
 	public String getQuestionnaire(String idDDIInstance, String idDDIInstrument) throws Exception {
-		List<ColecticaItem> parentsOfInstrument = new ArrayList<ColecticaItem>();
 
 		// Step 1 : Get the DDIInstance, the DDIInstrument and Check type (an
 		// Exception throws if not)
-		ColecticaItem ddiInstance = metadataServiceItem.getItemByType(idDDIInstance, DDIItemType.DDI_INSTANCE);
-		logger.info(ddiInstance.getIdentifier());
+		ColecticaItem DDIInstance = metadataServiceItem.getItemByType(idDDIInstance, DDIItemType.DDI_INSTANCE);
+		try {
+			ColecticaItem DDIInstrument = metadataServiceItem.getItemByType(idDDIInstrument, DDIItemType.QUESTIONNAIRE);
+		} catch (Exception e) {
+			throw e;
+		}
 		//////////////////////////////////////////////
 		// While Instrument not found
 		// Step 2 : Get all the group references
-		NodeList childrenInstance = xpathProcessor.queryList(ddiInstance.getItem(),
+		NodeList childrenInstance = xpathProcessor.queryList(DDIInstance.getItem(),
 				"//*[local-name()='Fragment']/*[local-name()='DDIInstance']/*[local-name()='GroupReference']");
 		for (int indexGroup = 1; indexGroup < childrenInstance.getLength() + 1; indexGroup++) {
-			String idGroup = xpathProcessor.queryString(ddiInstance.getItem(),
+			String idGroup = xpathProcessor.queryString(DDIInstance.getItem(),
 					"//*[local-name()='Fragment']/*[local-name()='DDIInstance']/*[local-name()='GroupReference']["
 							+ indexGroup + "]/*[local-name()='ID']/text()");
 			ColecticaItem groupItem = metadataServiceItem.getItem(idGroup);
@@ -131,11 +134,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 								logger.info(instrument.identifier);
 
 								if (instrument.identifier.equals(idDDIInstrument)) {
-									parentsOfInstrument.add(groupItem);
-									parentsOfInstrument.add(subGroupItem);
-									parentsOfInstrument.add(studyUnitItem);
-									parentsOfInstrument.add(dataCollection);
-									parentsOfInstrument.add(instrumentScheme);
 
 									ColecticaItemRefList listChildrenInstrument = metadataServiceItem
 											.getChildrenRef(instrument.getIdentifier());
@@ -186,7 +184,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 											docBuilder.getDocument());
 
 									// Step : Get the first Resource package
-									String idRP = xpathProcessor.queryString(ddiInstance.getItem(),
+									String idRP = xpathProcessor.queryString(DDIInstance.getItem(),
 											"/Fragment[1]/DDIInstance[1]/ResourcePackageReference[1]/ID[1]/text()");
 									String rpString = xpathProcessor.queryString(metadataServiceItem.getItem(idRP).item,
 											"/Fragment[1]/*");
@@ -195,22 +193,22 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 									// Step : Get DDI Instance informations on
 									// root : r:URN, r:Agency, r:ID, r:Version,
 									// r:UserID, r:Citation
-									String urnString = xpathProcessor.queryString(ddiInstance.getItem(),
+									String urnString = xpathProcessor.queryString(DDIInstance.getItem(),
 											"/Fragment[1]/DDIInstance[1]/URN[1]");
 									Node urnNode = getNode(urnString.trim(), docBuilder.getDocument());
-									String agencyString = xpathProcessor.queryString(ddiInstance.getItem(),
+									String agencyString = xpathProcessor.queryString(DDIInstance.getItem(),
 											"/Fragment[1]/DDIInstance[1]/Agency[1]");
 									Node agencyNode = getNode(agencyString, docBuilder.getDocument());
-									String idString = xpathProcessor.queryString(ddiInstance.getItem(),
+									String idString = xpathProcessor.queryString(DDIInstance.getItem(),
 											"/Fragment[1]/DDIInstance[1]/ID[1]");
 									Node idNode = getNode(idString, docBuilder.getDocument());
-									String versionString = xpathProcessor.queryString(ddiInstance.getItem(),
+									String versionString = xpathProcessor.queryString(DDIInstance.getItem(),
 											"/Fragment[1]/DDIInstance[1]/Version[1]");
 									Node versionNode = getNode(versionString, docBuilder.getDocument());
-									String userIDString = xpathProcessor.queryString(ddiInstance.getItem(),
+									String userIDString = xpathProcessor.queryString(DDIInstance.getItem(),
 											"/Fragment[1]/DDIInstance[1]/UserID[1]");
 									Node userIDNode = getNode(userIDString, docBuilder.getDocument());
-									String citationString = xpathProcessor.queryString(ddiInstance.getItem(),
+									String citationString = xpathProcessor.queryString(DDIInstance.getItem(),
 											"/Fragment[1]/DDIInstance[1]/Citation[1]");
 									Node citationNode = getNode(citationString, docBuilder.getDocument());
 
