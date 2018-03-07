@@ -31,6 +31,7 @@ import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
 import fr.insee.rmes.utils.ddi.UtilXML;
+import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
 public class QuestionnaireServiceImpl implements QuestionnaireService {
@@ -55,12 +56,29 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 	@Autowired
 	XpathProcessor xpathProcessor;
 
+	private String idDDIInstrument;
+
+	private ColecticaItem instrument;
+
+	private ColecticaItem DDIInstance;
+
+	private ColecticaItem subGroupItem;
+
+	private ColecticaItem groupItem;
+
+	private ColecticaItem studyUnitItem;
+
+	private ColecticaItem dataCollection;
+
+	private ColecticaItem instrumentScheme;
+
 	@Override
 	public String getQuestionnaire(String idDDIInstance, String idDDIInstrument) throws Exception {
+		this.idDDIInstrument = idDDIInstrument;
 
 		// Step 1 : Get the DDIInstance, the DDIInstrument and Check type (an
 		// Exception throws if not)
-		ColecticaItem DDIInstance = metadataServiceItem.getItemByType(idDDIInstance, DDIItemType.DDI_INSTANCE);
+		this.DDIInstance = metadataServiceItem.getItemByType(idDDIInstance, DDIItemType.DDI_INSTANCE);
 		try {
 			ColecticaItem DDIInstrument = metadataServiceItem.getItemByType(idDDIInstrument, DDIItemType.QUESTIONNAIRE);
 		} catch (Exception e) {
@@ -75,7 +93,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 			String idGroup = xpathProcessor.queryString(DDIInstance.getItem(),
 					"//*[local-name()='Fragment']/*[local-name()='DDIInstance']/*[local-name()='GroupReference']["
 							+ indexGroup + "]/*[local-name()='ID']/text()");
-			ColecticaItem groupItem = metadataServiceItem.getItem(idGroup);
+			this.groupItem = metadataServiceItem.getItem(idGroup);
 			// Step 3 : foreach group in groups --> Search subGroups and
 			// store the
 			// currentGroup as ColecticaItem
@@ -85,7 +103,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 				String idSubGroup = xpathProcessor.queryString(groupItem.getItem(),
 						"//*[local-name()='Fragment']/*[local-name()='Group']/*[local-name()='SubGroupReference']["
 								+ indexSubGroup + "]/*[local-name()='ID']/text()");
-				ColecticaItem subGroupItem = metadataServiceItem.getItem(idSubGroup);
+				this.subGroupItem = metadataServiceItem.getItem(idSubGroup);
 				// Step 4 : foreach subGroup in subGroups in currentGroup
 				// --> Search
 				// StudyUnits and store the currentSubGroup as ColecticaItem
@@ -95,7 +113,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 					String idStudyUnit = xpathProcessor.queryString(subGroupItem.getItem(),
 							"//*[local-name()='Fragment']/*[local-name()='SubGroup']/*[local-name()='StudyUnitReference']["
 									+ indexStudyUnit + "]/*[local-name()='ID']/text()");
-					ColecticaItem studyUnitItem = metadataServiceItem.getItem(idStudyUnit);
+					this.studyUnitItem = metadataServiceItem.getItem(idStudyUnit);
 
 					// Step 5 : foreach StudyUnit in currentStudyUnit in
 					// currentSubGroup in
@@ -109,7 +127,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 						String idDataCollection = xpathProcessor.queryString(studyUnitItem.getItem(),
 								"//*[local-name()='Fragment']/*[local-name()='StudyUnit']/*[local-name()='DataCollectionReference']["
 										+ indexDataCollection + "]/*[local-name()='ID']/text()");
-						ColecticaItem dataCollection = metadataServiceItem.getItem(idDataCollection);
+						this.dataCollection = metadataServiceItem.getItem(idDataCollection);
 						// Step 6 : foreach DataCollection in currentDC in
 						// currentStudyUnit in
 						// currentSubGroup ...
@@ -120,122 +138,26 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 							String idInstrumentScheme = xpathProcessor.queryString(dataCollection.getItem(),
 									"//*[local-name()='Fragment']/*[local-name()='DataCollection']/*[local-name()='InstrumentSchemeReference']["
 											+ indexDataCollection + "]/*[local-name()='ID']/text()");
-							ColecticaItem instrumentScheme = metadataServiceItem.getItem(idInstrumentScheme);
+							this.instrumentScheme = metadataServiceItem.getItem(idInstrumentScheme);
 							logger.info(instrumentScheme.identifier);
 
 							NodeList instrumentSchemeDC = xpathProcessor.queryList(instrumentScheme.getItem(),
 									"//*[local-name()='Fragment']/*[local-name()='InstrumentScheme']/*[local-name()='InstrumentReference']");
+							//// Step 7 : if the idDDIInstrument : leave the
+							//// Loop and get the
+							//// children list of this instrument
 							for (int indexInstrument = 1; indexInstrument < instrumentSchemeDC.getLength()
 									+ 1; indexInstrument++) {
 								String idInstrument = xpathProcessor.queryString(instrumentScheme.getItem(),
 										"//*[local-name()='Fragment']/*[local-name()='InstrumentScheme']/*[local-name()='InstrumentReference']["
 												+ indexDataCollection + "]/*[local-name()='ID']/text()");
-								ColecticaItem instrument = metadataServiceItem.getItem(idInstrument);
+								this.instrument = metadataServiceItem.getItem(idInstrument);
 								logger.info(instrument.identifier);
-
+								// Step 8 : Among all of the Instrument's
+								// chidren, search the instrument
+								// relating to its id as parameter
 								if (instrument.identifier.equals(idDDIInstrument)) {
-
-									ColecticaItemRefList listChildrenInstrument = metadataServiceItem
-											.getChildrenRef(instrument.getIdentifier());
-									ColecticaItemRef instrumentTemp = null;
-									for (ColecticaItemRef childInstrument : listChildrenInstrument.identifiers) {
-										if (childInstrument.identifier.equals(idDDIInstrument)) {
-											instrumentTemp = childInstrument;
-										}
-									}
-									if (instrumentTemp != null) {
-										listChildrenInstrument.identifiers.remove(instrumentTemp);
-									}
-
-									// Step : Build the group, from the
-									// studyUnit to the group
-									DDIDocumentBuilder docBuilder = new DDIDocumentBuilder(true, Envelope.INSTRUMENT);
-
-									Node subGroupNode = getNode(
-											UtilXML.nodeToString(xpathProcessor
-													.queryList(subGroupItem.getItem(), "/Fragment[1]/*").item(0)),
-											docBuilder.getDocument());
-
-									subGroupNode = getNode(UtilXML.nodeToString(subGroupNode),
-											docBuilder.getDocument());
-									Node groupNode = getNode(
-											UtilXML.nodeToString(xpathProcessor
-													.queryList(groupItem.getItem(), "/Fragment[1]/*").item(0)),
-											docBuilder.getDocument());
-
-									Node studyUnitNode = getNode(
-											UtilXML.nodeToString(xpathProcessor
-													.queryList(studyUnitItem.getItem(), "/Fragment[1]/*").item(0)),
-											docBuilder.getDocument());
-
-									Node DCNode = getNode(
-											UtilXML.nodeToString(xpathProcessor
-													.queryList(dataCollection.getItem(), "/Fragment[1]/*").item(0)),
-											docBuilder.getDocument());
-
-									Node instrumentSchemeNode = getNode(
-											UtilXML.nodeToString(xpathProcessor
-													.queryList(instrumentScheme.item, "/Fragment[1]/*").item(0)),
-											docBuilder.getDocument());
-
-									Node instrumentNode = getNode(
-											UtilXML.nodeToString(xpathProcessor
-													.queryList(instrument.item, "/Fragment[1]/*").item(0)),
-											docBuilder.getDocument());
-
-									// Step : Get the first Resource package
-									String idRP = xpathProcessor.queryString(DDIInstance.getItem(),
-											"/Fragment[1]/DDIInstance[1]/ResourcePackageReference[1]/ID[1]/text()");
-									String rpString = xpathProcessor.queryString(metadataServiceItem.getItem(idRP).item,
-											"/Fragment[1]/*");
-									Node RP1 = getNode(rpString, docBuilder.getDocument());
-
-									// Step : Get DDI Instance informations on
-									// root : r:URN, r:Agency, r:ID, r:Version,
-									// r:UserID, r:Citation
-									String urnString = xpathProcessor.queryString(DDIInstance.getItem(),
-											"/Fragment[1]/DDIInstance[1]/URN[1]");
-									Node urnNode = getNode(urnString.trim(), docBuilder.getDocument());
-									String agencyString = xpathProcessor.queryString(DDIInstance.getItem(),
-											"/Fragment[1]/DDIInstance[1]/Agency[1]");
-									Node agencyNode = getNode(agencyString, docBuilder.getDocument());
-									String idString = xpathProcessor.queryString(DDIInstance.getItem(),
-											"/Fragment[1]/DDIInstance[1]/ID[1]");
-									Node idNode = getNode(idString, docBuilder.getDocument());
-									String versionString = xpathProcessor.queryString(DDIInstance.getItem(),
-											"/Fragment[1]/DDIInstance[1]/Version[1]");
-									Node versionNode = getNode(versionString, docBuilder.getDocument());
-									String userIDString = xpathProcessor.queryString(DDIInstance.getItem(),
-											"/Fragment[1]/DDIInstance[1]/UserID[1]");
-									Node userIDNode = getNode(userIDString, docBuilder.getDocument());
-									String citationString = xpathProcessor.queryString(DDIInstance.getItem(),
-											"/Fragment[1]/DDIInstance[1]/Citation[1]");
-									Node citationNode = getNode(citationString, docBuilder.getDocument());
-
-									// Final step add Child on root
-									docBuilder.appendChild(urnNode);
-									docBuilder.appendChild(agencyNode);
-									docBuilder.appendChild(idNode);
-									docBuilder.appendChild(versionNode);
-									docBuilder.appendChild(userIDNode);
-									docBuilder.appendChild(citationNode);
-									docBuilder.appendChild(groupNode);
-									docBuilder.appendChildByParent("Group", subGroupNode);
-									docBuilder.appendChildByParent("SubGroup", studyUnitNode);
-									docBuilder.appendChildByParent("StudyUnit", DCNode);
-									docBuilder.appendChildByParent("DataCollection", instrumentSchemeNode);
-									docBuilder.appendChildByParent("InstrumentScheme", instrumentNode);
-									docBuilder.appendChild(RP1);
-									List<ColecticaItem> items = metadataServiceItem.getItems(listChildrenInstrument);
-									for (ColecticaItem item : items) {
-										Node itemNode = getNode(
-												UtilXML.nodeToString(xpathProcessor
-														.queryList(item.getItem(), "/Fragment[1]/*").item(0)),
-												docBuilder.getDocument());
-										docBuilder.appendChildByParent("ResourcePackage", itemNode);
-									}
-
-									return docBuilder.toString();
+									return buildQuestionnaire();
 								}
 
 							}
@@ -245,22 +167,113 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 			}
 		}
 
-		//// Step 7 : if the idDDIInstrument : leave the Loop and get the
-		//// children list of this instrument
-		/////////////////////////////////////////////////////////////////
+		throw new RMeSException(404, "The DDI Instrument specified as parameter was not found.", "");
+	}
 
-		// Step 8 : Among all of the Instrument's chidren, search the instrument
-		// relating to its id as parameter
+	private String buildQuestionnaire() throws Exception {
 
-		// Step 9 : Insert the content of the instrument got to the enveloppe as
-		// a child of StudyUnit's template.
+		ColecticaItemRefList listChildrenInstrument = metadataServiceItem.getChildrenRef(instrument.getIdentifier());
+		ColecticaItemRef instrumentTemp = null;
+		for (ColecticaItemRef childInstrument : listChildrenInstrument.identifiers) {
+			if (childInstrument.identifier.equals(idDDIInstrument)) {
+				instrumentTemp = childInstrument;
+			}
+		}
+		if (instrumentTemp != null) {
+			listChildrenInstrument.identifiers.remove(instrumentTemp);
+		}
 
-		// Step 10 : Insert the other references of the studyUnit to the
-		// enveloppe as children of RessourcePackageTemplate
+		// Step 9 : Build the group, from the
+		// studyUnit to the group
+		DDIDocumentBuilder docBuilder = new DDIDocumentBuilder(true, Envelope.INSTRUMENT);
 
-		// Step 11 : return the filled out enveloppe as result
+		Node subGroupNode = getNode(
+				UtilXML.nodeToString(xpathProcessor.queryList(subGroupItem.getItem(), "/Fragment[1]/*").item(0)),
+				docBuilder.getDocument());
 
-		return "";
+		subGroupNode = getNode(UtilXML.nodeToString(subGroupNode), docBuilder.getDocument());
+		Node groupNode = getNode(
+				UtilXML.nodeToString(xpathProcessor.queryList(groupItem.getItem(), "/Fragment[1]/*").item(0)),
+				docBuilder.getDocument());
+
+		Node studyUnitNode = getNode(
+				UtilXML.nodeToString(xpathProcessor.queryList(studyUnitItem.getItem(), "/Fragment[1]/*").item(0)),
+				docBuilder.getDocument());
+
+		Node DCNode = getNode(
+				UtilXML.nodeToString(xpathProcessor.queryList(dataCollection.getItem(), "/Fragment[1]/*").item(0)),
+				docBuilder.getDocument());
+
+		Node instrumentSchemeNode = getNode(
+				UtilXML.nodeToString(xpathProcessor.queryList(instrumentScheme.item, "/Fragment[1]/*").item(0)),
+				docBuilder.getDocument());
+
+		Node instrumentNode = getNode(
+				UtilXML.nodeToString(xpathProcessor.queryList(instrument.item, "/Fragment[1]/*").item(0)),
+				docBuilder.getDocument());
+
+		// Step 10 : Get the first Resource package
+		String idRP = xpathProcessor.queryString(DDIInstance.getItem(),
+				"/Fragment[1]/DDIInstance[1]/ResourcePackageReference[1]/ID[1]/text()");
+		String rpString = xpathProcessor.queryString(metadataServiceItem.getItem(idRP).item, "/Fragment[1]/*");
+		Node RP1 = getNode(rpString, docBuilder.getDocument());
+
+		// Step 11 : Get DDI Instance informations
+		// on
+		// root : r:URN, r:Agency, r:ID, r:Version,
+		// r:UserID, r:Citation
+		String urnString = xpathProcessor.queryString(DDIInstance.getItem(), "/Fragment[1]/DDIInstance[1]/URN[1]");
+		Node urnNode = getNode(urnString.trim(), docBuilder.getDocument());
+		String agencyString = xpathProcessor.queryString(DDIInstance.getItem(),
+				"/Fragment[1]/DDIInstance[1]/Agency[1]");
+		Node agencyNode = getNode(agencyString, docBuilder.getDocument());
+		String idString = xpathProcessor.queryString(DDIInstance.getItem(), "/Fragment[1]/DDIInstance[1]/ID[1]");
+		Node idNode = getNode(idString, docBuilder.getDocument());
+		String versionString = xpathProcessor.queryString(DDIInstance.getItem(),
+				"/Fragment[1]/DDIInstance[1]/Version[1]");
+		Node versionNode = getNode(versionString, docBuilder.getDocument());
+		String userIDString = xpathProcessor.queryString(DDIInstance.getItem(),
+				"/Fragment[1]/DDIInstance[1]/UserID[1]");
+		Node userIDNode = getNode(userIDString, docBuilder.getDocument());
+		String citationString = xpathProcessor.queryString(DDIInstance.getItem(),
+				"/Fragment[1]/DDIInstance[1]/Citation[1]");
+		Node citationNode = getNode(citationString, docBuilder.getDocument());
+
+		docBuilder.appendChild(urnNode);
+		docBuilder.appendChild(agencyNode);
+		docBuilder.appendChild(idNode);
+		docBuilder.appendChild(versionNode);
+		docBuilder.appendChild(userIDNode);
+		docBuilder.appendChild(citationNode);
+		docBuilder.appendChild(groupNode);
+		docBuilder.appendChildByParent("Group", subGroupNode);
+		docBuilder.appendChildByParent("SubGroup", studyUnitNode);
+		// Step 12 : Insert the content of the
+		// DataCollection got to the enveloppe as
+		// a child of the StudyUnit.
+		docBuilder.appendChildByParent("StudyUnit", DCNode);
+		docBuilder.appendChildByParent("DataCollection", instrumentSchemeNode);
+		docBuilder.appendChildByParent("InstrumentScheme", instrumentNode);
+		docBuilder.appendChild(RP1);
+		List<ColecticaItem> items = metadataServiceItem.getItems(listChildrenInstrument);
+		// Step 13 : Insert the other references of
+		// the studyUnit to the
+		// enveloppe as children of
+		// the first RessourcePackage
+		for (ColecticaItem item : items) {
+			// TODO: send POST requests to get the
+			// relationship (parent) of each item
+			// which has a Scheme (example :
+			// Category --> CategoryScheme
+			Node itemNode = getNode(
+					UtilXML.nodeToString(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*").item(0)),
+					docBuilder.getDocument());
+			docBuilder.appendChildByParent("ResourcePackage", itemNode);
+		}
+		// Step 14 : return the filled out enveloppe
+		// as result
+		return docBuilder.toString();
+
 	}
 
 	private Node getNode(String fragment, Document doc) throws Exception {
