@@ -55,6 +55,7 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 		return mapResponse(client.search(request));
 	}
 
+	@Override
 	public List<DDIItem> findByLabelInSubGroup(String label, String subgroupId, String... types) throws Exception {
 		SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
 				.query(QueryBuilders.boolQuery()
@@ -73,9 +74,12 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 
 	@Override
 	public List<DDIItem> getStudyUnits(String subgGroupId) throws Exception {
-		SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
-				.query(QueryBuilders.termQuery("parent", subgGroupId));
-		SearchRequest request = new SearchRequest().indices(index).types("study-unit").source(srcBuilder);
+		SearchRequest request = new SearchRequest().indices(index).types("study-unit");
+		if (subgGroupId != null) {
+			SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
+					.query(QueryBuilders.termQuery("parent", subgGroupId));
+			request.source(srcBuilder);
+		}
 		return mapResponse(client.search(request));
 	}
 
@@ -92,8 +96,6 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 		DeleteRequest request = new DeleteRequest(index, type, id);
 		return client.delete(request);
 	}
-
-	
 
 	private List<DDIItem> mapResponse(SearchResponse response) {
 		List<SearchHit> esHits = Arrays.asList(response.getHits().getHits());
@@ -118,14 +120,14 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 
 	@Override
 	public DataCollectionContext getDataCollectionContext(String dataCollectionId) throws Exception {
-		// TODO 
+		// TODO
 		return null;
 	}
-	
+
 	@Override
 	public List<ResponseSearchItem> getItemsByCriteria(String subgroupId, String operationId, String dataCollectionId,
 			DDIQuery criteria) throws Exception {
-		// TODO 
+		// TODO
 		return null;
 	}
 
@@ -138,5 +140,11 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 	public DDIItem getItemById(String id) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<DDIItem> getGroups() throws Exception {
+		SearchRequest request = new SearchRequest().indices(index).types("group");
+		return mapResponse(client.search(request));
 	}
 }
