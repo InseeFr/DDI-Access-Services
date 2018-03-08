@@ -228,7 +228,7 @@ public class RMeSMetadata {
 	}
 
 	@GET
-	@Path("questionnaire/{id}/ddi")
+	@Path("questionnaire/{idDdiInstance}/{idDdiInstrument}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
 	public Response getQuestionnaire(@PathParam(value = "idDdiInstance") String idDdiInstance,

@@ -16,6 +16,8 @@ import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.Relationship;
+import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.utils.ddi.ItemFormat;
 
@@ -29,7 +31,7 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 
 	@Value("${fr.insee.rmes.api.remote.metadata.agency}")
 	public String agencyId;
-	
+
 	@Value("${fr.insee.rmes.api.remote.metadata.user}")
 	private String versionResponsability;
 
@@ -107,5 +109,10 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 	public Integer getLastestVersionItem(String id) throws Exception {
 		return metadataClient.getLastestVersionItem(id);
 
+	}
+
+	@Override
+	public Relationship[] getRelationship(ObjectColecticaPost relationshipPost) throws Exception {
+		return metadataClient.getRelationship(relationshipPost);
 	}
 }
