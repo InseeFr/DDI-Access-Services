@@ -3,8 +3,10 @@ package fr.insee.rmes.metadata.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class RelationshipPost {
+public class ObjectColecticaPost {
 
 	/*
 	 * { "ItemTypes": [ "StringUUID" ], "TargetItem": { "AgencyId": "String",
@@ -60,6 +62,11 @@ public class RelationshipPost {
 	public String toString() {
 		return "RelationshipPost [ItemTypes=" + ItemTypes + ", targetItem=" + targetItem + ", UseDistinctResultItem="
 				+ UseDistinctResultItem + ", UseDistinctTargetItem=" + UseDistinctTargetItem + "]";
+	}
+
+	public String toJson() throws JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.writeValueAsString(this);
 	}
 
 }

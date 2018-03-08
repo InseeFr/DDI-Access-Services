@@ -6,7 +6,7 @@ import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Relationship;
-import fr.insee.rmes.metadata.model.RelationshipPost;
+import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 
 public interface MetadataClient {
@@ -25,6 +25,6 @@ public interface MetadataClient {
 
 	String postItem(ColecticaItemPostRef ref);
 
-	Relationship postRelationship(RelationshipPost relationshipPost);
+	Relationship[] getRelationship(ObjectColecticaPost objectColecticaPost);
 
 }

@@ -8,7 +8,7 @@ import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Relationship;
-import fr.insee.rmes.metadata.model.RelationshipPost;
+import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 
 public interface MetadataRepository {
@@ -27,7 +27,7 @@ public interface MetadataRepository {
 
 	Integer getLastestVersionItem(String id) throws Exception;
 
-	Relationship postRelationship(RelationshipPost relationshipPost) throws Exception;
+	Relationship[] getRelationship(ObjectColecticaPost relationshipPost) throws Exception;
 
 	List<Unit> getUnits() throws Exception;
 }

@@ -10,41 +10,41 @@ public class identifierTriple {
 	 */
 
 	@JsonProperty("Item1")
-	private String Item1;
+	private String identifier;
 
 	@JsonProperty("Item2")
-	private Integer Item2;
+	private Integer version;
 
 	@JsonProperty("Item3")
-	private String Item3;
+	private String agency;
 
-	public String getItem1() {
-		return Item1;
+	public String getIdentifier() {
+		return identifier;
 	}
 
-	public void setItem1(String item1) {
-		Item1 = item1;
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
 
-	public Integer getItem2() {
-		return Item2;
+	public Integer getVersion() {
+		return version;
 	}
 
-	public void setItem2(Integer item2) {
-		Item2 = item2;
+	public void setVersion(Integer version) {
+		this.version = version;
 	}
 
-	public String getItem3() {
-		return Item3;
+	public String getAgency() {
+		return agency;
 	}
 
-	public void setItem3(String item3) {
-		Item3 = item3;
+	public void setAgency(String agency) {
+		this.agency = agency;
 	}
 
 	@Override
 	public String toString() {
-		return "identifierTriple [Item1=" + Item1 + ", Item2=" + Item2 + ", Item3=" + Item3 + "]";
+		return "identifierTriple [identifier=" + identifier + ", Version=" + version + ", agency=" + agency + "]";
 	}
 
 }

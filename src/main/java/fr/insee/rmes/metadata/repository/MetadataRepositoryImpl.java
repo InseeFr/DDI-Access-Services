@@ -17,7 +17,7 @@ import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Relationship;
-import fr.insee.rmes.metadata.model.RelationshipPost;
+import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.utils.ddi.ItemFormat;
 
@@ -112,7 +112,7 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 	}
 
 	@Override
-	public Relationship postRelationship(RelationshipPost relationshipPost) throws Exception {
-		return metadataClient.postRelationship(relationshipPost);
+	public Relationship[] getRelationship(ObjectColecticaPost relationshipPost) throws Exception {
+		return metadataClient.getRelationship(relationshipPost);
 	}
 }
