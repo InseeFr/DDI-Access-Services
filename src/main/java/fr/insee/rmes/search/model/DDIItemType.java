@@ -16,22 +16,22 @@ public enum DDIItemType {
 	ORGANISATION_SCHEME("OrganisationScheme","organisation-scheme","08ED326A-8043-4DA2-ACE9-3F5BD19B6196"),
 	CONCEPT_SCHEME("ConceptScheme","concept-scheme","63C9F58D-1EA3-4239-99CF-E4418EC384C5"),
 	UNIVERSE_SCHEME("UniverseScheme","universe-scheme","101F901A-2C28-4931-88D6-8F80B36D5650"),
-	INTERVIEWER_INSTRUCTION_SCHEME("InterviewerInstructionScheme","interviewer-instruction-scheme","5BF598A9-9333-4C84-8C10-46195776800A"),
+	INTERVIEWERINSTRUCTION_SCHEME("InterviewerInstructionScheme","interviewer-instruction-scheme","5BF598A9-9333-4C84-8C10-46195776800A"),
 	CONTROLCONSTRUCT_SCHEME("ControlConstructScheme","control-construct-scheme","ED3801FE-6798-4EA6-808B-73052CC1C633"),
 	QUESTION_SCHEME("QuestionScheme","question-scheme","0A63FCF6-FFDD-4214-B38C-147D6689D6A1"),
 	CATEGORY_SCHEME("CategoryScheme","category-scheme","1C11DE94-A36D-4D80-95DC-950C6F37F624"),
 	VARIABLE_SCHEME("VariableScheme","variable-scheme","50907716-B67A-4DCD-8F9F-8A283CB5FEE0"),
-	PROCESSING_EVENT_SCHEME("ProcessingEventScheme","processing-event-scheme","DC15C74B-9B4A-492E-9DDD-4E02ECA9D9D7"),
-	PROCESSING_INSTRUCTION_SCHEME("ProcessingInstructionScheme","processing-instruction-scheme","A1A5C54A-3A7B-4DFB-A5FA-46ED8EF465CC"),
-	PHYSICAL_STRUCTURE_SCHEME("PhysicalStructureScheme","physical-structure-scheme","19273B86-934A-4C2C-9B64-BD2B3BB07ACD"),
-	RECORD_LAYOUT_SCHEME("RecordLayoutScheme","record-layout-scheme","8E4D59DB-E757-4E94-BB19-1AC72761566E"),
-	QUALITY_STATEMENT_SCHEME("QualityStatementScheme","quality-statement-scheme","4AA7EA9C-495D-4919-95F7-AC107C877F56"),
-	CONCEPTUAL_VARIABLE_SCHEME("ConceptualVariableScheme","conceptual-variable-scheme","CE0F8AF6-DB9C-4FB3-A31A-E9523FC53668"),
-	REPRESENTED_VARIABLE_SCHEME("RepresentedVariableScheme","represented-variable-scheme","14404696-2DB3-45AC-A94D-139521DE6E21"),
+	PROCESSINGEVENT_SCHEME("ProcessingEventScheme","processing-event-scheme","DC15C74B-9B4A-492E-9DDD-4E02ECA9D9D7"),
+	PROCESSINGINSTRUCTION_SCHEME("ProcessingInstructionScheme","processing-instruction-scheme","A1A5C54A-3A7B-4DFB-A5FA-46ED8EF465CC"),
+	PHYSICALSTRUCTURE_SCHEME("PhysicalStructureScheme","physical-structure-scheme","19273B86-934A-4C2C-9B64-BD2B3BB07ACD"),
+	RECORDLAYOUT_SCHEME("RecordLayoutScheme","record-layout-scheme","8E4D59DB-E757-4E94-BB19-1AC72761566E"),
+	QUALITYSTATEMENT_SCHEME("QualityStatementScheme","quality-statement-scheme","4AA7EA9C-495D-4919-95F7-AC107C877F56"),
+	CONCEPTUALVARIABLE_SCHEME("ConceptualVariableScheme","conceptual-variable-scheme","CE0F8AF6-DB9C-4FB3-A31A-E9523FC53668"),
+	REPRESENTEDVARIABLE_SCHEME("RepresentedVariableScheme","represented-variable-scheme","14404696-2DB3-45AC-A94D-139521DE6E21"),
 	NCUBE_SCHEME("NCubeScheme","n-cube-scheme","31E8515B-C0CC-4E88-9E00-AE4BB6D4AC25"),
 	INSTRUMENT_SCHEME("InstrumentScheme","instrument-scheme","F152EE61-08BA-4FCA-8A3A-DAF8F87F972E"),
 	CODELIST_SCHEME("CodeListScheme","code-list-scheme","4193D389-B5AE-4368-B399-CD5A7EE3653C"),
-	MANAGED_REPRESENTATION_SCHEME("ManagedRepresentationScheme","managed-representation-scheme","16D4D829-41E1-4677-AA17-81190B6A0E66");
+	MANAGEDREPRESENTATION_SCHEME("ManagedRepresentationScheme","managed-representation-scheme","16D4D829-41E1-4677-AA17-81190B6A0E66");
 	
 	private String name = "" ; 
 	private String type ="";
