@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 
 	@Override
 	public ColecticaItem getItem(String id) throws Exception {
-		if (id != null && !id.equals("")) {
+		if (StringUtils.isNotEmpty(id)) {
 			return metadataRepository.findById(id);
 		} else {
 			return null;
@@ -62,11 +63,17 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	public ColecticaItem getDDIInstance(String id) throws Exception {
 		return getItemByType(id, DDIItemType.DDI_INSTANCE);
 	}
-	
+
+	@Override
+	public ColecticaItem getStudyUnit(String id) throws Exception {
+		return getItemByType(id, DDIItemType.STUDY_UNIT);
+	}
+
+	@Override
 	public ColecticaItem getItemByType(String id, DDIItemType type) throws Exception {
 		ColecticaItem item = metadataRepository.findById(id);
-		DDIItemType typeItem = item.getType(); 
-		if (item != null && typeItem!=null) {
+		DDIItemType typeItem = item.getType();
+		if (item != null && typeItem != null) {
 			if (typeItem.getName().equals(type.getName())) {
 				return item;
 			} else {
@@ -78,7 +85,6 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		}
 	}
 
-	
 	@Override
 	public ColecticaItemRefList getChildrenRef(String id) throws Exception {
 		return metadataRepository.getChildrenRef(id);
@@ -88,16 +94,17 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	public List<ColecticaItem> getItems(ColecticaItemRefList refs) throws Exception {
 		return metadataRepository.getItems(refs);
 	}
-	
+
 	@Override
-	public Map<String,ColecticaItem> getMapItems(ColecticaItemRefList refs) throws Exception {
-		Map<String,ColecticaItem> items = new HashMap<String,ColecticaItem>();
-		for(ColecticaItem item : this.getItems(refs)){
+	public Map<String, ColecticaItem> getMapItems(ColecticaItemRefList refs) throws Exception {
+		Map<String, ColecticaItem> items = new HashMap<String, ColecticaItem>();
+		for (ColecticaItem item : this.getItems(refs)) {
 			items.put(item.getIdentifier(), item);
 		}
 		return items;
 	}
 
+	@Override
 	public ResponseItem getDDIRoot(String id) throws Exception {
 		ResponseItem ddiRoot = new ResponseItem();
 		String fragment = getItem(id).item;
@@ -112,6 +119,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		return ddiRoot;
 	}
 
+	@Override
 	public List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String idRP) throws Exception {
 		String fragment = getItem(idRP).item;
 		String rootExp = "//*[local-name()='Fragment']";
@@ -136,6 +144,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		return clsList;
 	}
 
+	@Override
 	public List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String idGroupRoot) throws Exception {
 		List<ResponseItem> clsList = new ArrayList<>();
 		logger.debug("GroupRoot id : " + idGroupRoot);
