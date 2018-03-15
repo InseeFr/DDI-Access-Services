@@ -99,97 +99,54 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 	private Node citationNode;
 
 	@Override
-	public String getQuestionnaire(String idDDIInstance, String idDDIInstrument) throws Exception {
+	public String getQuestionnaire(String idDDIInstrument) throws Exception {
 		this.idDDIInstrument = idDDIInstrument;
 
 		// Step 1 : Get the DDIInstance, the DDIInstrument and Check type (an
 		// Exception throws if not)
-		this.DDIInstance = metadataServiceItem.getItemByType(idDDIInstance, DDIItemType.DDI_INSTANCE);
 
 		ColecticaItem DDIInstrument = metadataServiceItem.getItemByType(idDDIInstrument, DDIItemType.QUESTIONNAIRE);
+		this.instrument = DDIInstrument;
+		ObjectColecticaPost objectColecticaPost = new ObjectColecticaPost();
+		List<String> itemTypes = new ArrayList<String>();
+		itemTypes.add(DDIItemType.INSTRUMENT_SCHEME.getUUID());
+		objectColecticaPost.setItemTypes(itemTypes);
+		TargetItem targetItem = new TargetItem();
+		targetItem.setAgencyId(DDIInstrument.agencyId);
+		targetItem.setIdentifier(DDIInstrument.identifier);
+		targetItem.setVersion(Integer.valueOf(DDIInstrument.version));
+		objectColecticaPost.setTargetItem(targetItem);
+		objectColecticaPost.setUseDistinctResultItem(true);
+		objectColecticaPost.setUseDistinctTargetItem(true);
+		Relationship[] relationshipsInstrument = metadataService.getRelationship(objectColecticaPost);
+		String DDIidentifier = relationshipsInstrument[0].getIdentifierTriple().getIdentifier();
+		instrumentScheme = metadataServiceItem.getItem(DDIidentifier);
+		dataCollection = searchInstrumentParent(itemTypes, DDIItemType.DATA_COLLECTION, objectColecticaPost,
+				instrumentScheme);
+		studyUnitItem = searchInstrumentParent(itemTypes, DDIItemType.STUDY_UNIT, objectColecticaPost, dataCollection);
+		subGroupItem = searchInstrumentParent(itemTypes, DDIItemType.SUB_GROUP, objectColecticaPost, studyUnitItem);
+		groupItem = searchInstrumentParent(itemTypes, DDIItemType.GROUP, objectColecticaPost, subGroupItem);
+		DDIInstance = searchInstrumentParent(itemTypes, DDIItemType.DDI_INSTANCE, objectColecticaPost, groupItem);
+		return buildQuestionnaire();
 
-		//////////////////////////////////////////////
-		// While Instrument not found
-		// Step 2 : Get all the group references
-		NodeList childrenInstance = xpathProcessor.queryList(DDIInstance.getItem(),
-				"//*[local-name()='Fragment']/*[local-name()='DDIInstance']/*[local-name()='GroupReference']");
-		for (int indexGroup = 1; indexGroup < childrenInstance.getLength() + 1; indexGroup++) {
-			String idGroup = xpathProcessor.queryString(DDIInstance.getItem(),
-					"//*[local-name()='Fragment']/*[local-name()='DDIInstance']/*[local-name()='GroupReference']["
-							+ indexGroup + "]/*[local-name()='ID']/text()");
-			this.groupItem = metadataServiceItem.getItem(idGroup);
-			// Step 3 : foreach group in groups --> Search subGroups and
-			// store the
-			// currentGroup as ColecticaItem
-			NodeList childrenGroup = xpathProcessor.queryList(groupItem.getItem(),
-					"//*[local-name()='Fragment']/*[local-name()='Group']/*[local-name()='SubGroupReference']");
-			for (int indexSubGroup = 1; indexSubGroup < childrenGroup.getLength() + 1; indexSubGroup++) {
-				String idSubGroup = xpathProcessor.queryString(groupItem.getItem(),
-						"//*[local-name()='Fragment']/*[local-name()='Group']/*[local-name()='SubGroupReference']["
-								+ indexSubGroup + "]/*[local-name()='ID']/text()");
-				this.subGroupItem = metadataServiceItem.getItem(idSubGroup);
-				// Step 4 : foreach subGroup in subGroups in currentGroup
-				// --> Search
-				// StudyUnits and store the currentSubGroup as ColecticaItem
-				NodeList childrenSubGroup = xpathProcessor.queryList(subGroupItem.getItem(),
-						"//*[local-name()='Fragment']/*[local-name()='SubGroup']/*[local-name()='StudyUnitReference']");
-				for (int indexStudyUnit = 1; indexStudyUnit < childrenSubGroup.getLength() + 1; indexStudyUnit++) {
-					String idStudyUnit = xpathProcessor.queryString(subGroupItem.getItem(),
-							"//*[local-name()='Fragment']/*[local-name()='SubGroup']/*[local-name()='StudyUnitReference']["
-									+ indexStudyUnit + "]/*[local-name()='ID']/text()");
-					this.studyUnitItem = metadataServiceItem.getItem(idStudyUnit);
+	}
 
-					// Step 5 : foreach StudyUnit in currentStudyUnit in
-					// currentSubGroup in
-					// currentGroup -->
-					// Search Instruments and store the currentStudyUnit as
-					// ColecticaItem
-					NodeList childrenStudyUnit = xpathProcessor.queryList(subGroupItem.getItem(),
-							"//*[local-name()='Fragment']/*[local-name()='SubGroup']/*[local-name()='StudyUnitReference']");
-					for (int indexDataCollection = 1; indexDataCollection < childrenStudyUnit.getLength()
-							+ 1; indexDataCollection++) {
-						String idDataCollection = xpathProcessor.queryString(studyUnitItem.getItem(),
-								"//*[local-name()='Fragment']/*[local-name()='StudyUnit']/*[local-name()='DataCollectionReference']["
-										+ indexDataCollection + "]/*[local-name()='ID']/text()");
-						this.dataCollection = metadataServiceItem.getItem(idDataCollection);
-						// Step 6 : foreach DataCollection in currentDC in
-						// currentStudyUnit in
-						// currentSubGroup ...
-						NodeList childrenDC = xpathProcessor.queryList(dataCollection.getItem(),
-								"//*[local-name()='Fragment']/*[local-name()='DataCollection']/*[local-name()='InstrumentSchemeReference']");
-						for (int indexInstrumentScheme = 1; indexInstrumentScheme < childrenDC.getLength()
-								+ 1; indexInstrumentScheme++) {
-							String idInstrumentScheme = xpathProcessor.queryString(dataCollection.getItem(),
-									"//*[local-name()='Fragment']/*[local-name()='DataCollection']/*[local-name()='InstrumentSchemeReference']["
-											+ indexDataCollection + "]/*[local-name()='ID']/text()");
-							this.instrumentScheme = metadataServiceItem.getItem(idInstrumentScheme);
-
-							NodeList instrumentSchemeDC = xpathProcessor.queryList(instrumentScheme.getItem(),
-									"//*[local-name()='Fragment']/*[local-name()='InstrumentScheme']/*[local-name()='InstrumentReference']");
-							//// Step 7 : if the idDDIInstrument : leave the
-							//// Loop and get the
-							//// children list of this instrument
-							for (int indexInstrument = 1; indexInstrument < instrumentSchemeDC.getLength()
-									+ 1; indexInstrument++) {
-								String idInstrument = xpathProcessor.queryString(instrumentScheme.getItem(),
-										"//*[local-name()='Fragment']/*[local-name()='InstrumentScheme']/*[local-name()='InstrumentReference']["
-												+ indexDataCollection + "]/*[local-name()='ID']/text()");
-								this.instrument = metadataServiceItem.getItem(idInstrument);
-								// Step 8 : Among all of the Instrument's
-								// chidren, search the instrument
-								// relating to its id as parameter
-								if (instrument.identifier.equals(idDDIInstrument)) {
-									return buildQuestionnaire();
-								}
-
-							}
-						}
-					}
-				}
-			}
-		}
-
-		throw new RMeSException(404, "The DDI Instrument specified as parameter was not found.", "");
+	private ColecticaItem searchInstrumentParent(List<String> itemTypes, DDIItemType ddiItemType,
+			ObjectColecticaPost objectColecticaPost, ColecticaItem itemChild) throws Exception {
+		itemTypes.clear();
+		itemTypes.add(ddiItemType.getUUID());
+		objectColecticaPost.setItemTypes(itemTypes);
+		TargetItem targetItem = new TargetItem();
+		targetItem.setAgencyId(itemChild.agencyId);
+		targetItem.setIdentifier(itemChild.identifier);
+		targetItem.setVersion(Integer.valueOf(itemChild.version));
+		objectColecticaPost.setTargetItem(targetItem);
+		objectColecticaPost.setUseDistinctResultItem(true);
+		objectColecticaPost.setUseDistinctTargetItem(true);
+		Relationship[] relationshipsInstrument = metadataService.getRelationship(objectColecticaPost);
+		String DDIidentifier = relationshipsInstrument[0].getIdentifierTriple().getIdentifier();
+		ColecticaItem item = metadataServiceItem.getItem(DDIidentifier);
+		return item;
 	}
 
 	/**
@@ -247,7 +204,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		docBuilder.appendChildByParent("StudyUnit", DCNode);
 		removeReferences(instrumentSchemeNode);
 		docBuilder.appendChildByParent("DataCollection", instrumentSchemeNode);
-		removeReferences(instrumentNode);
 		docBuilder.appendChildByParent("InstrumentScheme", instrumentNode);
 
 	}
