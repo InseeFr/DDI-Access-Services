@@ -360,37 +360,37 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 			objectColecticaPost.setUseDistinctTargetItem(true);
 			if (itemTypes.size() > 0) {
 				Relationship[] relationshipsSchemes = metadataService.getRelationship(objectColecticaPost);
-
-				ItemWithParent itemWithParent = new ItemWithParent();
-				itemWithParent.setItem(item);
-				itemWithParent.setItemNode(getNode(
-						UtilXML.nodeToString(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*").item(0)),
-						docBuilder.getDocument()));
-				itemWithParent.setParent(
-						metadataServiceItem.getItem(relationshipsSchemes[0].getIdentifierTriple().getIdentifier()));
-				itemWithParent.setParentNode(getNode(
-						UtilXML.nodeToString(xpathProcessor
-								.queryList(itemWithParent.getParent().getItem(), "/Fragment[1]/*").item(0)),
-						docBuilder.getDocument()));
-				// First adding of a parentNode
-				if (!identifierParentsWithCildren.contains(itemWithParent.getParent().getIdentifier())) {
-					removeReferences(itemWithParent.getParentNode());
-					parentsWithCildren.add(itemWithParent);
-					identifierParentsWithCildren.add(itemWithParent.getParent().getIdentifier());
-					itemSchemes.add(itemWithParent.getParent());
-					itemSchemeNodes.add(itemWithParent.getParentNode());
-				} else {
-					// Update of the parent node with a new child Node
-					for (ItemWithParent itemParentWithChildren : parentsWithCildren) {
-						if (itemParentWithChildren.getParent().getIdentifier()
-								.equals(itemWithParent.getParent().getIdentifier())) {
-							removeReferences(itemWithParent.getItemNode());
-							itemParentWithChildren.getParentNode().appendChild(itemWithParent.getItemNode());
+				for (int i = 0; i < relationshipsSchemes.length; i++) {
+					ItemWithParent itemWithParent = new ItemWithParent();
+					itemWithParent.setItem(item);
+					itemWithParent.setItemNode(getNode(
+							UtilXML.nodeToString(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*").item(0)),
+							docBuilder.getDocument()));
+					itemWithParent.setParent(
+							metadataServiceItem.getItem(relationshipsSchemes[i].getIdentifierTriple().getIdentifier()));
+					itemWithParent.setParentNode(getNode(
+							UtilXML.nodeToString(xpathProcessor
+									.queryList(itemWithParent.getParent().getItem(), "/Fragment[1]/*").item(0)),
+							docBuilder.getDocument()));
+					// First adding of a parentNode
+					if (!identifierParentsWithCildren.contains(itemWithParent.getParent().getIdentifier())) {
+						removeReferences(itemWithParent.getParentNode());
+						parentsWithCildren.add(itemWithParent);
+						identifierParentsWithCildren.add(itemWithParent.getParent().getIdentifier());
+						itemSchemes.add(itemWithParent.getParent());
+						itemSchemeNodes.add(itemWithParent.getParentNode());
+					} else {
+						// Update of the parent node with a new child Node
+						for (ItemWithParent itemParentWithChildren : parentsWithCildren) {
+							if (itemParentWithChildren.getParent().getIdentifier()
+									.equals(itemWithParent.getParent().getIdentifier())) {
+								removeReferences(itemWithParent.getItemNode());
+								itemParentWithChildren.getParentNode().appendChild(itemWithParent.getItemNode());
+							}
 						}
 					}
 				}
 			}
-
 		}
 	}
 
