@@ -26,6 +26,7 @@ import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.metadata.service.codeList.CodeListService;
 import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
 import fr.insee.rmes.metadata.service.questionnaire.QuestionnaireService;
+import fr.insee.rmes.metadata.service.variableBook.VariableBookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -33,7 +34,6 @@ import io.swagger.annotations.ApiParam;
 /**
  * Main WebService class of the MetaData service
  *
- * @author I6VWID
  */
 @Path("/meta-data")
 @Api(value = "DDI MetaData API")
@@ -55,6 +55,9 @@ public class RMeSMetadata {
 
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
+
+	@Autowired
+	VariableBookService variableBookServiceItem;
 
 	@GET
 	@Path("colectica-item/{id}")
@@ -232,6 +235,7 @@ public class RMeSMetadata {
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
 	public Response getQuestionnaire(@PathParam(value = "idDdiInstrument") String idDdiInstrument) throws Exception {
+
 		try {
 			String questionnaire = questionnaireService.getQuestionnaire(idDdiInstrument);
 
@@ -280,6 +284,28 @@ public class RMeSMetadata {
 			StreamingOutput stream = output -> {
 				try {
 					output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
+
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("operation/{id}/variableBook")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get all data to create variableBook", notes = "Gets a DDI document with a StudyUnit from Colectica repository reference {id}, and all its variables", response = String.class)
+	public Response getVariableBook(@PathParam(value = "id") String id) throws Exception {
+		try {
+			String variablesBook = variableBookServiceItem.getVariableBook(id);
+			StreamingOutput stream = output -> {
+				try {
+					output.write(variablesBook.getBytes(StandardCharsets.UTF_8));
 
 				} catch (Exception e) {
 					throw new RMeSException(500, "Transformation error", e.getMessage());

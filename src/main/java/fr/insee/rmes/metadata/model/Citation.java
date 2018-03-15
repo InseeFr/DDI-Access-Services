@@ -5,21 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Citation {
 
 	@JsonProperty("Title")
-	private String titile = "";
+	private String title = "";
 
 	public String getTitle() {
-		return titile;
+		return title;
 	}
 
 	public void setTitle(String title) {
-		this.titile = title;
+		this.title = title;
 	}
 
 	@Override
 	public String toString() {
-		return "Citation [titile=" + titile + "]";
+		return "Citation [title=" + title + "]";
 	}
-	
-	
-	
+
 }

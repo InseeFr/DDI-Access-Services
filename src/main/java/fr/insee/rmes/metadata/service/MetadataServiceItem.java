@@ -17,25 +17,27 @@ public interface MetadataServiceItem {
 	ColecticaItem getItemByType(String id, DDIItemType type) throws Exception;
 
 	ColecticaItem getDDIInstance(String id) throws Exception;
-	
+
 	ColecticaItem getSequence(String id) throws Exception;
 
 	ColecticaItem getQuestion(String id) throws Exception;
-	
+
 	ColecticaItemRefList getChildrenRef(String id) throws Exception;
 
-	Map<String,ColecticaItem> getMapItems(ColecticaItemRefList refs) throws Exception ;
-	
+	Map<String, ColecticaItem> getMapItems(ColecticaItemRefList refs) throws Exception;
+
 	List<ColecticaItem> getItems(ColecticaItemRefList refs) throws Exception;
 
 	ResponseItem getDDIRoot(String id) throws Exception;
-	
+
 	List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String id) throws Exception;
 
 	List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception;
-	
+
 	Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception;
 
 	Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception;
+
+	ColecticaItem getStudyUnit(String idStudyUnit) throws Exception;
 
 }

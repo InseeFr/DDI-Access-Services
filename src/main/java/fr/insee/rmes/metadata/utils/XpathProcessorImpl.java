@@ -28,10 +28,7 @@ public class XpathProcessorImpl implements XpathProcessor {
 	@Override
 	public NodeList queryList(String fragment, String xpathExpression) throws Exception {
 		Document node = toDocument(fragment);
-		XPathFactory xpf = XPathFactory.newInstance();
-		XPath path = xpf.newXPath();
-		XPathExpression exp = path.compile(xpathExpression);
-		return (NodeList) exp.evaluate(node, XPathConstants.NODESET);
+		return queryList(node, xpathExpression);
 	}
 
 	@Override
@@ -68,10 +65,7 @@ public class XpathProcessorImpl implements XpathProcessor {
 	@Override
 	public String queryText(String fragment, String xpathExpression) throws Exception {
 		Document node = toDocument(fragment);
-		XPathFactory xpf = XPathFactory.newInstance();
-		XPath path = xpf.newXPath();
-		XPathExpression exp = path.compile(xpathExpression);
-		return (String) exp.evaluate(node, XPathConstants.STRING);
+		return queryText(node, xpathExpression);
 	}
 
 	@Override

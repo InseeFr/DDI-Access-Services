@@ -16,11 +16,13 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,6 +32,8 @@ import org.xml.sax.InputSource;
 import com.google.common.io.Resources;
 
 public class DDIDocumentBuilder {
+
+	private final static Logger logger = LogManager.getLogger(DDIDocumentBuilder.class);
 
 	private Boolean envelope;
 	private String nameEnvelope = Envelope.DEFAULT.toString();
@@ -55,7 +59,6 @@ public class DDIDocumentBuilder {
 		this.envelope = envelope;
 		if (envelope) {
 			try {
-
 				packagedDocument = buildEnvelope();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -137,7 +140,6 @@ public class DDIDocumentBuilder {
 			if (null != itemNode) {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
 				appendChildByParent("g:ResourcePackage", itemNode);
-
 				refactor(itemNode, packagedDocument);
 			}
 			for (Integer key : nodesWithParentNames.keySet()) {
@@ -146,7 +148,6 @@ public class DDIDocumentBuilder {
 					importChildByParent(map.get(node), node);
 				}
 			}
-
 		}
 
 		if (null != resourcePackageNode) {
@@ -216,14 +217,14 @@ public class DDIDocumentBuilder {
 	public void refactor(Node node, Document document) {
 
 		switch (node.getNodeName()) {
-		case "CodeList":
-			changeTagName(document, "CodeList", "l:CodeList", "");
-		case "Code":
-			changeTagName(document, "Code", "l:Code", "");
-		case "Category":
-			changeTagName(document, "Category", "l:Category", "");
-		case "CategoryScheme":
-			changeTagName(document, "CategoryScheme", "l:CategoryScheme", "");
+			case "CodeList":
+				changeTagName(document, "CodeList", "l:CodeList", "");
+			case "Code":
+				changeTagName(document, "Code", "l:Code", "");
+			case "Category":
+				changeTagName(document, "Category", "l:Category", "");
+			case "CategoryScheme":
+				changeTagName(document, "CategoryScheme", "l:CategoryScheme", "");
 		}
 	}
 
@@ -343,9 +344,7 @@ public class DDIDocumentBuilder {
 				for (Node nodeChild : childNodes) {
 					finalNode.appendChild(nodeChild);
 				}
-
 			}
-
 		}
 	}
 
@@ -364,17 +363,21 @@ public class DDIDocumentBuilder {
 		return packagedDocument;
 	}
 
+	public Document getDocument(String fragment) throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		if (null == fragment || fragment.isEmpty()) {
+			return builder.newDocument();
+		}
+		InputSource ddiSource = new InputSource(new StringReader(fragment));
+		return builder.parse(ddiSource);
+	}
+
+	@Override
 	public String toString() {
 		StringWriter stringWriter = new StringWriter();
 		try {
-			XPath xPath = XPathFactory.newInstance().newXPath();
-			NodeList nodeList = (NodeList) xPath.evaluate("//text()[normalize-space()='']", packagedDocument,
-					XPathConstants.NODESET);
-
-			for (int i = 0; i < nodeList.getLength(); ++i) {
-				Node node = nodeList.item(i);
-				node.getParentNode().removeChild(node);
-			}
+			encode();
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -383,7 +386,7 @@ public class DDIDocumentBuilder {
 			StreamResult streamResult = new StreamResult(stringWriter);
 			transformer.transform(new DOMSource(packagedDocument), streamResult);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return stringWriter.toString();
 	}
@@ -424,7 +427,7 @@ public class DDIDocumentBuilder {
 		}
 	}
 
-	private Node getNode(String fragment, Document doc) throws Exception {
+	public Node getNode(String fragment, Document doc) throws Exception {
 		Element node = getDocument(fragment).getDocumentElement();
 		Node newNode = node.cloneNode(true);
 		// Transfer ownership of the new node into the destination document
@@ -436,21 +439,40 @@ public class DDIDocumentBuilder {
 		NodeList refChildren = refNode.getChildNodes();
 		for (int i = 0; i < refChildren.getLength(); i++) {
 			if (refChildren.item(i).getNodeName().equals("r:ID")) {
-				System.out.println(refNode.getNodeName() + " -> " + refChildren.item(i).getTextContent());
+				logger.info(refNode.getNodeName() + " -> " + refChildren.item(i).getTextContent());
 				return refChildren.item(i).getTextContent();
 			}
 		}
 		throw new Exception("No reference found in node");
 	}
 
-	private Document getDocument(String fragment) throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		if (null == fragment || fragment.isEmpty()) {
-			return builder.newDocument();
-		}
-		InputSource ddiSource = new InputSource(new StringReader(fragment));
-		return builder.parse(ddiSource);
+	/*
+	 * Read all document, remove unused breakline, normalize spaces and encode XML characters 
+	 */
+	private void encode() throws XPathExpressionException {
+		Node node = packagedDocument.getFirstChild();
+		encode(node);
 	}
 
+	private void encode(NodeList nodeListToEncode) {
+		for (int i = 0; i < nodeListToEncode.getLength(); ++i) {
+			encode(nodeListToEncode.item(i));
+		}
+	}
+
+	private void encode(Node nodeToEncode) {
+		if (nodeToEncode == null) {
+			return;
+		}
+		if (nodeToEncode.hasChildNodes()) {
+			encode(nodeToEncode.getChildNodes());
+		}
+		if (nodeToEncode.getNodeType() == Node.TEXT_NODE) {
+			nodeToEncode.setTextContent(StringUtils.removeStart(nodeToEncode.getTextContent(), "\n"));
+			nodeToEncode.setTextContent(StringUtils.removeEnd(nodeToEncode.getTextContent(), "\n"));
+			nodeToEncode.setTextContent(StringEscapeUtils.escapeXml11(nodeToEncode.getTextContent()));
+			nodeToEncode.setTextContent(StringUtils.normalizeSpace(nodeToEncode.getTextContent()));
+		}
+
+	}
 }
