@@ -64,6 +64,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 	private ColecticaItem DDIInstance;
 
+	private ColecticaItem variableScheme;
+
 	private ColecticaItem subGroupItem;
 
 	private ColecticaItem groupItem;
@@ -81,6 +83,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 	private Node studyUnitNode;
 
 	private Node DCNode;
+
+	private Node variableSchemeNode;
 
 	private Node instrumentSchemeNode;
 
@@ -121,17 +125,25 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		Relationship[] relationshipsInstrument = metadataService.getRelationship(objectColecticaPost);
 		String DDIidentifier = relationshipsInstrument[0].getIdentifierTriple().getIdentifier();
 		instrumentScheme = metadataServiceItem.getItem(DDIidentifier);
-		dataCollection = searchInstrumentParent(itemTypes, DDIItemType.DATA_COLLECTION, objectColecticaPost,
+		dataCollection = searchItemParent(itemTypes, DDIItemType.DATA_COLLECTION, objectColecticaPost,
 				instrumentScheme);
-		studyUnitItem = searchInstrumentParent(itemTypes, DDIItemType.STUDY_UNIT, objectColecticaPost, dataCollection);
-		subGroupItem = searchInstrumentParent(itemTypes, DDIItemType.SUB_GROUP, objectColecticaPost, studyUnitItem);
-		groupItem = searchInstrumentParent(itemTypes, DDIItemType.GROUP, objectColecticaPost, subGroupItem);
-		DDIInstance = searchInstrumentParent(itemTypes, DDIItemType.DDI_INSTANCE, objectColecticaPost, groupItem);
+		variableScheme = mockGetVariableScheme(dataCollection);
+		studyUnitItem = searchItemParent(itemTypes, DDIItemType.STUDY_UNIT, objectColecticaPost, dataCollection);
+		subGroupItem = searchItemParent(itemTypes, DDIItemType.SUB_GROUP, objectColecticaPost, studyUnitItem);
+		groupItem = searchItemParent(itemTypes, DDIItemType.GROUP, objectColecticaPost, subGroupItem);
+		DDIInstance = searchItemParent(itemTypes, DDIItemType.DDI_INSTANCE, objectColecticaPost, groupItem);
 		return buildQuestionnaire();
 
 	}
 
-	private ColecticaItem searchInstrumentParent(List<String> itemTypes, DDIItemType ddiItemType,
+	private ColecticaItem mockGetVariableScheme(ColecticaItem dataCollection) throws Exception {
+		// TODO: remove mock when
+		// context will be fixed
+
+		return metadataServiceItem.getItem("10489bc2-11bb-4688-b56f-3886c3f81c58");
+	}
+
+	private ColecticaItem searchItemParent(List<String> itemTypes, DDIItemType ddiItemType,
 			ObjectColecticaPost objectColecticaPost, ColecticaItem itemChild) throws Exception {
 		itemTypes.clear();
 		itemTypes.add(ddiItemType.getUUID());
@@ -255,6 +267,10 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 				UtilXML.nodeToString(xpathProcessor.queryList(dataCollection.getItem(), "/Fragment[1]/*").item(0)),
 				docBuilder.getDocument());
 
+		this.variableSchemeNode = getNode(
+				UtilXML.nodeToString(xpathProcessor.queryList(variableScheme.getItem(), "/Fragment[1]/*").item(0)),
+				docBuilder.getDocument());
+
 		this.instrumentSchemeNode = getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(instrumentScheme.item, "/Fragment[1]/*").item(0)),
 				docBuilder.getDocument());
@@ -270,6 +286,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 		List<ItemWithParent> parentsWithCildren = new ArrayList<ItemWithParent>();
 		List<ColecticaItem> items = metadataServiceItem.getItems(listItemsChildrenInstrument);
+
 		// Step 1 : Insert the other references of
 		// the studyUnit to the
 		// enveloppe as children of
@@ -336,25 +353,47 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		List<String> identifierParentsWithCildren = new ArrayList<String>();
 		List<Node> itemSchemeNodes = new ArrayList<Node>();
 		List<ColecticaItem> itemSchemes = new ArrayList<ColecticaItem>();
+		List<String> itemTypes = new ArrayList<String>();
+
+		// Adding variableScheme : independent scheme
+		ColecticaItemRefList refsVariables = metadataServiceItem.getChildrenRef(this.variableScheme.getIdentifier());
+		List<ColecticaItem> variables = metadataServiceItem.getItems(refsVariables);
+		for (ColecticaItem variable : variables) {
+			Node variableNode = getNode(
+					UtilXML.nodeToString(xpathProcessor.queryList(variable.item, "/Fragment[1]/*").item(0)),
+					docBuilder.getDocument());
+			this.variableSchemeNode.appendChild(variableNode);
+		}
+		ItemWithParent variableScheme = new ItemWithParent();
+		variableScheme.setParent(this.variableScheme);
+		// TODO: add ParentNode and check debugging
+		ObjectColecticaPost objectColecticaPost = new ObjectColecticaPost();
+		variableScheme.setRessourcePackage(
+				searchItemParent(itemTypes, DDIItemType.RESSOURCEPACKAGE, objectColecticaPost, this.variableScheme));
+		variableScheme.setRessourcePackageNode(getNode(
+				UtilXML.nodeToString(
+						xpathProcessor.queryList(variableScheme.getRessourcePackage().item, "/Fragment[1]/*").item(0)),
+				docBuilder.getDocument()));
+		removeReferences(variableScheme.getRessourcePackageNode());
+		variableScheme.setParentNode(this.variableSchemeNode);
+		parentsWithCildren.add(variableScheme);
+
+		for (DDIItemType type : DDIItemType.values()) {
+			if (type.getName().endsWith("Scheme")) {
+				itemTypes.add(type.getUUID());
+			}
+		}
 		for (ColecticaItem item : items) {
-			ObjectColecticaPost objectColecticaPost = new ObjectColecticaPost();
+			objectColecticaPost = new ObjectColecticaPost();
 			Node node = getNode(
 					UtilXML.nodeToString(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*[1]").item(0)),
 					docBuilder.getDocument());
 			removeReferences(node);
-			List<String> itemTypes = new ArrayList<String>();
-			for (DDIItemType type : DDIItemType.values()) {
-				if (type.name().endsWith("SCHEME") && type.name().contains(node.getNodeName().toUpperCase() + "_")) {
-					itemTypes.add(type.getUUID());
-				}
-			}
-
 			TargetItem targetItem = new TargetItem();
 			targetItem.setAgencyId(item.agencyId);
 			targetItem.setVersion(Integer.valueOf(item.version));
 			targetItem.setIdentifier(item.identifier);
 			objectColecticaPost.setItemTypes(itemTypes);
-
 			objectColecticaPost.setTargetItem(targetItem);
 			objectColecticaPost.setUseDistinctResultItem(true);
 			objectColecticaPost.setUseDistinctTargetItem(true);
@@ -375,21 +414,60 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 					// First adding of a parentNode
 					if (!identifierParentsWithCildren.contains(itemWithParent.getParent().getIdentifier())) {
 						removeReferences(itemWithParent.getParentNode());
-						parentsWithCildren.add(itemWithParent);
-						identifierParentsWithCildren.add(itemWithParent.getParent().getIdentifier());
-						itemSchemes.add(itemWithParent.getParent());
-						itemSchemeNodes.add(itemWithParent.getParentNode());
+						addParentNode(parentsWithCildren, itemWithParent, identifierParentsWithCildren, itemSchemes,
+								itemSchemeNodes);
 					} else {
 						// Update of the parent node with a new child Node
-						for (ItemWithParent itemParentWithChildren : parentsWithCildren) {
-							if (itemParentWithChildren.getParent().getIdentifier()
-									.equals(itemWithParent.getParent().getIdentifier())) {
-								removeReferences(itemWithParent.getItemNode());
-								itemParentWithChildren.getParentNode().appendChild(itemWithParent.getItemNode());
-							}
-						}
+						updateParentNode(parentsWithCildren, itemWithParent);
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Add the parent Node and the Parent Item to the currentItem. The aim of
+	 * this method is to construct the parent tree
+	 * 
+	 * @param parentsWithCildren
+	 * @param itemWithParent
+	 * @param identifierParentsWithCildren
+	 * @param itemSchemes
+	 * @param itemSchemeNodes
+	 * @throws RMeSException
+	 */
+	public void addParentNode(List<ItemWithParent> parentsWithCildren, ItemWithParent itemWithParent,
+			List<String> identifierParentsWithCildren, List<ColecticaItem> itemSchemes, List<Node> itemSchemeNodes)
+			throws RMeSException {
+		if (itemWithParent != null && itemWithParent.getParent() != null) {
+			parentsWithCildren.add(itemWithParent);
+			identifierParentsWithCildren.add(itemWithParent.getParent().getIdentifier());
+			itemSchemes.add(itemWithParent.getParent());
+			itemSchemeNodes.add(itemWithParent.getParentNode());
+		} else {
+			throw new RMeSException(500, "The parentNode of a Colectica Item was not found or is unreachable.",
+					itemWithParent.toString());
+		}
+	}
+
+	/**
+	 * 
+	 * @param parentsWithCildren
+	 * @param itemWithParent
+	 * @throws RMeSException
+	 */
+	public void updateParentNode(List<ItemWithParent> parentsWithCildren, ItemWithParent itemWithParent)
+			throws RMeSException {
+		for (ItemWithParent itemParentWithChildren : parentsWithCildren) {
+			if (itemParentWithChildren != null && itemParentWithChildren.getParent() != null) {
+				if (itemParentWithChildren.getParent().getIdentifier()
+						.equals(itemWithParent.getParent().getIdentifier())) {
+					removeReferences(itemWithParent.getItemNode());
+					itemParentWithChildren.getParentNode().appendChild(itemWithParent.getItemNode());
+				}
+			} else {
+				throw new RMeSException(500, "The parentNode of a Colectica Item was not found or is unreachable.",
+						itemWithParent.toString());
 			}
 		}
 	}
