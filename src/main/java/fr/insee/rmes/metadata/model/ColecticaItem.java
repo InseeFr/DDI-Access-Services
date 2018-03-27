@@ -19,7 +19,6 @@ import fr.insee.rmes.search.model.DDIItemType;
  */
 public class ColecticaItem {
 
-	
 	@JsonProperty("ItemType")
 	public String itemType;
 
@@ -169,32 +168,10 @@ public class ColecticaItem {
 		XpathProcessor xpathProcessor = new XpathProcessorImpl();
 		NodeList nodes = xpathProcessor.queryList(this.getItem(), "/Fragment/*");
 		String elementName = nodes.item(0).getNodeName();
-		if (elementName.equals(DDIItemType.DDI_INSTANCE.getName())) {
-			return DDIItemType.DDI_INSTANCE;
-		}
-		if (elementName.equals(DDIItemType.GROUP.getName())) {
-			return DDIItemType.GROUP;
-		}
-		if (elementName.equals(DDIItemType.SUB_GROUP.getName())) {
-			return DDIItemType.SUB_GROUP;
-		}
-		if (elementName.equals(DDIItemType.STUDY_UNIT.getName())) {
-			return DDIItemType.STUDY_UNIT;
-		}
-		if (elementName.equals(DDIItemType.DATA_COLLECTION.getName())) {
-			return DDIItemType.DATA_COLLECTION;
-		}
-		if (elementName.equals(DDIItemType.QUESTIONNAIRE.getName())) {
-			return DDIItemType.QUESTIONNAIRE;
-		}
-		if (elementName.equals(DDIItemType.SEQUENCE.getName())) {
-			return DDIItemType.SEQUENCE;
-		}
-		if (elementName.equals(DDIItemType.QUESTION.getName())) {
-			return DDIItemType.QUESTION;
-		}
-		if (elementName.equals(DDIItemType.CODE_LIST.getName())) {
-			return DDIItemType.CODE_LIST;
+		for (DDIItemType type : DDIItemType.values()) {
+			if (elementName.equals(type.getName())) {
+				return type;
+			}
 		}
 		return null;
 	}

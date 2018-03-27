@@ -62,8 +62,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("colectica-item/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get the item with id {id}", notes = "Get an item from Colectica Repository, given it's {id}",
-			response = ColecticaItem.class)
+	@ApiOperation(value = "Get the item with id {id}", notes = "Get an item from Colectica Repository, given it's {id}", response = ColecticaItem.class)
 	public Response getItem(@PathParam(value = "id") String id) throws Exception {
 		try {
 			ColecticaItem item = metadataServiceItem.getItem(id);
@@ -77,11 +76,9 @@ public class RMeSMetadata {
 	@GET
 	@Path("colectica-item/{id}/refs/")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get the colectica item children refs with parent id {id}",
-			notes = "This will give a list of object containing a reference id, version and agency. Note that you will"
-					+ "need to map response objects keys to be able to use it for querying items "
-					+ "(see /items doc model)",
-			response = ColecticaItemRefList.class)
+	@ApiOperation(value = "Get the colectica item children refs with parent id {id}", notes = "This will give a list of object containing a reference id, version and agency. Note that you will"
+			+ "need to map response objects keys to be able to use it for querying items "
+			+ "(see /items doc model)", response = ColecticaItemRefList.class)
 	public Response getChildrenRef(@PathParam(value = "id") String id) throws Exception {
 		try {
 			ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(id);
@@ -95,9 +92,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("units")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get units measure",
-			notes = "This will give a list of objects containing the uri and the label for all units",
-			response = Unit.class, responseContainer = "List")
+	@ApiOperation(value = "Get units measure", notes = "This will give a list of objects containing the uri and the label for all units", response = Unit.class, responseContainer = "List")
 	public Response getUnits() throws Exception {
 		try {
 			List<Unit> units = metadataService.getUnits();
@@ -112,9 +107,7 @@ public class RMeSMetadata {
 	@Path("colectica-items")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get all de-referenced items",
-			notes = "Maps a list of ColecticaItemRef given as a payload to a list of actual full ColecticaItem objects",
-			response = ColecticaItem.class, responseContainer = "List")
+	@ApiOperation(value = "Get all de-referenced items", notes = "Maps a list of ColecticaItemRef given as a payload to a list of actual full ColecticaItem objects", response = ColecticaItem.class, responseContainer = "List")
 	public Response getItems(
 			@ApiParam(value = "Item references query object", required = true) ColecticaItemRefList query)
 			throws Exception {
@@ -130,9 +123,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("item/{id}/rp/{resourcePackageId}/deref-ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get Deref DDI document (external resource package)",
-			notes = "Get a full Deref DDI document from Colectica repository reference {id} with an external resource package",
-			response = String.class)
+	@ApiOperation(value = "Get Deref DDI document (external resource package)", notes = "Get a full Deref DDI document from Colectica repository reference {id} with an external resource package", response = String.class)
 	public Response getFullDDIWithExternalRP(@PathParam(value = "id") String id,
 			@PathParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
@@ -154,8 +145,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("item/{id}/deref-ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get Deref DDI document",
-			notes = "Gets a full DDI document from Colectica repository reference {id}", response = String.class)
+	@ApiOperation(value = "Get Deref DDI document", notes = "Gets a full DDI document from Colectica repository reference {id}", response = String.class)
 	public Response getFullDDI(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String ddiDocument = metadataService.getDDIDocument(id);
@@ -176,8 +166,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("item/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository reference {id}",
-			response = String.class)
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository reference {id}", response = String.class)
 	public Response getDDIDocument(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String ddiDocument = metadataService.getDDIDocument(id);
@@ -198,9 +187,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("codeList/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get the codeList",
-			notes = "Get a DDI document with a codeList from Colectica repository reference {id}",
-			response = String.class)
+	@ApiOperation(value = "Get the codeList", notes = "Get a DDI document with a codeList from Colectica repository reference {id}", response = String.class)
 	public Response getCodeList(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
@@ -222,9 +209,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("sequence/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document",
-			notes = "Gets a DDI document with a sequence from Colectica repository reference {id}",
-			response = String.class)
+	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a sequence from Colectica repository reference {id}", response = String.class)
 	public Response getSequence(@PathParam(value = "id") String id,
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
@@ -246,15 +231,13 @@ public class RMeSMetadata {
 	}
 
 	@GET
-	@Path("questionnaire/{idDdiInstance}/{idDdiInstrument}/ddi")
+	@Path("questionnaire/{idDdiInstrument}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document of a questionnaire",
-			notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}",
-			response = String.class)
-	public Response getQuestionnaire(@PathParam(value = "idDdiInstance") String idDdiInstance,
-			@PathParam(value = "idDdiInstrument") String idDdiInstrument) throws Exception {
+	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
+	public Response getQuestionnaire(@PathParam(value = "idDdiInstrument") String idDdiInstrument) throws Exception {
+
 		try {
-			String questionnaire = questionnaireService.getQuestionnaire(idDdiInstance, idDdiInstrument);
+			String questionnaire = questionnaireService.getQuestionnaire(idDdiInstrument);
 
 			StreamingOutput stream = output -> {
 				try {
@@ -274,9 +257,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("ddi-instance/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document of a DDI instance",
-			notes = "Get a DDI document of a DDI Instance from Colectica repository reference {id}",
-			response = String.class)
+	@ApiOperation(value = "Get DDI document of a DDI instance", notes = "Get a DDI document of a DDI Instance from Colectica repository reference {id}", response = String.class)
 	public Response getDDIInstance(@PathParam(value = "id") String id) throws Exception {
 
 		try {
@@ -295,9 +276,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("question/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document of a question",
-			notes = "Gets a DDI document with a Question from Colectica repository reference {id}",
-			response = String.class)
+	@ApiOperation(value = "Get DDI document of a question", notes = "Gets a DDI document with a Question from Colectica repository reference {id}", response = String.class)
 	public Response getQuestion(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String questionnaire = metadataService.getQuestion(id);
@@ -320,9 +299,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("operation/{id}/variableBook")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get all data to create variableBook",
-			notes = "Gets a DDI document with a StudyUnit from Colectica repository reference {id}, and all its variables",
-			response = String.class)
+	@ApiOperation(value = "Get all data to create variableBook", notes = "Gets a DDI document with a StudyUnit from Colectica repository reference {id}, and all its variables", response = String.class)
 	public Response getVariableBook(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String variablesBook = variableBookServiceItem.getVariableBook(id);
