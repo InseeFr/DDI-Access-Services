@@ -15,8 +15,6 @@ import fr.insee.rmes.utils.ddi.UtilXML;
 
 @Service
 public class VariableBookServiceImpl implements VariableBookService {
-	// private final static Logger logger =
-	// LogManager.getLogger(DDIInstanceServiceImpl.class);
 
 	@Autowired
 	MetadataRepository metadataRepository;
@@ -51,23 +49,23 @@ public class VariableBookServiceImpl implements VariableBookService {
 		// Step 3 : Get the Variables Groups and all their contents
 		NodeList representedVariableGroupNodes = xpathProcessor.queryList(representedVariableSchemeItem.getItem(),
 				"/Fragment[1]/RepresentedVariableScheme[1]/RepresentedVariableGroupReference/ID[1]");
-
 		for (int i = 0; i < representedVariableGroupNodes.getLength(); i++) {
-			Node rVarGroupNode = representedVariableGroupNodes.item(i);
-			Node varGroup = getCompleteNode(docBuilder, rVarGroupNode);
+			Node varGroup = getCompleteNode(docBuilder, representedVariableGroupNodes.item(i));
 			studyUnitNode.appendChild(varGroup);
 		}
+
+		// Step 4 : Build the document
 		docBuilder.appendChild(studyUnitNode);
 		return docBuilder.toString();
 
 	}
 
-	private Node getCompleteNode(DDIDocumentBuilder docBuilder, Node rVarGroupNode) throws Exception {
-		String idVarGroup = rVarGroupNode.getTextContent();
-		String idString = xpathProcessor.queryString(metadataService.getDerefDDIDocument(idVarGroup),
+	private Node getCompleteNode(DDIDocumentBuilder docBuilder, Node nodeToExtract) throws Exception {
+		String idNodeToExtract = nodeToExtract.getTextContent();
+		String idString = xpathProcessor.queryString(metadataService.getDerefDDIDocument(idNodeToExtract),
 				"/DDIInstance[1]/*");
-		Node varGroup = docBuilder.getNode(idString, docBuilder.getDocument());
-		return varGroup;
+		return docBuilder.getNode(idString, docBuilder.getDocument());
+	}
 	}
 
 }
