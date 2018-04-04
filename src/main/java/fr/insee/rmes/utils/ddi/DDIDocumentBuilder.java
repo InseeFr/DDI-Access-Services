@@ -19,7 +19,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -423,6 +422,8 @@ public class DDIDocumentBuilder {
 					root.removeChild(node);
 					walk(child, document, references);
 				}
+			} else {
+				walk(node, document, references);
 			}
 		}
 	}
@@ -470,7 +471,6 @@ public class DDIDocumentBuilder {
 		if (nodeToEncode.getNodeType() == Node.TEXT_NODE) {
 			nodeToEncode.setTextContent(StringUtils.removeStart(nodeToEncode.getTextContent(), "\n"));
 			nodeToEncode.setTextContent(StringUtils.removeEnd(nodeToEncode.getTextContent(), "\n"));
-			nodeToEncode.setTextContent(StringEscapeUtils.escapeXml11(nodeToEncode.getTextContent()));
 			nodeToEncode.setTextContent(StringUtils.normalizeSpace(nodeToEncode.getTextContent()));
 		}
 
