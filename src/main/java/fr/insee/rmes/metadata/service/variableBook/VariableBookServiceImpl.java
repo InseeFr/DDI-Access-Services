@@ -1,5 +1,9 @@
 package fr.insee.rmes.metadata.service.variableBook;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -15,8 +19,6 @@ import fr.insee.rmes.utils.ddi.UtilXML;
 
 @Service
 public class VariableBookServiceImpl implements VariableBookService {
-	// private final static Logger logger =
-	// LogManager.getLogger(DDIInstanceServiceImpl.class);
 
 	@Autowired
 	MetadataRepository metadataRepository;
@@ -51,23 +53,55 @@ public class VariableBookServiceImpl implements VariableBookService {
 		// Step 3 : Get the Variables Groups and all their contents
 		NodeList representedVariableGroupNodes = xpathProcessor.queryList(representedVariableSchemeItem.getItem(),
 				"/Fragment[1]/RepresentedVariableScheme[1]/RepresentedVariableGroupReference/ID[1]");
+		Map<String, Node> groupMap = new HashMap<String, Node>();
+		List<String> subgroupsId = new ArrayList<String>();
 
 		for (int i = 0; i < representedVariableGroupNodes.getLength(); i++) {
-			Node rVarGroupNode = representedVariableGroupNodes.item(i);
-			Node varGroup = getCompleteNode(docBuilder, rVarGroupNode);
-			studyUnitNode.appendChild(varGroup);
+			String idGroup = representedVariableGroupNodes.item(i).getTextContent();
+			if (!subgroupsId.contains(idGroup)) {// if not already a subgroup
+				Node varGroup = getCompleteNode(docBuilder, idGroup);
+				groupMap.put(idGroup, varGroup);
+				completeSubGroupIdsList(subgroupsId, varGroup);
+			}
 		}
+
+		for (Map.Entry<String, Node> entry : groupMap.entrySet()) {
+			if (!subgroupsId.contains(entry.getKey())) {
+				studyUnitNode.appendChild(entry.getValue());
+			}
+		}
+
+		// Step 4 : Build the document
 		docBuilder.appendChild(studyUnitNode);
 		return docBuilder.toString();
 
 	}
 
-	private Node getCompleteNode(DDIDocumentBuilder docBuilder, Node rVarGroupNode) throws Exception {
-		String idVarGroup = rVarGroupNode.getTextContent();
-		String idString = xpathProcessor.queryString(metadataService.getDerefDDIDocument(idVarGroup),
+	private void completeSubGroupIdsList(List<String> subgroupsId, Node varGroup) throws Exception {
+		// check if varGroup has subgroups
+		NodeList groupChildren = varGroup.getChildNodes();
+		for (int j = 0; j < groupChildren.getLength(); j++) {
+			Node node = groupChildren.item(j);
+			if (node.getNodeName().equals("RepresentedVariableGroup")) {
+				subgroupsId.add(getId(node));
+			}
+		}
+	}
+
+	private Node getCompleteNode(DDIDocumentBuilder docBuilder, String idNodeToExtract) throws Exception {
+		String fragment = xpathProcessor.queryString(metadataService.getDerefDDIDocument(idNodeToExtract),
 				"/DDIInstance[1]/*");
-		Node varGroup = docBuilder.getNode(idString, docBuilder.getDocument());
-		return varGroup;
+		return docBuilder.getNode(fragment, docBuilder.getDocument());
+	}
+
+	private static String getId(Node refNode) throws Exception {
+		NodeList refChildren = refNode.getChildNodes();
+		for (int i = 0; i < refChildren.getLength(); i++) {
+			if (refChildren.item(i).getNodeName().equals("r:ID")) {
+				return refChildren.item(i).getTextContent();
+			}
+		}
+		throw new Exception("No reference found in node");
 	}
 
 }
