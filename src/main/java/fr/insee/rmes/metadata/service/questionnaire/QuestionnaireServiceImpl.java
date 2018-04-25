@@ -139,7 +139,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 	private ColecticaItem mockGetVariableScheme(ColecticaItem dataCollection) throws Exception {
 		// TODO: remove mock when
 		// context will be fixed
-
 		return metadataServiceItem.getItem("10489bc2-11bb-4688-b56f-3886c3f81c58");
 	}
 
