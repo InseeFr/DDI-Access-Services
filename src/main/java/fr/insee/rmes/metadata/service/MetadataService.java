@@ -6,6 +6,7 @@ import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.search.model.ResourcePackage;
 
 public interface MetadataService {
 
@@ -30,5 +31,7 @@ public interface MetadataService {
 	List<String> getRessourcePackageIds() throws Exception;
 
 	Relationship[] getRelationship(ObjectColecticaPost relationshipPost) throws Exception;
+	
+	ResourcePackage getResourcePackage(String id) throws Exception;
 
 }

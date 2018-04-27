@@ -1,6 +1,8 @@
 package fr.insee.rmes.metadata.service.ddiinstance;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -103,16 +105,23 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		// Step : Get the first Resource package
 		String idRP = xpathProcessor.queryString(ddiInstance.getItem(),
 				"/Fragment[1]/DDIInstance[1]/ResourcePackageReference[1]/ID[1]/text()");
-		String rpString = xpathProcessor.queryString(metadataService.getDerefDDIDocument(idRP), "/DDIInstance[1]/*");
+		String rpString = xpathProcessor.queryString(metadataServiceItem.getItem(idRP).getItem(), "/*");
+		List<Node> rp1Schemes = patchReferencesItems(rpString, docBuilder);
+		rpString = xpathProcessor.queryString(metadataServiceItem.getItem(idRP).getItem(), "/Fragment[1]/*");
 		Node RP1 = getNode(rpString, docBuilder.getDocument());
+		removeReferences(RP1);
 		// Step : Get the second Resource package (if available)
+		List<Node> rp2Schemes = null;
 		Node RP2 = null;
 		try {
 			String idRP2 = xpathProcessor.queryString(ddiInstance.getItem(),
 					"/Fragment[1]/DDIInstance[1]/ResourcePackageReference[2]/ID[1]/text()");
-			String rpString2 = xpathProcessor.queryString(metadataService.getDerefDDIDocument(idRP2),
-					"/DDIInstance[1]/*");
+			String rpString2 = xpathProcessor.queryString(metadataServiceItem.getItem(idRP2).getItem(), "/*");
+			rp2Schemes = patchReferencesItems(rpString2, docBuilder);
+			rpString2 = xpathProcessor.queryString(metadataServiceItem.getItem(idRP2).getItem(), "/Fragment[1]/*");
 			RP2 = getNode(rpString2, docBuilder.getDocument());
+			removeReferences(RP2);
+
 		} catch (Exception e) {
 		}
 
@@ -143,12 +152,80 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		docBuilder.appendChild(userIDNode);
 		docBuilder.appendChild(citationNode);
 		docBuilder.appendChild(groupNode);
+		for (Node nodeRP1 : rp1Schemes) {
+			RP1.appendChild(nodeRP1);
+		}
 		docBuilder.appendChild(RP1);
+		if (rp2Schemes != null) {
+			for (Node nodeRP2 : rp2Schemes) {
+				RP2.appendChild(nodeRP2);
+			}
+		}
 		if (RP2 != null) {
 			docBuilder.appendChild(RP2);
 		}
+
 		return docBuilder.toString();
 
+	}
+
+	/**
+	 * Get the refernces and return them as a List<Node> for the final process
+	 * @param rpNodeStr : String of the rootNode
+	 * @param doc : DDIDocumentBuilder
+	 * @return List<Node> nodes of the schemes
+	 * @throws Exception
+	 */
+	private List<Node> patchReferencesItems(String rpNodeStr, DDIDocumentBuilder doc) throws Exception {
+		List<Node> nodes = new ArrayList<Node>();
+		Node nodeRP = null;
+		List<NodeList> fragmentsSchemes = new ArrayList<NodeList>();
+		NodeList nodeList = xpathProcessor.queryList(rpNodeStr, "/Fragment[1]/*");
+		for (int n = 0; n < nodeList.getLength(); n++) {
+			nodeRP = nodeList.item(n);
+			if (nodeRP.getNodeName().contains("ResourcePackage")) {
+				NodeList listRP = nodeRP.getChildNodes();
+				for (int i = 0; i < listRP.getLength(); i++) {
+					Node nodeREF = listRP.item(i);
+					if (nodeREF.getNodeName().endsWith("Reference")) {
+						NodeList childRefNodes = nodeREF.getChildNodes();
+						for (int j = 0; j < childRefNodes.getLength(); j++) {
+							Node childRefNode = childRefNodes.item(j);
+							if (childRefNode.getNodeName().contains("r:ID")) {
+								ColecticaItem item = metadataServiceItem
+										.getItem(childRefNode.getChildNodes().item(0).getNodeValue());
+								fragmentsSchemes.add(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*"));
+
+							}
+						}
+					}
+				}
+			}
+
+		}
+
+		for (NodeList nodeListScheme : fragmentsSchemes) {
+			for (int j = 0; j < nodeListScheme.getLength(); j++) {
+				Node newNode = nodeListScheme.item(j).cloneNode(true);
+				doc.getDocument().adoptNode(newNode);
+				nodes.add(newNode);
+			}
+		}
+		return nodes;
+	}
+
+	/**
+	 * Remove the references of the Resource Package Node
+	 * @param rpNode : node related to <ResourcePackage></ResourcePackage>
+	 */
+	private void removeReferences(Node rpNode) {
+		NodeList listRP = rpNode.getChildNodes();
+		for (int j = 0; j < listRP.getLength(); j++) {
+			Node nodeREF = listRP.item(j);
+			if (nodeREF.getNodeName().endsWith("Reference")) {
+				rpNode.removeChild(nodeREF);
+			}
+		}
 	}
 
 	private Document getDocument(String fragment) throws Exception {
