@@ -98,8 +98,11 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	@Override
 	public Map<String, ColecticaItem> getMapItems(ColecticaItemRefList refs) throws Exception {
 		Map<String, ColecticaItem> items = new HashMap<String, ColecticaItem>();
-		for (ColecticaItem item : this.getItems(refs)) {
-			items.put(item.getIdentifier(), item);
+		List<ColecticaItem> itemList = getItems(refs);
+		for (ColecticaItem item : itemList) {
+			if (item != null && item.getIdentifier() != null) {
+				items.put(item.getIdentifier(), item);
+			}
 		}
 		return items;
 	}
