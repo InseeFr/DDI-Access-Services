@@ -115,4 +115,9 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 	public Relationship[] getRelationship(ObjectColecticaPost relationshipPost) throws Exception {
 		return metadataClient.getRelationship(relationshipPost);
 	}
+
+	@Override
+	public Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) {
+		return metadataClient.getRelationshipChildren(relationshipPost);
+	}
 }

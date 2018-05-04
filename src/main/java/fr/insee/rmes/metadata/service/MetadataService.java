@@ -32,6 +32,8 @@ public interface MetadataService {
 
 	Relationship[] getRelationship(ObjectColecticaPost relationshipPost) throws Exception;
 	
+	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception;
+	
 	ResourcePackage getResourcePackage(String id) throws Exception;
 
 }

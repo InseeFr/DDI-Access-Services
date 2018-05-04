@@ -388,6 +388,11 @@ public class MetadataServiceImpl implements MetadataService {
 		return metadataRepository.getRelationship(relationshipPost);
 	}
 
+	@Override
+	public Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception {
+		return metadataRepository.getRelationshipChildren(relationshipPost);
+	}
+
 	
 
 }

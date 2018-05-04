@@ -137,4 +137,16 @@ public class MetadataClientImpl implements MetadataClient {
 		return response.getBody();
 	}
 
+	@Override
+	public Relationship[] getRelationshipChildren(ObjectColecticaPost objectColecticaPost) {
+		String url = String.format("%s/api/v1/_query/relationship/bysubject?api_key=%s", serviceUrl, apiKey);
+
+		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+		headers.add("Content-type", ContentType.APPLICATION_JSON.getMimeType());
+		HttpEntity<ObjectColecticaPost> request = new HttpEntity<>(objectColecticaPost, headers);
+		ResponseEntity<Relationship[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
+				Relationship[].class);
+		return response.getBody();
+	}
+
 }

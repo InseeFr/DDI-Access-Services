@@ -27,4 +27,6 @@ public interface MetadataClient {
 
 	Relationship[] getRelationship(ObjectColecticaPost objectColecticaPost);
 
+	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost);
+
 }
