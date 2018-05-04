@@ -30,4 +30,6 @@ public interface MetadataRepository {
 	Relationship[] getRelationship(ObjectColecticaPost relationshipPost) throws Exception;
 
 	List<Unit> getUnits() throws Exception;
+
+	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost);
 }

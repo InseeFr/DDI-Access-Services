@@ -25,6 +25,7 @@ public enum DDIItemType {
 	PROCESSINGEVENT_SCHEME("ProcessingEventScheme","processing-event-scheme","DC15C74B-9B4A-492E-9DDD-4E02ECA9D9D7"),
 	PROCESSINGINSTRUCTION_SCHEME("ProcessingInstructionScheme","processing-instruction-scheme","A1A5C54A-3A7B-4DFB-A5FA-46ED8EF465CC"),
 	PHYSICALSTRUCTURE_SCHEME("PhysicalStructureScheme","physical-structure-scheme","19273B86-934A-4C2C-9B64-BD2B3BB07ACD"),
+	PHYSICAL_DATA_PRODUCT("PhysicalDataProduct","physical-data-product","E27AAC79-BE4A-47D3-96E3-36DA178F3923"),
 	RECORDLAYOUT_SCHEME("RecordLayoutScheme","record-layout-scheme","8E4D59DB-E757-4E94-BB19-1AC72761566E"),
 	QUALITYSTATEMENT_SCHEME("QualityStatementScheme","quality-statement-scheme","4AA7EA9C-495D-4919-95F7-AC107C877F56"),
 	CONCEPTUALVARIABLE_SCHEME("ConceptualVariableScheme","conceptual-variable-scheme","CE0F8AF6-DB9C-4FB3-A31A-E9523FC53668"),
