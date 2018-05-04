@@ -2,6 +2,7 @@ package fr.insee.rmes.metadata.service.ddiinstance;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -18,10 +19,14 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ObjectColecticaPost;
+import fr.insee.rmes.metadata.model.Relationship;
+import fr.insee.rmes.metadata.model.TargetItem;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
+import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.utils.ddi.UtilXML;
 
@@ -43,86 +48,91 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 
 	@Override
 	public String getDDIInstance(String id) throws Exception {
-
+		DDIDocumentBuilder docBuilder = new DDIDocumentBuilder();
 		// Step 1 : Get the ColecticaItem and Check if it's a DDI instance (an
 		// Exception throws if not)
 		ColecticaItem ddiInstance = metadataServiceItem.getDDIInstance(id);
-		// Step 2 : Get the ColecticaItem group
-		String idGroup = xpathProcessor.queryString(ddiInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/GroupReference[1]/ID[1]/text()");
-		ColecticaItem groupItem = metadataServiceItem.getItem(idGroup);
-		// Step 3 : Get the ColecticaItem sub-group
-		String idSubGroup = xpathProcessor.queryString(groupItem.getItem(),
-				"/Fragment[1]/Group[1]/SubGroupReference[1]/ID[1]/text()");
-		ColecticaItem subGroupItem = metadataServiceItem.getItem(idSubGroup);
-		// Step 4 : Get the ColecticaItem Study-unit
-		String idStudyUnit = xpathProcessor.queryString(subGroupItem.getItem(),
-				"/Fragment[1]/SubGroup[1]/StudyUnitReference[1]/ID[1]/text()");
-		ColecticaItem studyUnitItem = metadataServiceItem.getItem(idStudyUnit);
-		// Step 5 : Get the ColecticaItem PhysicalDataProduct
-		String idPhysicalDataProduct = xpathProcessor.queryString(subGroupItem.getItem(),
-				"/Fragment[1]/SubGroup[1]/PhysicalDataProductReference[1]/ID[1]/text()");
-		ColecticaItem physicalDataProductItem = metadataServiceItem.getItem(idPhysicalDataProduct);
-		// Step : Build the group, from the studyUnit to the group
-		DDIDocumentBuilder docBuilder = new DDIDocumentBuilder();
 
-		Node subGroupNode = getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(subGroupItem.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
-		NodeList subGroupChildrenNodes = subGroupNode.getChildNodes();
-		for (int i = 0; i < subGroupChildrenNodes.getLength(); i++) {
-			Node node = subGroupChildrenNodes.item(i);
-			if (node.getNodeName().contains("StudyUnitReference")) {
-				Node studyUnitNode = getNode(
-						UtilXML.nodeToString(
-								xpathProcessor.queryList(studyUnitItem.getItem(), "/Fragment[1]/*").item(0)),
+		// Step 2 : Get the ColecticaItem groups /subGroups / StuDyUnits
+		List<ColecticaItem> groups = searchItemsChildrenByType(DDIItemType.GROUP, ddiInstance);
+		List<Node> groupNodes = new ArrayList<Node>();
+		for (ColecticaItem group : groups) {
+			Node groupNode = null;
+			List<ColecticaItem> subgroups = searchItemsChildrenByType(DDIItemType.SUB_GROUP, group);
+			for (ColecticaItem subgroup : subgroups) {
+				Node subGroupNode = getNode(
+						UtilXML.nodeToString(xpathProcessor.queryList(subgroup.getItem(), "/Fragment[1]/*").item(0)),
 						docBuilder.getDocument());
-				subGroupNode.removeChild(node);
-				subGroupNode.appendChild(studyUnitNode);
-			}
-			if (node.getNodeName().contains("PhysicalDataProductReference")) {
-				Node physicalDataProductNode = getNode(
-						UtilXML.nodeToString(
-								xpathProcessor.queryList(physicalDataProductItem.getItem(), "/Fragment[1]/*").item(0)),
+				NodeList subGroupChildrenNodes = subGroupNode.getChildNodes();
+				for (int i = 0; i < subGroupChildrenNodes.getLength(); i++) {
+					Node node = subGroupChildrenNodes.item(i);
+					if (node.getNodeName().contains("StudyUnitReference")) {
+						List<ColecticaItem> studyUnits = searchItemsChildrenByType(DDIItemType.STUDY_UNIT, subgroup);
+						for (ColecticaItem studyUnitItem : studyUnits) {
+							Node studyUnitNode = getNode(
+									UtilXML.nodeToString(xpathProcessor
+											.queryList(studyUnitItem.getItem(), "/Fragment[1]/*").item(0)),
+									docBuilder.getDocument());
+							List<ColecticaItem> dataCollections = searchItemsChildrenByType(DDIItemType.DATA_COLLECTION,
+									studyUnitItem);
+							for (ColecticaItem dcItem : dataCollections) {
+								Node DCNode = getNode(
+										UtilXML.nodeToString(
+												xpathProcessor.queryList(dcItem.getItem(), "/Fragment[1]/*").item(0)),
+										docBuilder.getDocument());
+
+								removeReferences(studyUnitNode);
+								studyUnitNode.appendChild(DCNode);
+
+							}
+
+							subGroupNode.removeChild(node);
+							subGroupNode.appendChild(studyUnitNode);
+						}
+					}
+					if (node.getNodeName().contains("PhysicalDataProductReference")) {
+						List<ColecticaItem> physicalDataProducts = searchItemsChildrenByType(
+								DDIItemType.PHYSICAL_DATA_PRODUCT, subgroup);
+						for (ColecticaItem physicalDataProductItem : physicalDataProducts) {
+							Node physicalDataProductNode = getNode(
+									UtilXML.nodeToString(xpathProcessor
+											.queryList(physicalDataProductItem.getItem(), "/Fragment[1]/*").item(0)),
+									docBuilder.getDocument());
+							subGroupNode.removeChild(node);
+							subGroupNode.appendChild(physicalDataProductNode);
+						}
+
+					}
+				}
+				subGroupNode = getNode(UtilXML.nodeToString(subGroupNode), docBuilder.getDocument());
+				groupNode = getNode(
+						UtilXML.nodeToString(xpathProcessor.queryList(group.getItem(), "/Fragment[1]/*").item(0)),
 						docBuilder.getDocument());
-				subGroupNode.removeChild(node);
-				subGroupNode.appendChild(physicalDataProductNode);
+				NodeList groupChildrenNodes = groupNode.getChildNodes();
+				for (int i = 0; i < groupChildrenNodes.getLength(); i++) {
+					Node node = groupChildrenNodes.item(i);
+					if (node.getNodeName().contains("SubGroupReference")) {
+						groupNode.appendChild(subGroupNode);
+						groupNode.removeChild(node);
+					}
+				}
+				groupNodes.add(groupNode);
 			}
 		}
-		subGroupNode = getNode(UtilXML.nodeToString(subGroupNode), docBuilder.getDocument());
-		Node groupNode = getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(groupItem.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
-		NodeList groupChildrenNodes = groupNode.getChildNodes();
-		for (int i = 0; i < groupChildrenNodes.getLength(); i++) {
-			Node node = groupChildrenNodes.item(i);
-			if (node.getNodeName().contains("SubGroupReference")) {
-				groupNode.appendChild(subGroupNode);
-				groupNode.removeChild(node);
+
+		// Get ResourcesPackages
+		List<ColecticaItem> RPitems = searchItemsChildrenByType(DDIItemType.RESSOURCEPACKAGE, ddiInstance);
+		List<Node> RPNodes = new ArrayList<Node>();
+		for (ColecticaItem rpItem : RPitems) {
+			String rpString = xpathProcessor.queryString(rpItem.getItem(), "/*");
+			List<Node> rpSchemes = patchReferencesItems(rpString, docBuilder);
+			rpString = xpathProcessor.queryString(rpItem.getItem(), "/Fragment[1]/*");
+			Node rpItemNode = getNode(rpString, docBuilder.getDocument());
+			removeReferences(rpItemNode);
+			for (Node node : rpSchemes) {
+				rpItemNode.appendChild(node);
 			}
-		}
-
-		// Step : Get the first Resource package
-		String idRP = xpathProcessor.queryString(ddiInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/ResourcePackageReference[1]/ID[1]/text()");
-		String rpString = xpathProcessor.queryString(metadataServiceItem.getItem(idRP).getItem(), "/*");
-		List<Node> rp1Schemes = patchReferencesItems(rpString, docBuilder);
-		rpString = xpathProcessor.queryString(metadataServiceItem.getItem(idRP).getItem(), "/Fragment[1]/*");
-		Node RP1 = getNode(rpString, docBuilder.getDocument());
-		removeReferences(RP1);
-		// Step : Get the second Resource package (if available)
-		List<Node> rp2Schemes = null;
-		Node RP2 = null;
-		try {
-			String idRP2 = xpathProcessor.queryString(ddiInstance.getItem(),
-					"/Fragment[1]/DDIInstance[1]/ResourcePackageReference[2]/ID[1]/text()");
-			String rpString2 = xpathProcessor.queryString(metadataServiceItem.getItem(idRP2).getItem(), "/*");
-			rp2Schemes = patchReferencesItems(rpString2, docBuilder);
-			rpString2 = xpathProcessor.queryString(metadataServiceItem.getItem(idRP2).getItem(), "/Fragment[1]/*");
-			RP2 = getNode(rpString2, docBuilder.getDocument());
-			removeReferences(RP2);
-
-		} catch (Exception e) {
+			RPNodes.add(rpItemNode);
 		}
 
 		// Step : Get DDI Instance informations on root : r:URN, r:Agency, r:ID,
@@ -151,18 +161,12 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		docBuilder.appendChild(versionNode);
 		docBuilder.appendChild(userIDNode);
 		docBuilder.appendChild(citationNode);
-		docBuilder.appendChild(groupNode);
-		for (Node nodeRP1 : rp1Schemes) {
-			RP1.appendChild(nodeRP1);
+		for (Node node : groupNodes) {
+			docBuilder.appendChild(node);
 		}
-		docBuilder.appendChild(RP1);
-		if (rp2Schemes != null) {
-			for (Node nodeRP2 : rp2Schemes) {
-				RP2.appendChild(nodeRP2);
-			}
-		}
-		if (RP2 != null) {
-			docBuilder.appendChild(RP2);
+
+		for (Node node : RPNodes) {
+			docBuilder.appendChild(node);
 		}
 
 		return docBuilder.toString();
@@ -171,9 +175,12 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 
 	/**
 	 * Get the refernces and return them as a List<Node> for the final process
-	 * @param rpNodeStr : String of the rootNode
-	 * @param doc : DDIDocumentBuilder
-	 * @return List<Node> nodes of the schemes
+	 * 
+	 * @param rpNodeStr
+	 *            : String of the rootNode
+	 * @param doc
+	 *            : DDIDocumentBuilder
+	 * @return List<Node> : nodes of the schemes
 	 * @throws Exception
 	 */
 	private List<Node> patchReferencesItems(String rpNodeStr, DDIDocumentBuilder doc) throws Exception {
@@ -216,7 +223,9 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 
 	/**
 	 * Remove the references of the Resource Package Node
-	 * @param rpNode : node related to <ResourcePackage></ResourcePackage>
+	 * 
+	 * @param rpNode
+	 *            : node related to <ResourcePackage></ResourcePackage>
 	 */
 	private void removeReferences(Node rpNode) {
 		NodeList listRP = rpNode.getChildNodes();
@@ -244,6 +253,39 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		// Transfer ownership of the new node into the destination document
 		doc.adoptNode(newNode);
 		return newNode;
+	}
+
+	/**
+	 * Serach the children of a specific DDI TYpe for a DDI object
+	 * 
+	 * @param ddiItemType
+	 *            : <tt>DDIItemType<tt>
+	 * @param itemChild
+	 *            : <tt>ColecticaItem<tt>
+	 * @return
+	 * @throws Exception
+	 */
+	private List<ColecticaItem> searchItemsChildrenByType(DDIItemType ddiItemType, ColecticaItem itemChild)
+			throws Exception {
+		ObjectColecticaPost objectColecticaPost = new ObjectColecticaPost();
+		List<String> itemTypes = new ArrayList<String>();
+		List<ColecticaItem> items = new ArrayList<ColecticaItem>();
+		itemTypes.add(ddiItemType.getUUID());
+		objectColecticaPost.setItemTypes(itemTypes);
+		TargetItem targetItem = new TargetItem();
+		targetItem.setAgencyId(itemChild.agencyId);
+		targetItem.setIdentifier(itemChild.identifier);
+		targetItem.setVersion(Integer.valueOf(itemChild.version));
+		objectColecticaPost.setTargetItem(targetItem);
+		objectColecticaPost.setUseDistinctResultItem(true);
+		objectColecticaPost.setUseDistinctTargetItem(true);
+		Relationship[] relationships = metadataService.getRelationshipChildren(objectColecticaPost);
+		for (Relationship relationship : relationships) {
+			String DDIidentifier = relationship.getIdentifierTriple().getIdentifier();
+			ColecticaItem item = metadataServiceItem.getItem(DDIidentifier);
+			items.add(item);
+		}
+		return items;
 	}
 
 }
