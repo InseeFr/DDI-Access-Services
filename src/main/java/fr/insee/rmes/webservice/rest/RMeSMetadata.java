@@ -25,6 +25,7 @@ import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.metadata.service.codeList.CodeListService;
 import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
+import fr.insee.rmes.metadata.service.groups.GroupsService;
 import fr.insee.rmes.metadata.service.questionnaire.QuestionnaireService;
 import fr.insee.rmes.metadata.service.variableBook.VariableBookService;
 import io.swagger.annotations.Api;
@@ -58,6 +59,9 @@ public class RMeSMetadata {
 
 	@Autowired
 	VariableBookService variableBookServiceItem;
+	
+	@Autowired
+	GroupsService groupService;
 
 	@GET
 	@Path("colectica-item/{id}")
@@ -170,6 +174,27 @@ public class RMeSMetadata {
 	public Response getDDIDocument(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String ddiDocument = metadataService.getDDIDocument(id);
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+	
+	@GET
+	@Path("groups/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including all groups from a tpLevel {id}", response = String.class)
+	public Response getDDIDocumentGroups(@PathParam(value = "id") String id) throws Exception {
+		try {
+			String ddiDocument = groupService.getGroups(id);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
