@@ -8,6 +8,6 @@ public interface GroupsService {
 	 * @throws Exception 
 	 * @return String : fragmentInstance with all fragment's groups.
 	 */
-	String getGroups(String idTopLevel) throws Exception;
+	String getGroup(String idTopLevel) throws Exception;
 
 }

@@ -189,12 +189,12 @@ public class RMeSMetadata {
 	}
 	
 	@GET
-	@Path("groups/{id}/ddi")
+	@Path("group/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including all groups from a tpLevel {id}", response = String.class)
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including a group from a tpLevel {id}", response = String.class)
 	public Response getDDIDocumentGroups(@PathParam(value = "id") String id) throws Exception {
 		try {
-			String ddiDocument = groupService.getGroups(id);
+			String ddiDocument = groupService.getGroup(id);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
