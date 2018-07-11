@@ -25,6 +25,7 @@ import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.metadata.service.codeList.CodeListService;
 import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
+import fr.insee.rmes.metadata.service.fragmentInstance.FragmentInstanceService;
 import fr.insee.rmes.metadata.service.groups.GroupsService;
 import fr.insee.rmes.metadata.service.questionnaire.QuestionnaireService;
 import fr.insee.rmes.metadata.service.variableBook.VariableBookService;
@@ -59,9 +60,12 @@ public class RMeSMetadata {
 
 	@Autowired
 	VariableBookService variableBookServiceItem;
-	
+
 	@Autowired
 	GroupsService groupService;
+
+	@Autowired
+	FragmentInstanceService fragmentInstanceService;
 
 	@GET
 	@Path("colectica-item/{id}")
@@ -187,14 +191,35 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
-	
+
 	@GET
 	@Path("group/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including a group from a tpLevel {id}", response = String.class)
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including a group from a topLevel {id}", response = String.class)
 	public Response getDDIDocumentGroups(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String ddiDocument = groupService.getGroup(id);
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("fragmentInstance/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.", response = String.class)
+	public Response getDDIDocumentFragmentInstance(@PathParam(value = "id") String id) throws Exception {
+		try {
+			String ddiDocument = fragmentInstanceService.getFragmentInstance(id, null);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
