@@ -51,7 +51,7 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 			replaceValueEnvelope(docBuilder, "r:TypeOfObject", itemType.getName());
 		}
 
-		// Step 4 : add the group and all of its children
+		// Step 4 : add the root Instance and all of its children
 		ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(idTopLevel);
 
 		List<ColecticaItem> items = metadataServiceItem.getItems(refs);

@@ -4,6 +4,6 @@
     <r:Agency>agency</r:Agency>
     <r:ID>UUID</r:ID>
     <r:Version>version</r:Version>
-    <r:TypeOfObject>Group</r:TypeOfObject>
+    <r:TypeOfObject>Item</r:TypeOfObject>
   </ddi:TopLevelReference>
 </ddi:FragmentInstance>
