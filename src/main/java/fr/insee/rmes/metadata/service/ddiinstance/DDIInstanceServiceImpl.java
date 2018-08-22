@@ -25,6 +25,7 @@ import fr.insee.rmes.metadata.model.TargetItem;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
@@ -57,58 +58,12 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		List<ColecticaItem> groups = searchItemsChildrenByType(DDIItemType.GROUP, ddiInstance);
 		List<Node> groupNodes = new ArrayList<Node>();
 		for (ColecticaItem group : groups) {
-			Node groupNode = null;
+			Node groupNode = DocumentBuilderUtils.getNode(itemToString(group),docBuilder.getDocument());
 			List<ColecticaItem> subgroups = searchItemsChildrenByType(DDIItemType.SUB_GROUP, group);
+			NodeList groupChildrenNodes = groupNode.getChildNodes();
+
 			for (ColecticaItem subgroup : subgroups) {
-				Node subGroupNode = getNode(
-						UtilXML.nodeToString(xpathProcessor.queryList(subgroup.getItem(), "/Fragment[1]/*").item(0)),
-						docBuilder.getDocument());
-				NodeList subGroupChildrenNodes = subGroupNode.getChildNodes();
-				for (int i = 0; i < subGroupChildrenNodes.getLength(); i++) {
-					Node node = subGroupChildrenNodes.item(i);
-					if (node.getNodeName().contains("StudyUnitReference")) {
-						List<ColecticaItem> studyUnits = searchItemsChildrenByType(DDIItemType.STUDY_UNIT, subgroup);
-						for (ColecticaItem studyUnitItem : studyUnits) {
-							Node studyUnitNode = getNode(
-									UtilXML.nodeToString(xpathProcessor
-											.queryList(studyUnitItem.getItem(), "/Fragment[1]/*").item(0)),
-									docBuilder.getDocument());
-							List<ColecticaItem> dataCollections = searchItemsChildrenByType(DDIItemType.DATA_COLLECTION,
-									studyUnitItem);
-							for (ColecticaItem dcItem : dataCollections) {
-								Node DCNode = getNode(
-										UtilXML.nodeToString(
-												xpathProcessor.queryList(dcItem.getItem(), "/Fragment[1]/*").item(0)),
-										docBuilder.getDocument());
-
-								removeReferences(studyUnitNode);
-								studyUnitNode.appendChild(DCNode);
-
-							}
-
-							subGroupNode.removeChild(node);
-							subGroupNode.appendChild(studyUnitNode);
-						}
-					}
-					if (node.getNodeName().contains("PhysicalDataProductReference")) {
-						List<ColecticaItem> physicalDataProducts = searchItemsChildrenByType(
-								DDIItemType.PHYSICAL_DATA_PRODUCT, subgroup);
-						for (ColecticaItem physicalDataProductItem : physicalDataProducts) {
-							Node physicalDataProductNode = getNode(
-									UtilXML.nodeToString(xpathProcessor
-											.queryList(physicalDataProductItem.getItem(), "/Fragment[1]/*").item(0)),
-									docBuilder.getDocument());
-							subGroupNode.removeChild(node);
-							subGroupNode.appendChild(physicalDataProductNode);
-						}
-
-					}
-				}
-				subGroupNode = getNode(UtilXML.nodeToString(subGroupNode), docBuilder.getDocument());
-				groupNode = getNode(
-						UtilXML.nodeToString(xpathProcessor.queryList(group.getItem(), "/Fragment[1]/*").item(0)),
-						docBuilder.getDocument());
-				NodeList groupChildrenNodes = groupNode.getChildNodes();
+				Node subGroupNode = subGroupItemToNode(docBuilder, subgroup);
 				for (int i = 0; i < groupChildrenNodes.getLength(); i++) {
 					Node node = groupChildrenNodes.item(i);
 					if (node.getNodeName().contains("SubGroupReference")) {
@@ -125,9 +80,8 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		List<Node> RPNodes = new ArrayList<Node>();
 		for (ColecticaItem rpItem : RPitems) {
 			String rpString = xpathProcessor.queryString(rpItem.getItem(), "/*");
-			List<Node> rpSchemes = patchReferencesItems(rpString, docBuilder);
-			rpString = xpathProcessor.queryString(rpItem.getItem(), "/Fragment[1]/*");
-			Node rpItemNode = getNode(rpString, docBuilder.getDocument());
+			List<Node> rpSchemes = getReferencesInListOfNodes(rpString, docBuilder);
+			Node rpItemNode = getNodeByXpath(docBuilder, rpItem, "/Fragment[1]/*");
 			removeReferences(rpItemNode);
 			for (Node node : rpSchemes) {
 				rpItemNode.appendChild(node);
@@ -137,30 +91,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 
 		// Step : Get DDI Instance informations on root : r:URN, r:Agency, r:ID,
 		// r:Version, r:UserID, r:Citation
-		String urnString = xpathProcessor.queryString(ddiInstance.getItem(), "/Fragment[1]/DDIInstance[1]/URN[1]");
-		Node urnNode = getNode(urnString.trim(), docBuilder.getDocument());
-		String agencyString = xpathProcessor.queryString(ddiInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/Agency[1]");
-		Node agencyNode = getNode(agencyString, docBuilder.getDocument());
-		String idString = xpathProcessor.queryString(ddiInstance.getItem(), "/Fragment[1]/DDIInstance[1]/ID[1]");
-		Node idNode = getNode(idString, docBuilder.getDocument());
-		String versionString = xpathProcessor.queryString(ddiInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/Version[1]");
-		Node versionNode = getNode(versionString, docBuilder.getDocument());
-		String userIDString = xpathProcessor.queryString(ddiInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/UserID[1]");
-		Node userIDNode = getNode(userIDString, docBuilder.getDocument());
-		String citationString = xpathProcessor.queryString(ddiInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/Citation[1]");
-		Node citationNode = getNode(citationString, docBuilder.getDocument());
-
-		// Final step add Child on root
-		docBuilder.appendChild(urnNode);
-		docBuilder.appendChild(agencyNode);
-		docBuilder.appendChild(idNode);
-		docBuilder.appendChild(versionNode);
-		docBuilder.appendChild(userIDNode);
-		docBuilder.appendChild(citationNode);
+		addDDIInstanceInformationToDocBuilder(ddiInstance,docBuilder);
 		for (Node node : groupNodes) {
 			docBuilder.appendChild(node);
 		}
@@ -173,29 +104,78 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 
 	}
 
+	private Node subGroupItemToNode(DDIDocumentBuilder docBuilder, ColecticaItem subgroup) throws Exception {
+		Node subGroupNode = DocumentBuilderUtils.getNode(itemToString(subgroup),	docBuilder.getDocument());
+		NodeList subGroupChildrenNodes = subGroupNode.getChildNodes();
+		for (int i = 0; i < subGroupChildrenNodes.getLength(); i++) {
+			Node node = subGroupChildrenNodes.item(i);
+			if (node.getNodeName().contains("StudyUnitReference")) {
+				List<ColecticaItem> studyUnits = searchItemsChildrenByType(DDIItemType.STUDY_UNIT, subgroup);
+				for (ColecticaItem studyUnitItem : studyUnits) {
+					Node studyUnitNode = studyUnitItemToNode(docBuilder, studyUnitItem);
+					subGroupNode.removeChild(node);
+					subGroupNode.appendChild(studyUnitNode);
+				}
+			}
+			if (node.getNodeName().contains("PhysicalDataProductReference")) {
+				List<ColecticaItem> physicalDataProducts = searchItemsChildrenByType(
+						DDIItemType.PHYSICAL_DATA_PRODUCT, subgroup);
+				for (ColecticaItem physicalDataProductItem : physicalDataProducts) {
+					Node physicalDataProductNode = DocumentBuilderUtils.getNode(itemToString(physicalDataProductItem),docBuilder);
+					subGroupNode.removeChild(node);
+					subGroupNode.appendChild(physicalDataProductNode);
+				}
+			}
+		}
+		return subGroupNode;
+	}
+
+	private Node studyUnitItemToNode(DDIDocumentBuilder docBuilder, ColecticaItem studyUnitItem) throws Exception {
+		Node studyUnitNode = DocumentBuilderUtils.getNode(itemToString(studyUnitItem),docBuilder);
+		List<ColecticaItem> dataCollections = searchItemsChildrenByType(DDIItemType.DATA_COLLECTION,
+				studyUnitItem);
+		for (ColecticaItem dcItem : dataCollections) {
+			Node dataCollectionNode = DocumentBuilderUtils.getNode(itemToString(dcItem),docBuilder);
+			removeReferences(studyUnitNode);
+			studyUnitNode.appendChild(dataCollectionNode);
+		}
+		return studyUnitNode;
+	}
+
+	private String itemToString(ColecticaItem colecticaItem) throws Exception {
+		return UtilXML.nodeToString(xpathProcessor.queryList(colecticaItem.getItem(), "/Fragment[1]/*").item(0));
+	}
+
+	private Node getNodeByXpath(DDIDocumentBuilder docBuilder, ColecticaItem ddiInstance, String xpathExpression)
+			throws Exception {
+		String fragment = xpathProcessor.queryString(ddiInstance.getItem(), xpathExpression);
+		Node node = DocumentBuilderUtils.getNode(fragment.trim(), docBuilder);
+		return node;
+	}
+
 	/**
-	 * Get the refernces and return them as a List<Node> for the final process
+	 * Get the references in a fragment and return them as a List of Node 
 	 * 
-	 * @param rpNodeStr
+	 * @param fragment
 	 *            : String of the rootNode
 	 * @param doc
 	 *            : DDIDocumentBuilder
 	 * @return List<Node> : nodes of the schemes
 	 * @throws Exception
 	 */
-	private List<Node> patchReferencesItems(String rpNodeStr, DDIDocumentBuilder doc) throws Exception {
-		List<Node> nodes = new ArrayList<Node>();
-		Node nodeRP = null;
+	private List<Node> getReferencesInListOfNodes(String fragment, DDIDocumentBuilder doc) throws Exception {
+		List<Node> referencesNodes = new ArrayList<Node>();
 		List<NodeList> fragmentsSchemes = new ArrayList<NodeList>();
-		NodeList nodeList = xpathProcessor.queryList(rpNodeStr, "/Fragment[1]/*");
-		for (int n = 0; n < nodeList.getLength(); n++) {
-			nodeRP = nodeList.item(n);
-			if (nodeRP.getNodeName().contains("ResourcePackage")) {
-				NodeList listRP = nodeRP.getChildNodes();
-				for (int i = 0; i < listRP.getLength(); i++) {
-					Node nodeREF = listRP.item(i);
-					if (nodeREF.getNodeName().endsWith("Reference")) {
-						NodeList childRefNodes = nodeREF.getChildNodes();
+		NodeList fragmentNodes = xpathProcessor.queryList(fragment, "/Fragment[1]/*");
+		Node fragmentNode = null;
+		for (int n = 0; n < fragmentNodes.getLength(); n++) {
+			fragmentNode = fragmentNodes.item(n);
+			if (fragmentNode.getNodeName().contains("ResourcePackage")) {
+				NodeList resourcePackageChildren = fragmentNode.getChildNodes();
+				for (int i = 0; i < resourcePackageChildren.getLength(); i++) {
+					Node childNode = resourcePackageChildren.item(i);
+					if (childNode.getNodeName().endsWith("Reference")) {
+						NodeList childRefNodes = childNode.getChildNodes();
 						for (int j = 0; j < childRefNodes.getLength(); j++) {
 							Node childRefNode = childRefNodes.item(j);
 							if (childRefNode.getNodeName().contains("r:ID")) {
@@ -215,10 +195,10 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 			for (int j = 0; j < nodeListScheme.getLength(); j++) {
 				Node newNode = nodeListScheme.item(j).cloneNode(true);
 				doc.getDocument().adoptNode(newNode);
-				nodes.add(newNode);
+				referencesNodes.add(newNode);
 			}
 		}
-		return nodes;
+		return referencesNodes;
 	}
 
 	/**
@@ -237,26 +217,9 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		}
 	}
 
-	private Document getDocument(String fragment) throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		if (null == fragment || fragment.isEmpty()) {
-			return builder.newDocument();
-		}
-		InputSource ddiSource = new InputSource(new StringReader(fragment));
-		return builder.parse(ddiSource);
-	}
-
-	private Node getNode(String fragment, Document doc) throws Exception {
-		Element node = getDocument(fragment).getDocumentElement();
-		Node newNode = node.cloneNode(true);
-		// Transfer ownership of the new node into the destination document
-		doc.adoptNode(newNode);
-		return newNode;
-	}
 
 	/**
-	 * Serach the children of a specific DDI TYpe for a DDI object
+	 * Search the children of a specific DDI TYpe for a DDI object
 	 * 
 	 * @param ddiItemType
 	 *            : <tt>DDIItemType<tt>
@@ -286,6 +249,32 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 			items.add(item);
 		}
 		return items;
+	}
+
+	/**
+	 * Get DDI Instance Informations on root and append to docBuilder
+	 *  r:URN, r:Agency, r:ID, r:Version, r:UserID, r:Citation
+	 * @param docBuilder
+	 * @param ddiInstance
+	 * @throws Exception
+	 */
+	@Override
+	public void addDDIInstanceInformationToDocBuilder(ColecticaItem ddiInstance, DDIDocumentBuilder docBuilder) throws Exception {
+		Node urnNode = getNodeByXpath(docBuilder, ddiInstance, "/Fragment[1]/DDIInstance[1]/URN[1]");
+		Node agencyNode = getNodeByXpath(docBuilder, ddiInstance, "/Fragment[1]/DDIInstance[1]/Agency[1]");
+		Node idNode = getNodeByXpath(docBuilder, ddiInstance, "/Fragment[1]/DDIInstance[1]/ID[1]");
+		Node versionNode = getNodeByXpath(docBuilder,ddiInstance,"/Fragment[1]/DDIInstance[1]/Version[1]");
+		Node userIDNode = getNodeByXpath(docBuilder, ddiInstance,"/Fragment[1]/DDIInstance[1]/UserID[1]");
+		Node citationNode = getNodeByXpath(docBuilder, ddiInstance, "/Fragment[1]/DDIInstance[1]/Citation[1]");
+
+		// add Child on root
+		docBuilder.appendChild(urnNode);
+		docBuilder.appendChild(agencyNode);
+		docBuilder.appendChild(idNode);
+		docBuilder.appendChild(versionNode);
+		docBuilder.appendChild(userIDNode);
+		docBuilder.appendChild(citationNode);
+		
 	}
 
 }

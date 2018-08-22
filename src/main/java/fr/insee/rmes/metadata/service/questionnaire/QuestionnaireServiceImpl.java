@@ -28,6 +28,8 @@ import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.service.SearchService;
@@ -48,6 +50,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 	@Autowired
 	MetadataService metadataService;
+	
+	@Autowired
+	DDIInstanceService ddiInstanceService;
 
 	@Autowired
 	SearchService searchService;
@@ -90,18 +95,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 	private Node instrumentNode;
 
-	private Node urnNode;
-
-	private Node agencyNode;
-
-	private Node idNode;
-
-	private Node versionNode;
-
-	private Node userIDNode;
-
-	private Node citationNode;
-
 	@Override
 	public String getQuestionnaire(String idDDIInstrument) throws Exception {
 		this.idDDIInstrument = idDDIInstrument;
@@ -137,9 +130,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 	}
 
 	private ColecticaItem mockGetVariableScheme(ColecticaItem dataCollection) throws Exception {
-		// TODO: remove mock when
-		// context will be fixed
-
+		// TODO: remove mock when context will be fixed
 		return metadataServiceItem.getItem("10489bc2-11bb-4688-b56f-3886c3f81c58");
 	}
 
@@ -162,7 +153,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 	}
 
 	/**
-	 * This method build the DDI Questiuonnaire
+	 * This method build the DDI Questionnaire
 	 * 
 	 * @return DDIQuestionnaire.toString()
 	 * @throws Exception
@@ -186,8 +177,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		// Step 3 : Build the group, from the
 		// studyUnit to the group
 		DDIDocumentBuilder docBuilder = new DDIDocumentBuilder();
+		ddiInstanceService.addDDIInstanceInformationToDocBuilder(DDIInstance,docBuilder);
 		convertAsNodesWithXPath(docBuilder);
-		convertAsDDINodesInformation(docBuilder);
 		appendChildsByParent(docBuilder);
 		// Step 4 : return the filled out enveloppe
 		// as result
@@ -197,12 +188,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 	}
 
 	private void appendChildsByParent(DDIDocumentBuilder docBuilder) {
-		docBuilder.appendChild(urnNode);
-		docBuilder.appendChild(agencyNode);
-		docBuilder.appendChild(idNode);
-		docBuilder.appendChild(versionNode);
-		docBuilder.appendChild(userIDNode);
-		docBuilder.appendChild(citationNode);
 		removeReferences(groupNode);
 		docBuilder.appendChild(groupNode);
 		removeReferences(subGroupNode);
@@ -220,64 +205,36 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 	}
 
-	private void convertAsDDINodesInformation(DDIDocumentBuilder docBuilder) throws Exception {
-		// Step
-		// 1 :
-		// Get
-		// DDI
-		// Instance
-		// informations
-		// on
-		// root : r:URN, r:Agency, r:ID, r:Version,
-		// r:UserID, r:Citation
-		String urnString = xpathProcessor.queryString(DDIInstance.getItem(), "/Fragment[1]/DDIInstance[1]/URN[1]");
-		this.urnNode = getNode(urnString.trim(), docBuilder.getDocument());
-		String agencyString = xpathProcessor.queryString(DDIInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/Agency[1]");
-		this.agencyNode = getNode(agencyString, docBuilder.getDocument());
-		String idString = xpathProcessor.queryString(DDIInstance.getItem(), "/Fragment[1]/DDIInstance[1]/ID[1]");
-		this.idNode = getNode(idString, docBuilder.getDocument());
-		String versionString = xpathProcessor.queryString(DDIInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/Version[1]");
-		this.versionNode = getNode(versionString, docBuilder.getDocument());
-		String userIDString = xpathProcessor.queryString(DDIInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/UserID[1]");
-		this.userIDNode = getNode(userIDString, docBuilder.getDocument());
-		String citationString = xpathProcessor.queryString(DDIInstance.getItem(),
-				"/Fragment[1]/DDIInstance[1]/Citation[1]");
-		this.citationNode = getNode(citationString, docBuilder.getDocument());
-
-	}
 
 	private void convertAsNodesWithXPath(DDIDocumentBuilder docBuilder) throws Exception {
-		this.subGroupNode = getNode(
+		this.subGroupNode = DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(subGroupItem.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
+				docBuilder);
 
-		subGroupNode = getNode(UtilXML.nodeToString(subGroupNode), docBuilder.getDocument());
-		this.groupNode = getNode(
+		subGroupNode = DocumentBuilderUtils.getNode(UtilXML.nodeToString(subGroupNode), docBuilder);
+		this.groupNode = DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(groupItem.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
+				docBuilder);
 
-		this.studyUnitNode = getNode(
+		this.studyUnitNode = DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(studyUnitItem.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
+				docBuilder);
 
-		this.DCNode = getNode(
+		this.DCNode = DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(dataCollection.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
+				docBuilder);
 
-		this.variableSchemeNode = getNode(
+		this.variableSchemeNode = DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(variableScheme.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
+				docBuilder);
 
-		this.instrumentSchemeNode = getNode(
+		this.instrumentSchemeNode = DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(instrumentScheme.item, "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
+				docBuilder);
 
-		this.instrumentNode = getNode(
+		this.instrumentNode = DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(instrument.item, "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
+				docBuilder);
 
 	}
 
@@ -335,9 +292,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 				ColecticaItem rpItem = metadataServiceItem.getItem(identifierRP);
 				ItemWithParent rpItemNodeString = new ItemWithParent();
 				rpItemNodeString.setItem(rpItem);
-				rpItemNodeString.setRessourcePackageNode(getNode(
+				rpItemNodeString.setRessourcePackageNode(DocumentBuilderUtils.getNode(
 						UtilXML.nodeToString(xpathProcessor.queryList(rpItem.getItem(), "/Fragment[1]/*").item(0)),
-						docBuilder.getDocument()));
+						docBuilder));
 				removeReferences(itemParentWithChildren.getParentNode());
 				rpItemNodeString.getRessourcePackageNode().appendChild(itemParentWithChildren.getParentNode());
 				rpItemNodeString.setRessourcePackage(rpItem);
@@ -359,9 +316,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		ColecticaItemRefList refsVariables = metadataServiceItem.getChildrenRef(this.variableScheme.getIdentifier());
 		List<ColecticaItem> variables = metadataServiceItem.getItems(refsVariables);
 		for (ColecticaItem variable : variables) {
-			Node variableNode = getNode(
+			Node variableNode = DocumentBuilderUtils.getNode(
 					UtilXML.nodeToString(xpathProcessor.queryList(variable.item, "/Fragment[1]/*").item(0)),
-					docBuilder.getDocument());
+					docBuilder);
 			this.variableSchemeNode.appendChild(variableNode);
 		}
 		ItemWithParent variableScheme = new ItemWithParent();
@@ -370,10 +327,10 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		ObjectColecticaPost objectColecticaPost = new ObjectColecticaPost();
 		variableScheme.setRessourcePackage(
 				searchItemParent(itemTypes, DDIItemType.RESSOURCEPACKAGE, objectColecticaPost, this.variableScheme));
-		variableScheme.setRessourcePackageNode(getNode(
+		variableScheme.setRessourcePackageNode(DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(
 						xpathProcessor.queryList(variableScheme.getRessourcePackage().item, "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument()));
+				docBuilder));
 		removeReferences(variableScheme.getRessourcePackageNode());
 		variableScheme.setParentNode(this.variableSchemeNode);
 		parentsWithCildren.add(variableScheme);
@@ -385,9 +342,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		}
 		for (ColecticaItem item : items) {
 			objectColecticaPost = new ObjectColecticaPost();
-			Node node = getNode(
+			Node node = DocumentBuilderUtils.getNode(
 					UtilXML.nodeToString(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*[1]").item(0)),
-					docBuilder.getDocument());
+					docBuilder);
 			removeReferences(node);
 			TargetItem targetItem = new TargetItem();
 			targetItem.setAgencyId(item.agencyId);
@@ -402,15 +359,15 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 				for (int i = 0; i < relationshipsSchemes.length; i++) {
 					ItemWithParent itemWithParent = new ItemWithParent();
 					itemWithParent.setItem(item);
-					itemWithParent.setItemNode(getNode(
+					itemWithParent.setItemNode(DocumentBuilderUtils.getNode(
 							UtilXML.nodeToString(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*").item(0)),
-							docBuilder.getDocument()));
+							docBuilder));
 					itemWithParent.setParent(
 							metadataServiceItem.getItem(relationshipsSchemes[i].getIdentifierTriple().getIdentifier()));
-					itemWithParent.setParentNode(getNode(
+					itemWithParent.setParentNode(DocumentBuilderUtils.getNode(
 							UtilXML.nodeToString(xpathProcessor
 									.queryList(itemWithParent.getParent().getItem(), "/Fragment[1]/*").item(0)),
-							docBuilder.getDocument()));
+							docBuilder));
 					// First adding of a parentNode
 					if (!identifierParentsWithCildren.contains(itemWithParent.getParent().getIdentifier())) {
 						removeReferences(itemWithParent.getParentNode());
@@ -491,22 +448,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		}
 	}
 
-	private Node getNode(String fragment, Document doc) throws Exception {
-		Element node = getDocument(fragment).getDocumentElement();
-		Node newNode = node.cloneNode(true);
-		// Transfer ownership of the new node into the destination document
-		doc.adoptNode(newNode);
-		return newNode;
-	}
 
-	private Document getDocument(String fragment) throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		if (null == fragment || fragment.isEmpty()) {
-			return builder.newDocument();
-		}
-		InputSource ddiSource = new InputSource(new StringReader(fragment));
-		return builder.parse(ddiSource);
-	}
+
+
 
 }

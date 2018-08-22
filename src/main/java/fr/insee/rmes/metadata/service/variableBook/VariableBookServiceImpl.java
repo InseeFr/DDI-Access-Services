@@ -13,6 +13,7 @@ import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.utils.ddi.UtilXML;
@@ -38,9 +39,9 @@ public class VariableBookServiceImpl implements VariableBookService {
 
 		// Step 1 : Get the ColecticaItem and Check if it's a StudyUnit
 		ColecticaItem studyUnit = metadataServiceItem.getStudyUnit(idStudyUnit);
-		Node studyUnitNode = docBuilder.getNode(
+		Node studyUnitNode = DocumentBuilderUtils.getNode(
 				UtilXML.nodeToString(xpathProcessor.queryList(studyUnit.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder.getDocument());
+				docBuilder);
 
 		// Step 2 : Get the LogicalProduct and RepresentedVariableScheme
 		String idLogicalProduct = xpathProcessor.queryString(studyUnit.getItem(),
@@ -91,7 +92,7 @@ public class VariableBookServiceImpl implements VariableBookService {
 	private Node getCompleteNode(DDIDocumentBuilder docBuilder, String idNodeToExtract) throws Exception {
 		String fragment = xpathProcessor.queryString(metadataService.getDerefDDIDocument(idNodeToExtract),
 				"/DDIInstance[1]/*");
-		return docBuilder.getNode(fragment, docBuilder.getDocument());
+		return DocumentBuilderUtils.getNode(fragment, docBuilder);
 	}
 
 	private static String getId(Node refNode) throws Exception {
