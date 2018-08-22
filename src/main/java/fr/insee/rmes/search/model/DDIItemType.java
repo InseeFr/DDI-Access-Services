@@ -21,6 +21,7 @@ public enum DDIItemType {
 	CONTROLCONSTRUCT_SCHEME("ControlConstructScheme","control-construct-scheme","ED3801FE-6798-4EA6-808B-73052CC1C633"),
 	QUESTION_SCHEME("QuestionScheme","question-scheme","0A63FCF6-FFDD-4214-B38C-147D6689D6A1"),
 	CATEGORY_SCHEME("CategoryScheme","category-scheme","1C11DE94-A36D-4D80-95DC-950C6F37F624"),
+	CATEGORY("Category","category","7E47C269-BCAB-40F7-A778-AF7BBC4E3D00"),
 	VARIABLE_SCHEME("VariableScheme","variable-scheme","50907716-B67A-4DCD-8F9F-8A283CB5FEE0"),
 	PROCESSINGEVENT_SCHEME("ProcessingEventScheme","processing-event-scheme","DC15C74B-9B4A-492E-9DDD-4E02ECA9D9D7"),
 	PROCESSINGINSTRUCTION_SCHEME("ProcessingInstructionScheme","processing-instruction-scheme","A1A5C54A-3A7B-4DFB-A5FA-46ED8EF465CC"),
@@ -30,10 +31,13 @@ public enum DDIItemType {
 	QUALITYSTATEMENT_SCHEME("QualityStatementScheme","quality-statement-scheme","4AA7EA9C-495D-4919-95F7-AC107C877F56"),
 	CONCEPTUALVARIABLE_SCHEME("ConceptualVariableScheme","conceptual-variable-scheme","CE0F8AF6-DB9C-4FB3-A31A-E9523FC53668"),
 	REPRESENTEDVARIABLE_SCHEME("RepresentedVariableScheme","represented-variable-scheme","14404696-2DB3-45AC-A94D-139521DE6E21"),
+	REPRESENTED_VARAIBLE("RepresentedVariable","represented-variable","1044459C-8AE2-474A-AD96-6EC18B04953C"),
+	REPRESENTED_VARIABLE_GROUP("RepresentedVariableGroup","represented-variable-group","A8CECEF5-4493-47B8-9C83-82A2F1CFB08E"),
 	NCUBE_SCHEME("NCubeScheme","n-cube-scheme","31E8515B-C0CC-4E88-9E00-AE4BB6D4AC25"),
 	INSTRUMENT_SCHEME("InstrumentScheme","instrument-scheme","F152EE61-08BA-4FCA-8A3A-DAF8F87F972E"),
 	CODELIST_SCHEME("CodeListScheme","code-list-scheme","4193D389-B5AE-4368-B399-CD5A7EE3653C"),
-	MANAGEDREPRESENTATION_SCHEME("ManagedRepresentationScheme","managed-representation-scheme","16D4D829-41E1-4677-AA17-81190B6A0E66");
+	MANAGEDREPRESENTATION_SCHEME("ManagedRepresentationScheme","managed-representation-scheme","16D4D829-41E1-4677-AA17-81190B6A0E66"),
+	LOGICAL_PRODUCT("LogicalProduct","logical-product","965C8D28-7D48-4950-BEA7-04B27E52BB9B");
 	
 	private String name = "" ; 
 	private String type ="";
