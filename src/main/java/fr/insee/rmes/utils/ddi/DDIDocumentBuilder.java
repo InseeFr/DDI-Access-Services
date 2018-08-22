@@ -19,7 +19,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +29,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.google.common.io.Resources;
+
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 
 public class DDIDocumentBuilder {
 
@@ -363,15 +364,7 @@ public class DDIDocumentBuilder {
 		return packagedDocument;
 	}
 
-	public Document getDocument(String fragment) throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		if (null == fragment || fragment.isEmpty()) {
-			return builder.newDocument();
-		}
-		InputSource ddiSource = new InputSource(new StringReader(fragment));
-		return builder.parse(ddiSource);
-	}
+
 
 	@Override
 	public String toString() {
@@ -392,7 +385,7 @@ public class DDIDocumentBuilder {
 	}
 
 	private Node buildNode(Document document, String rootId, Map<String, String> references) throws Exception {
-		Node node = getNode(references.get(rootId), document);
+		Node node = DocumentBuilderUtils.getNode(references.get(rootId), document);
 		walk(node, document, references);
 		return node;
 	}
@@ -403,11 +396,11 @@ public class DDIDocumentBuilder {
 		strBuilder.append(this.nameEnvelope);
 		URL url = Resources.getResource(strBuilder.toString());
 		String fragment = FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8.name());
-		return getDocument(fragment);
+		return DocumentBuilderUtils.getDocument(fragment);
 	}
 
 	private Document buildWithoutEnvelope() throws Exception {
-		return getDocument(null);
+		return DocumentBuilderUtils.getDocument(null);
 
 	}
 
@@ -418,21 +411,15 @@ public class DDIDocumentBuilder {
 			if (node.getNodeName().contains("Reference")) {
 				String fragment = references.get(getId(node));
 				if (null != fragment) {
-					Node child = getNode(fragment, document);
+					Node child = DocumentBuilderUtils.getNode(fragment, document);
 					root.appendChild(child);
 					root.removeChild(node);
 					walk(child, document, references);
 				}
+			} else {
+				walk(node, document, references);
 			}
 		}
-	}
-
-	public Node getNode(String fragment, Document doc) throws Exception {
-		Element node = getDocument(fragment).getDocumentElement();
-		Node newNode = node.cloneNode(true);
-		// Transfer ownership of the new node into the destination document
-		doc.adoptNode(newNode);
-		return newNode;
 	}
 
 	private static String getId(Node refNode) throws Exception {
@@ -470,7 +457,6 @@ public class DDIDocumentBuilder {
 		if (nodeToEncode.getNodeType() == Node.TEXT_NODE) {
 			nodeToEncode.setTextContent(StringUtils.removeStart(nodeToEncode.getTextContent(), "\n"));
 			nodeToEncode.setTextContent(StringUtils.removeEnd(nodeToEncode.getTextContent(), "\n"));
-			nodeToEncode.setTextContent(StringEscapeUtils.escapeXml11(nodeToEncode.getTextContent()));
 			nodeToEncode.setTextContent(StringUtils.normalizeSpace(nodeToEncode.getTextContent()));
 		}
 

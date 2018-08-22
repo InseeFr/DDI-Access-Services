@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -23,8 +22,6 @@ import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.model.ResponseItem;
-import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
-import fr.insee.rmes.utils.ddi.Envelope;
 import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
@@ -99,8 +96,11 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	@Override
 	public Map<String, ColecticaItem> getMapItems(ColecticaItemRefList refs) throws Exception {
 		Map<String, ColecticaItem> items = new HashMap<String, ColecticaItem>();
-		for (ColecticaItem item : this.getItems(refs)) {
-			items.put(item.getIdentifier(), item);
+		List<ColecticaItem> itemList = getItems(refs);
+		for (ColecticaItem item : itemList) {
+			if (item != null && item.getIdentifier() != null) {
+				items.put(item.getIdentifier(), item);
+			}
 		}
 		return items;
 	}

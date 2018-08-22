@@ -13,12 +13,7 @@
 		<param-name>isLog4jAutoInitializationDisabled</param-name>
 		<param-value>true</param-value>
 	</context-param>
-
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/applicationContext*.xml</param-value>
-	</context-param>
-
+	
 	<listener>
 		<listener-class>fr.insee.rmes.config.Log4j2DDIAccessServicesServletContextListener</listener-class>
 	</listener>
@@ -26,6 +21,13 @@
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
+
+
+<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/applicationContext*.xml</param-value>
+	</context-param>
+
 
 	<servlet>
 		<servlet-name>DDIAccessServices</servlet-name>

@@ -136,13 +136,7 @@ public class RMeSMetadata {
 			@PathParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
 			String ddiDocument = metadataService.getDerefDDIDocumentWithExternalRP(id, resourcePackageId);
-			StreamingOutput stream = output -> {
-				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(ddiDocument);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -157,13 +151,7 @@ public class RMeSMetadata {
 	public Response getFullDDI(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String ddiDocument = metadataService.getDDIDocument(id);
-			StreamingOutput stream = output -> {
-				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(ddiDocument);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -178,13 +166,7 @@ public class RMeSMetadata {
 	public Response getDDIDocument(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String ddiDocument = metadataService.getDDIDocument(id);
-			StreamingOutput stream = output -> {
-				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(ddiDocument);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -242,13 +224,7 @@ public class RMeSMetadata {
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
 			String codeList = codeListService.getCodeList(id, resourcePackageId);
-			StreamingOutput stream = output -> {
-				try {
-					output.write(codeList.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(codeList);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -264,15 +240,7 @@ public class RMeSMetadata {
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
 			String sequence = metadataService.getSequence(id);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(sequence.getBytes(StandardCharsets.UTF_8));
-
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(sequence);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -285,24 +253,17 @@ public class RMeSMetadata {
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
 	public Response getQuestionnaire(@PathParam(value = "idDdiInstrument") String idDdiInstrument) throws Exception {
-
 		try {
 			String questionnaire = questionnaireService.getQuestionnaire(idDdiInstrument);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
-
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(questionnaire);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
 	}
+
+
 
 	@GET
 	@Path("ddi-instance/{id}/ddi")
@@ -312,9 +273,7 @@ public class RMeSMetadata {
 
 		try {
 			String questionnaire = ddiInstanceService.getDDIInstance(id);
-			StreamingOutput stream = output -> {
-				output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
-			};
+			StreamingOutput stream = stringToStream(questionnaire);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -330,15 +289,7 @@ public class RMeSMetadata {
 	public Response getQuestion(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String questionnaire = metadataService.getQuestion(id);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
-
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(questionnaire);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -353,19 +304,23 @@ public class RMeSMetadata {
 	public Response getVariableBook(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String variablesBook = variableBookServiceItem.getVariableBook(id);
-			StreamingOutput stream = output -> {
-				try {
-					output.write(variablesBook.getBytes(StandardCharsets.UTF_8));
-
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(variablesBook);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
+	}
+	
+	private StreamingOutput stringToStream(String string) {
+		StreamingOutput stream = output -> {
+			try {
+				output.write(string.getBytes(StandardCharsets.UTF_8));
+			} catch (Exception e) {
+				throw new RMeSException(500, "Transformation error", e.getMessage());
+			}
+		};
+		return stream;
 	}
 
 }
