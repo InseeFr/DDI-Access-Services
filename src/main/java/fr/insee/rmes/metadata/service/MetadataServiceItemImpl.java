@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -349,21 +350,32 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	}
 
 	@Override
-	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
-		for (ColecticaItemPostRef item : refs.getItems()) {
-			item.setItem(new DDIDocumentBuilder(true, Envelope.FRAGMENT).build().toString());
+	public String postItems(ColecticaItemPostRefList refs) throws Exception {
+		for (ColecticaItemPostRef ref : refs.getItems()) {
+			checkVersionItem(ref);
 		}
 
-		return metadataRepository.postNewItems(refs);
+		return metadataRepository.postItems(refs);
 	}
 
 	@Override
-	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
-		for (ColecticaItemPostRef item : refs.getItems()) {
-			item.setItem(new DDIDocumentBuilder(true, Envelope.FRAGMENT).build().toString());
-		}
-		return metadataRepository.postUpdateItems(refs);
+	public String postItem(ColecticaItemPostRef ref) throws Exception {
 
+		checkVersionItem(ref);
+
+		return metadataRepository.postItem(ref);
+
+	}
+
+	public void checkVersionItem(ColecticaItemPostRef ref) {
+		try {
+			ColecticaItem item = this.getItem(ref.identifier);
+			int version = Integer.valueOf(item.version) + 1;
+			ref.version = String.valueOf(version);
+		} catch (Exception e) {
+			ref.version = "1";
+
+		}
 	}
 
 }
