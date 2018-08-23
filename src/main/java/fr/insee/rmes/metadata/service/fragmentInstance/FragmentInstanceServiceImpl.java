@@ -17,6 +17,7 @@ import org.xml.sax.InputSource;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
@@ -29,7 +30,6 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 
 	@Override
 	public String getFragmentInstance(String idTopLevel, DDIItemType itemType) throws Exception {
-
 		// Step 1 : get the topLevelItem
 		ColecticaItem item;
 		if (itemType == null) {
@@ -53,10 +53,9 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 
 		// Step 4 : add the root Instance and all of its children
 		ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(idTopLevel);
-
 		List<ColecticaItem> items = metadataServiceItem.getItems(refs);
 		for (ColecticaItem itemUnit : items) {
-			Node itemNode = getNode(itemUnit.item, docBuilder.getDocument());
+			Node itemNode = DocumentBuilderUtils.getNode(itemUnit.item, docBuilder.getDocument());
 			docBuilder.appendChild(itemNode);
 		}
 		return docBuilder.toString();
@@ -70,14 +69,6 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 		}
 		InputSource ddiSource = new InputSource(new StringReader(fragment));
 		return builder.parse(ddiSource);
-	}
-
-	private Node getNode(String fragment, Document doc) throws Exception {
-		Element node = getDocument(fragment).getDocumentElement();
-		Node newNode = node.cloneNode(true);
-		// Transfer ownership of the new node into the destination document
-		doc.adoptNode(newNode);
-		return newNode;
 	}
 
 	/**
