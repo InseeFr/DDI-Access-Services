@@ -50,7 +50,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 	@Autowired
 	MetadataService metadataService;
-	
+
 	@Autowired
 	DDIInstanceService ddiInstanceService;
 
@@ -87,7 +87,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 	private Node studyUnitNode;
 
-	private Node DCNode;
+	private Node dcNode;
 
 	private Node variableSchemeNode;
 
@@ -177,7 +177,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		// Step 3 : Build the group, from the
 		// studyUnit to the group
 		DDIDocumentBuilder docBuilder = new DDIDocumentBuilder();
-		ddiInstanceService.addDDIInstanceInformationToDocBuilder(DDIInstance,docBuilder);
+		ddiInstanceService.addDDIInstanceInformationToDocBuilder(DDIInstance, docBuilder);
 		convertAsNodesWithXPath(docBuilder);
 		appendChildsByParent(docBuilder);
 		// Step 4 : return the filled out enveloppe
@@ -197,45 +197,35 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		// Step 1 : Insert the content of the
 		// DataCollection got to the enveloppe as
 		// a child of the StudyUnit.
-		removeReferences(DCNode);
-		docBuilder.appendChildByParent("StudyUnit", DCNode);
+		removeReferences(dcNode);
+		docBuilder.appendChildByParent("StudyUnit", dcNode);
 		removeReferences(instrumentSchemeNode);
 		docBuilder.appendChildByParent("DataCollection", instrumentSchemeNode);
 		docBuilder.appendChildByParent("InstrumentScheme", instrumentNode);
 
 	}
 
-
 	private void convertAsNodesWithXPath(DDIDocumentBuilder docBuilder) throws Exception {
-		this.subGroupNode = DocumentBuilderUtils.getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(subGroupItem.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder);
+		this.subGroupNode = getNodeColecticaItemfromDocument(subGroupItem, docBuilder);
+		this.groupNode = getNodeColecticaItemfromDocument(groupItem, docBuilder);
+		this.studyUnitNode = getNodeColecticaItemfromDocument(studyUnitItem, docBuilder);
+		this.dcNode = getNodeColecticaItemfromDocument(dataCollection, docBuilder);
+		this.variableSchemeNode = getNodeColecticaItemfromDocument(variableScheme, docBuilder);
+		this.instrumentSchemeNode = getNodeColecticaItemfromDocument(instrumentScheme, docBuilder);
+		this.instrumentNode = getNodeColecticaItemfromDocument(instrument, docBuilder);
+	}
 
-		subGroupNode = DocumentBuilderUtils.getNode(UtilXML.nodeToString(subGroupNode), docBuilder);
-		this.groupNode = DocumentBuilderUtils.getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(groupItem.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder);
-
-		this.studyUnitNode = DocumentBuilderUtils.getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(studyUnitItem.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder);
-
-		this.DCNode = DocumentBuilderUtils.getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(dataCollection.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder);
-
-		this.variableSchemeNode = DocumentBuilderUtils.getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(variableScheme.getItem(), "/Fragment[1]/*").item(0)),
-				docBuilder);
-
-		this.instrumentSchemeNode = DocumentBuilderUtils.getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(instrumentScheme.item, "/Fragment[1]/*").item(0)),
-				docBuilder);
-
-		this.instrumentNode = DocumentBuilderUtils.getNode(
-				UtilXML.nodeToString(xpathProcessor.queryList(instrument.item, "/Fragment[1]/*").item(0)),
-				docBuilder);
-
+	
+	/**
+	 * get the first Node of the item in the Fragment
+	 * @param ColecticaItem item : target item
+	 * @param DDIDocumentBuilder docBuilder : Document
+	 * @return Node itemNode
+	 * @throws Exception
+	 */
+	public Node getNodeColecticaItemfromDocument(ColecticaItem item, DDIDocumentBuilder docBuilder) throws Exception {
+		return DocumentBuilderUtils.getNode(
+				UtilXML.nodeToString(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*").item(0)), docBuilder);
 	}
 
 	private void processItemsRessourcePackage(DDIDocumentBuilder docBuilder,
@@ -323,7 +313,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 		}
 		ItemWithParent variableScheme = new ItemWithParent();
 		variableScheme.setParent(this.variableScheme);
-		// TODO: add ParentNode and check debugging
 		ObjectColecticaPost objectColecticaPost = new ObjectColecticaPost();
 		variableScheme.setRessourcePackage(
 				searchItemParent(itemTypes, DDIItemType.RESSOURCEPACKAGE, objectColecticaPost, this.variableScheme));
@@ -383,8 +372,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 	}
 
 	/**
-	 * Add the parent Node and the Parent Item to the currentItem. The aim of
-	 * this method is to construct the parent tree
+	 * Add the parent Node and the Parent Item to the currentItem. The aim of this
+	 * method is to construct the parent tree
 	 * 
 	 * @param parentsWithCildren
 	 * @param itemWithParent
@@ -447,9 +436,5 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 			}
 		}
 	}
-
-
-
-
 
 }
