@@ -1,22 +1,14 @@
 package fr.insee.rmes.metadata.service.ddiinstance;
 
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
@@ -77,7 +69,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 
 		// Get ResourcesPackages
 		List<ColecticaItem> RPitems = searchItemsChildrenByType(DDIItemType.RESSOURCEPACKAGE, ddiInstance);
-		List<Node> RPNodes = new ArrayList<Node>();
+		List<Node> rpNodes = new ArrayList<Node>();
 		for (ColecticaItem rpItem : RPitems) {
 			String rpString = xpathProcessor.queryString(rpItem.getItem(), "/*");
 			List<Node> rpSchemes = getReferencesInListOfNodes(rpString, docBuilder);
@@ -86,7 +78,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 			for (Node node : rpSchemes) {
 				rpItemNode.appendChild(node);
 			}
-			RPNodes.add(rpItemNode);
+			rpNodes.add(rpItemNode);
 		}
 
 		// Step : Get DDI Instance informations on root : r:URN, r:Agency, r:ID,
@@ -96,7 +88,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 			docBuilder.appendChild(node);
 		}
 
-		for (Node node : RPNodes) {
+		for (Node node : rpNodes) {
 			docBuilder.appendChild(node);
 		}
 

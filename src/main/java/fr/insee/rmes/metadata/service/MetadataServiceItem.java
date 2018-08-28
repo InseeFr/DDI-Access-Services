@@ -34,9 +34,9 @@ public interface MetadataServiceItem {
 
 	List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String id) throws Exception;
 
-	Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception;
+	String postItems(ColecticaItemPostRefList refs) throws Exception;
 
-	Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception;
+	String postItem(ColecticaItemPostRef ref) throws Exception;
 
 	ColecticaItem getStudyUnit(String idStudyUnit) throws Exception;
 

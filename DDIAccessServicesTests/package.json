@@ -1,0 +1,21 @@
+{
+  "name": "ddiaccessservicestests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.18.3"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "body-parser-xml": "^1.1.0",
+    "express": "^4.16.3",
+    "mongoose": "^5.2.9",
+    "xml": "^1.0.1"
+  }
+}

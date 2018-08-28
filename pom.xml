@@ -228,7 +228,7 @@
 	<build>
 		<finalName>${final.war.name}</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
-
+		<testSourceDirectory>src/main/test</testSourceDirectory>
 		<plugins>
 
 			<plugin>
