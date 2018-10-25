@@ -10,13 +10,11 @@ import fr.insee.rmes.search.model.ResourcePackage;
 
 public interface MetadataService {
 
-	String getDerefDDIDocumentWithExternalRP(String itemId, String groupId) throws Exception;
+	String getDerefDDIDocumentWithExternalRP(String itemId, String ressourcePackageId) throws Exception;
 
 	String getDerefDDIDocument(String itemId) throws Exception;
 
 	String getDDIDocument(String itemId) throws Exception;
-
-	String getItemByType(String id, DDIItemType type) throws Exception;
 
 	String getDDIInstance(String id) throws Exception;
 

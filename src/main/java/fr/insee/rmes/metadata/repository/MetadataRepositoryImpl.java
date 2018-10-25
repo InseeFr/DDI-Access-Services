@@ -1,9 +1,6 @@
 package fr.insee.rmes.metadata.repository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +16,6 @@ import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
-import fr.insee.rmes.utils.ddi.ItemFormat;
 
 @Service
 public class MetadataRepositoryImpl implements MetadataRepository {
@@ -56,53 +52,14 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 	}
 
 	@Override
-	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
-		Map<ColecticaItemPostRef, String> results = new HashMap<ColecticaItemPostRef, String>();
+	public String postItems(ColecticaItemPostRefList refs) throws Exception {
+		return metadataClient.postItems(refs);
 
-		// Valuing new UUID
-		for (ColecticaItemPostRef colecticaItemPostRef : refs.getItems()) {
-			colecticaItemPostRef.identifier = UUID.randomUUID().toString();
-
-			colecticaItemPostRef.version = "0";
-			colecticaItemPostRef.agencyId = agencyId;
-			colecticaItemPostRef.setItemType("7E47C269-BCAB-40F7-A778-AF7BBC4E3D00");
-			colecticaItemPostRef.setVersionResponsibility(versionResponsability);
-			colecticaItemPostRef.setItemFormat(ItemFormat.DDI_32);
-
-		}
-		logger.debug(refs.toString());
-		String res = metadataClient.postItems(refs);
-
-		for (ColecticaItemPostRef colecticaItemPostRef : refs.getItems()) {
-			results.put(colecticaItemPostRef, res);
-		}
-		return results;
 	}
 
 	@Override
-	public Map<ColecticaItemPostRef, String> postNewItem(ColecticaItemPostRef ref) throws Exception {
-		Map<ColecticaItemPostRef, String> result = new HashMap<ColecticaItemPostRef, String>();
-		ref.identifier = UUID.randomUUID().toString();
-		metadataClient.postItem(ref);
-		result.put(ref, metadataClient.postItem(ref));
-		return result;
-	}
-
-	@Override
-	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
-		Map<ColecticaItemPostRef, String> results = new HashMap<ColecticaItemPostRef, String>();
-		int version = 0;
-		String result;
-		for (ColecticaItemPostRef colecticaItemPostRef : refs.getItems()) {
-			version = Integer.valueOf(colecticaItemPostRef.version);
-			version++;
-			colecticaItemPostRef.version = String.valueOf(version);
-			result = metadataClient.postItems(refs);
-			results.put(colecticaItemPostRef, result);
-
-		}
-		return results;
-
+	public String postItem(ColecticaItemPostRef ref) throws Exception {
+		return metadataClient.postItem(ref);
 	}
 
 	@Override

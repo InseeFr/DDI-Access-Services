@@ -14,8 +14,9 @@ public class GroupsServiceImpl implements GroupsService {
 
 	@Override
 	public String getGroup(String idTopLevel) throws Exception {
+		DDIItemType[] ddiItemTypes = { DDIItemType.GROUP, DDIItemType.SUB_GROUP };
 
-		return fragmentInstanceService.getFragmentInstance(idTopLevel, DDIItemType.GROUP);
+		return fragmentInstanceService.getFragmentInstances(idTopLevel, ddiItemTypes);
 
 	}
 }

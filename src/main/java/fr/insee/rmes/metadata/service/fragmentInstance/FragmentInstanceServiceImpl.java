@@ -17,9 +17,11 @@ import org.xml.sax.InputSource;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
+import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
 public class FragmentInstanceServiceImpl implements FragmentInstanceService {
@@ -27,9 +29,9 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 	@Autowired
 	private MetadataServiceItem metadataServiceItem;
 
+	@Deprecated
 	@Override
 	public String getFragmentInstance(String idTopLevel, DDIItemType itemType) throws Exception {
-
 		// Step 1 : get the topLevelItem
 		ColecticaItem item;
 		if (itemType == null) {
@@ -53,10 +55,9 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 
 		// Step 4 : add the root Instance and all of its children
 		ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(idTopLevel);
-
 		List<ColecticaItem> items = metadataServiceItem.getItems(refs);
 		for (ColecticaItem itemUnit : items) {
-			Node itemNode = getNode(itemUnit.item, docBuilder.getDocument());
+			Node itemNode = DocumentBuilderUtils.getNode(itemUnit.item, docBuilder.getDocument());
 			docBuilder.appendChild(itemNode);
 		}
 		return docBuilder.toString();
@@ -70,14 +71,6 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 		}
 		InputSource ddiSource = new InputSource(new StringReader(fragment));
 		return builder.parse(ddiSource);
-	}
-
-	private Node getNode(String fragment, Document doc) throws Exception {
-		Element node = getDocument(fragment).getDocumentElement();
-		Node newNode = node.cloneNode(true);
-		// Transfer ownership of the new node into the destination document
-		doc.adoptNode(newNode);
-		return newNode;
 	}
 
 	/**
@@ -94,6 +87,60 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 		NodeList nodes = docBuilder.getDocument().getElementsByTagName(targetTagName);
 		Node node = nodes.item(0);
 		node.setTextContent(newValue);
+	}
+
+	@Override
+	public String getFragmentInstances(String idTopLevel, DDIItemType[] itemTypes) throws Exception {
+		// Step 1 : get the topLevelItem
+		ColecticaItem item = null;
+		ColecticaItem itemTemp = null;
+		String itemTypeName = "";
+		if (itemTypes == null || itemTypes.length == 0) {
+			itemTemp = metadataServiceItem.getItem(idTopLevel);
+			itemTypeName = itemTemp.getType().getName();
+			item = itemTemp;
+		} else {
+			for (DDIItemType ddiItemType : itemTypes) {
+				try {
+					if (item == null) {
+						item = metadataServiceItem.getItemByType(idTopLevel, ddiItemType);
+						itemTypeName = item.getType().getName();
+					}
+				} catch (Exception e) {
+					if (itemTemp != null) {
+						item = itemTemp;
+						itemTypeName = item.getType().getName();
+					}
+				}
+			}
+
+		}
+
+		// Step 2 : create a DDIDocumentBuilder
+		DDIDocumentBuilder docBuilder = new DDIDocumentBuilder(true, Envelope.FRAGMENT_INSTANCE);
+
+		// Step 3 : replace attributes for the TopLevelReference
+		replaceValueEnvelope(docBuilder, "r:Agency", item.agencyId);
+		replaceValueEnvelope(docBuilder, "r:ID", item.identifier);
+		replaceValueEnvelope(docBuilder, "r:Version", item.version);
+		if (itemTypes == null) {
+			replaceValueEnvelope(docBuilder, "r:TypeOfObject", item.getType().getName());
+		} else {
+			replaceValueEnvelope(docBuilder, "r:TypeOfObject", itemTypeName);
+		}
+
+		// Step 4 : add the root Instance and all of its children
+		ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(idTopLevel);
+		List<ColecticaItem> items = metadataServiceItem.getItems(refs);
+		for (ColecticaItem itemUnit : items) {
+			Node itemNode = DocumentBuilderUtils.getNode(itemUnit.item, docBuilder.getDocument());
+			docBuilder.appendChild(itemNode);
+		}
+		return docBuilder.toString();
+	}
+
+	public void setMetadataServiceItem(MetadataServiceItem metadataServiceItem) {
+		this.metadataServiceItem = metadataServiceItem;
 	}
 
 }

@@ -18,6 +18,7 @@ import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.model.ResourcePackage;
@@ -47,8 +48,6 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public List<Unit> getUnits() throws Exception {
-		// getCodeList("a72e6e56-12a1-49b7-96c4-c724da3da5da",
-		// "c265b595-ced2-4526-88dc-151471de885d");
 		return metadataRepository.getUnits();
 	}
 
@@ -346,12 +345,6 @@ public class MetadataServiceImpl implements MetadataService {
 	public String getDDIDocument(String itemId) throws Exception {
 		// TODO Auto-generated method stub
 		return "Test";
-	}
-
-	@Override
-	public String getItemByType(String id, DDIItemType type) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mockito.exceptions.misusing.NullInsteadOfMockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -16,14 +18,13 @@ import org.w3c.dom.NodeList;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
+import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.model.ResponseItem;
-import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
-import fr.insee.rmes.utils.ddi.Envelope;
 import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
@@ -49,21 +50,33 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		}
 	}
 
+	/**
+	 * Check the type of an item and return it if this item is a sequence.
+	 */
 	@Override
 	public ColecticaItem getSequence(String id) throws Exception {
 		return getItemByType(id, DDIItemType.SEQUENCE);
 	}
 
+	/**
+	 * Check the type of an item and return it if this item is a question.
+	 */
 	@Override
 	public ColecticaItem getQuestion(String id) throws Exception {
 		return getItemByType(id, DDIItemType.QUESTION);
 	}
 
+	/**
+	 * Check the type of an item and return it if this item is a DDI Instance.
+	 */
 	@Override
 	public ColecticaItem getDDIInstance(String id) throws Exception {
 		return getItemByType(id, DDIItemType.DDI_INSTANCE);
 	}
 
+	/**
+	 * Check the type of an item and return it if this item is a Study Unit.
+	 */
 	@Override
 	public ColecticaItem getStudyUnit(String id) throws Exception {
 		return getItemByType(id, DDIItemType.STUDY_UNIT);
@@ -352,21 +365,66 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	}
 
 	@Override
-	public Map<ColecticaItemPostRef, String> postNewItems(ColecticaItemPostRefList refs) throws Exception {
-		for (ColecticaItemPostRef item : refs.getItems()) {
-			item.setItem(new DDIDocumentBuilder(true, Envelope.FRAGMENT).build().toString());
+	public String postItems(ColecticaItemPostRefList refs) throws Exception {
+		for (ColecticaItemPostRef ref : refs.getItems()) {
+			checks(ref);
 		}
 
-		return metadataRepository.postNewItems(refs);
+		return metadataRepository.postItems(refs);
 	}
 
 	@Override
-	public Map<ColecticaItemPostRef, String> postUpdateItems(ColecticaItemPostRefList refs) throws Exception {
-		for (ColecticaItemPostRef item : refs.getItems()) {
-			item.setItem(new DDIDocumentBuilder(true, Envelope.FRAGMENT).build().toString());
-		}
-		return metadataRepository.postUpdateItems(refs);
+	public String postItem(ColecticaItemPostRef ref) throws Exception {
+		checks(ref);
+		return metadataRepository.postItem(ref);
 
+	}
+
+	/**
+	 * Method which groups all the checks before posting an item.
+	 * 
+	 * @param ref : target ColecticaItemPostRef object
+	 */
+	public void checks(ColecticaItemPostRef ref) {
+		checkVersionItem(ref);
+		checkUUIDItem(ref);
+	}
+
+	/**
+	 * Check the version of a specific item (the version is incremented)
+	 * 
+	 * @param ref
+	 *            : reference of the DDI Item.
+	 */
+	public void checkVersionItem(ColecticaItemPostRef ref) {
+		if (ref != null) {
+			try {
+				ColecticaItem item = this.getItem(ref.identifier);
+				int version = Integer.valueOf(item.version) + 1;
+				ref.version = String.valueOf(version);
+			} catch (Exception e) {
+				ref.version = "1";
+			}
+		} else {
+			throw new NullPointerException();
+		}
+	}
+
+	/**
+	 * Check if the reference of the DDI item has an identifier. If no identifier is
+	 * found, a new UUID will be assigned.
+	 * 
+	 * @param ref
+	 *            : reference of the DDI Item.
+	 */
+	public void checkUUIDItem(ColecticaItemPostRef ref) {
+		if (ref != null) {
+			if (ref.identifier == null || ref.identifier.equals("")) {
+				ref.identifier = UUID.randomUUID().toString();
+			}
+		} else {
+			throw new NullPointerException();
+		}
 	}
 
 }

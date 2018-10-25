@@ -9,7 +9,7 @@
 
 Web services for accessing DDI metadata in Colectica
 
-Update src/main/resources/env properties file (Colectica API url) and acces to the swagger APi on 
+Update src/main/resources/env properties file (Colectica API url) and access to the swagger API on 
 
 http://localhost:8080/ddi-access-services/swagger-ui/dist/index.html
 

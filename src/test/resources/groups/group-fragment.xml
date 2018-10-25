@@ -1,0 +1,24 @@
+<Fragment xmlns:r="ddi:reusable:3_2" xmlns="
+	ddi:instance:3_2">
+	<Group isUniversallyUnique=" true" versionDate="
+		T08:48:28.3117393Z"
+		xmlns="ddi:group:3_2">
+		<r:URN>urn:ddi:fr.insee:41c2eca1-8b18-4932-809c-9330ca00fef3:0</r:URN>
+		<r:Agency>fr.insee</r:Agency>
+		<r:ID>41c2eca1-8b18-4932-809c-9330ca00fef3</r:ID>
+		<r:Version>0</r:Version>
+		<r:UserID typeOfUserID="colectica:sourceId" userIDVersion="">INSEE-EDL-GRP-ANTIPOL
+		</r:UserID>
+		<r:Citation>
+			<r:Title>
+				<r:String xml:lang="fr-FR">ANTIPOL</r:String>
+			</r:Title>
+		</r:Citation>
+		<SubGroupReference>
+			<r:Agency>fr.insee</r:Agency>
+			<r:ID>5a7204a5-a91b-4aca-a383-feff8930213c</r:ID>
+			<r:Version>0</r:Version>
+			<r:TypeOfObject>SubGroup</r:TypeOfObject>
+		</SubGroupReference>
+	</Group>
+</Fragment>

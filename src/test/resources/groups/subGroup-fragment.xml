@@ -1,0 +1,33 @@
+<Fragment xmlns:r="ddi:reusable:3_2" xmlns="
+	ddi:instance:3_2">
+	<SubGroup isUniversallyUnique="true" versionDate="
+		T08:48:28.3117393Z"
+		xmlns="ddi:group:3_2">
+		<r:URN>urn:ddi:fr.insee:5a7204a5-a91b-4aca-a383-feff8930213c:0</r:URN>
+		<r:Agency>fr.insee</r:Agency>
+		<r:ID>5a7204a5-a91b-4aca-a383-feff8930213c</r:ID>
+		<r:Version>0</r:Version>
+		<r:UserID typeOfUserID="colectica:sourceId" userIDVersion="">INSEE-EDL-SGRP-RP
+		</r:UserID>
+		<r:Citation>
+			<r:Title>
+				<r:String xml:lang="fr-FR">Investissements et dépenses
+					courantes
+					pour protéger l'environnement
+				</r:String>
+			</r:Title>
+		</r:Citation>
+		<r:StudyUnitReference>
+			<r:Agency>fr.insee</r:Agency>
+			<r:ID>f8a4332c-9bc1-4a7b-958a-05eada5f9ce1</r:ID>
+			<r:Version>0</r:Version>
+			<r:TypeOfObject>StudyUnit</r:TypeOfObject>
+		</r:StudyUnitReference>
+		<r:StudyUnitReference>
+			<r:Agency>fr.insee</r:Agency>
+			<r:ID>b16c08f4-41da-4adb-87e1-413bf6f99cf3</r:ID>
+			<r:Version>0</r:Version>
+			<r:TypeOfObject>StudyUnit</r:TypeOfObject>
+		</r:StudyUnitReference>
+	</SubGroup>
+</Fragment>

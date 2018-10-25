@@ -1,6 +1,7 @@
 package fr.insee.rmes.config;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -53,28 +54,32 @@ public class SwaggerConfig extends HttpServlet {
 		}
 		String propsPath = String.format("env/%s/ddi-access-services.properties", env);
 		props.load(getClass().getClassLoader().getResourceAsStream(propsPath));
-		File f = new File(
-				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "ddi-access-services.properties"));
-		if (f.exists() && !f.isDirectory()) {
-			FileReader r = new FileReader(f);
-			props.load(r);
-			r.close();
-		}
-		File f2 = new File(
-				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "rmspogbo.properties"));
-		if (f2.exists() && !f2.isDirectory()) {
-			FileReader r2 = new FileReader(f2);
-			props.load(r2);
-			r2.close();
-		}
-		File f3 = new File(
-				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "rmespogbo.properties"));
-		if (f3.exists() && !f3.isDirectory()) {
-			FileReader r3 = new FileReader(f3);
-			props.load(r3);
-			r3.close();
-		}
+		// Load properties in files
+		loadPropertiesInFile(props, "ddi-access-services.properties");
+		loadPropertiesInFile(props, "rmspogbo.properties");
+		loadPropertiesInFile(props, "rmespogbo.properties");
 		return props;
+	}
+
+	/**
+	 * Load the properties specified in a file to a Properties object.
+	 * 
+	 * @param props
+	 *            : Properties trageted
+	 * @param nameFileProps
+	 *            : name of the File to read in the Webapp Folder
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @see Properties
+	 */
+	private void loadPropertiesInFile(Properties props, String nameFileProps)
+			throws FileNotFoundException, IOException {
+		File file = new File(String.format("%s/webapps/%s", System.getProperty("catalina.base"), nameFileProps));
+		if (file.exists() && !file.isDirectory()) {
+			FileReader fileReader = new FileReader(file);
+			props.load(fileReader);
+			fileReader.close();
+		}
 	}
 
 }
