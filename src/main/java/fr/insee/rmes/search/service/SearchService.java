@@ -29,11 +29,13 @@ public interface SearchService {
 	List<DDIItem> getStudyUnits(String seriesId) throws Exception;
 
 	List<DDIItem> getDataCollections(String operationId) throws Exception;
-	
+
 	DDIItem getDDIItemById(String id) throws Exception;
 
 	DataCollectionContext getDataCollectionContext(String id) throws Exception;
 
 	void deleteAll() throws Exception;
+
+	List<DDIItem> getGroups() throws Exception;
 
 }

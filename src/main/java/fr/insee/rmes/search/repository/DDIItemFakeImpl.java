@@ -30,6 +30,7 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 		return null;
 	}
 
+	@Override
 	public List<DDIItem> findByLabelInSubGroup(String label, String subgroupId, String... types) throws Exception {
 		// TODO implement a fake method
 		return null;
@@ -68,53 +69,53 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 	}
 
 	@Override
-	public List<DDIItem> getStudyUnits(String subgGroupId) throws Exception {
+	public List<DDIItem> getStudyUnits(String subGroupId) throws Exception {
 		List<DDIItem> studyUnits = new ArrayList<DDIItem>();
-		System.out.println(subgGroupId);
-		if (subgGroupId.equals("SG02")) {
+		System.out.println(subGroupId);
+		if (subGroupId.equals("SG02") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU02", "Enquête auprès des salariés de l'État 2019", "SG02", "StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG03")) {
+		if (subGroupId.equals("SG03") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU03", "Enquête Emploi en continu 2017", "SG03", "StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG04")) {
+		if (subGroupId.equals("SG04") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU04",
 					"Enquête sur les technologies de l'information et de la communication (auprès des ménages) 2019",
 					"SG04", "StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG05")) {
+		if (subGroupId.equals("SG05") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU05", "Statistiques sur les ressources et conditions de vie 2018", "SG05",
 					"StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG06")) {
+		if (subGroupId.equals("SG06") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU06", "Enquête sectorielle annuelle 2018", "SG06", "StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG07")) {
+		if (subGroupId.equals("SG07") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU07",
 					"Enquête trimestrielle de conjoncture dans l'artisanat du bâtiment 2018", "SG07", "StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG08")) {
+		if (subGroupId.equals("SG08") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU08",
 					"Enquête trimestrielle de conjoncture dans la promotion immobilière 2018", "SG08", "StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG09")) {
+		if (subGroupId.equals("SG09") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU09",
 					"Enquête sur les investissements dans l'industrie pour protéger l'environnement 2017", "SG09",
 					"StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG10")) {
+		if (subGroupId.equals("SG10") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU10", "Enquête Achats-Production 2018", "SG10", "StudyUnit");
 			studyUnits.add(ddiItem);
 		}
-		if (subgGroupId.equals("SG11")) {
+		if (subGroupId.equals("SG11") || subGroupId == null) {
 			DDIItem ddiItem = new DDIItem("SU11",
 					"Enquête mensuelle sur l'activité des grandes surfaces alimentaires 2018", "SG11", "StudyUnit");
 			studyUnits.add(ddiItem);
@@ -311,20 +312,21 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 			if (operationId != null) {
 				if (dataCollectionId != null) {
 					for (ResponseSearchItem codeList : codeLists) {
-						if (codeList.getDataCollectionId()!=null && codeList.getDataCollectionId().equals(dataCollectionId)) {
+						if (codeList.getDataCollectionId() != null
+								&& codeList.getDataCollectionId().equals(dataCollectionId)) {
 							codeListsFiltered.add(codeList);
 						}
 					}
 				} else {
 					for (ResponseSearchItem codeList : codeLists) {
-						if (codeList.getStudyUnitId()!=null && codeList.getStudyUnitId().equals(operationId)) {
+						if (codeList.getStudyUnitId() != null && codeList.getStudyUnitId().equals(operationId)) {
 							codeListsFiltered.add(codeList);
 						}
 					}
 				}
 			} else {
 				for (ResponseSearchItem codeList : codeLists) {
-					if (codeList.getSubgroupId()!=null && codeList.getSubgroupId().equals(subgroupId)) {
+					if (codeList.getSubgroupId() != null && codeList.getSubgroupId().equals(subgroupId)) {
 						codeListsFiltered.add(codeList);
 					}
 				}
@@ -333,7 +335,7 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 			codeListsFiltered.addAll(codeLists);
 		}
 		codeListsFiltered = addCommonCodeList(codeListsFiltered);
-		
+
 		for (ResponseSearchItem codeList : codeListsFiltered) {
 			if (codeList.getTitle().toUpperCase().contains(filter.toUpperCase())) {
 				codeListsFilteredFinal.add(codeList);
@@ -642,5 +644,14 @@ public class DDIItemFakeImpl implements DDIItemRepository {
 		return null;
 	}
 
+	@Override
+	public List<DDIItem> getGroups() throws Exception {
+		List<DDIItem> groups = new ArrayList<DDIItem>();
+		DDIItem ddiItem1 = new DDIItem("G01", "Famille 1", null, "Group");
+		DDIItem ddiItem2 = new DDIItem("G02", "Famille 2", null, "Group");
+		groups.add(ddiItem2);
+		groups.add(ddiItem1);
+		return groups;
+	}
 
 }

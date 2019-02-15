@@ -23,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import fr.insee.rmes.search.model.DDIItem;
+import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseSearchItem;
-import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.search.source.ColecticaSourceImporter;
 import io.swagger.annotations.Api;
@@ -86,7 +86,9 @@ public class RMeSSearch {
 	@GET
 	@Path("import")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Import indexes from Colectica", notes = "This require a living instance of colectica aswell as a up and running elasticsearch cluster", response = String.class)
+	@ApiOperation(value = "Import indexes from Colectica",
+			notes = "This require a living instance of colectica as well as a up and running elasticsearch cluster",
+			response = String.class)
 	public Response source() throws Exception {
 		try {
 			colecticaSourceImporter.source();
@@ -98,9 +100,22 @@ public class RMeSSearch {
 	}
 
 	@GET
+	@Path("familles")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Get all groups (familles)", notes = "Retrieve all groups", response = String.class)
+	public List<DDIItem> getGroups() throws Exception {
+		try {
+			return searchService.getGroups();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
 	@Path("series")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get all sub-group (series)", notes = "Retrieve all operations with a parent id matching with a group Id given in parameters file", response = String.class)
+	@ApiOperation(value = "Get all sub-group (series)", notes = "Retrieve all sub-groups", response = String.class)
 	public List<DDIItem> getSubGroups() throws Exception {
 		try {
 			return searchService.getSubGroups();
@@ -113,10 +128,26 @@ public class RMeSSearch {
 	@GET
 	@Path("series/{id}/operations")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get all study-units (operations) for a given sub-group (series)", notes = "Retrieve all operations with a parent id matching the series id given as a path parameter", response = String.class)
+	@ApiOperation(value = "Get all study-units (operations) for a given sub-group (series)",
+			notes = "Retrieve all operations with a parent id matching the series id given as a path parameter",
+			response = String.class)
 	public List<DDIItem> getStudyUnits(@PathParam(value = "id") String id) throws Exception {
 		try {
 			return searchService.getStudyUnits(id);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("/operations")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Get all study-units (operations) ", notes = "Retrieve all operations ",
+			response = String.class)
+	public List<DDIItem> getStudyUnits() throws Exception {
+		try {
+			return searchService.getStudyUnits(null);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;

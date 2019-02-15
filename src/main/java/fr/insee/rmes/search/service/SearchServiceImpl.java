@@ -25,14 +25,17 @@ public class SearchServiceImpl implements SearchService {
 		return ddiItemRepository.save(type, item);
 	}
 
+	@Override
 	public List<DDIItem> searchByLabel(String label, String... types) throws Exception {
 		return ddiItemRepository.findByLabel(label, types);
 	}
 
+	@Override
 	public List<DDIItem> searchByLabelInSubgroup(String label, String subgroupId, String... types) throws Exception {
 		return ddiItemRepository.findByLabelInSubGroup(label, subgroupId, types);
 	}
 
+	@Override
 	public DeleteResponse delete(String type, String id) throws Exception {
 		return ddiItemRepository.delete(type, id);
 	}
@@ -73,6 +76,11 @@ public class SearchServiceImpl implements SearchService {
 	@Override
 	public DDIItem getDDIItemById(String id) throws Exception {
 		return ddiItemRepository.getItemById(id);
+	}
+
+	@Override
+	public List<DDIItem> getGroups() throws Exception {
+		return ddiItemRepository.getGroups();
 	}
 
 }

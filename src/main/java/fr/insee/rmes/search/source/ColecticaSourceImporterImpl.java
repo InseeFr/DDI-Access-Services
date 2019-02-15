@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
-	
+
 	@Autowired
 	SearchService searchService;
 
@@ -45,9 +46,9 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 	@Override
 	public void source() throws Exception {
 
-		//searchService.deleteAll();
+		// searchService.deleteAll();
 		for (String id : rootIds) {
-			if (id != null && !id.equals("")) {
+			if (StringUtils.isNotEmpty(id)) {
 				logger.debug("Getting data from colectica API for root id " + id);
 				ResponseItem r = metadataServiceItem.getDDIRoot(id);
 				logger.debug("Root contains " + r.getChildren().size() + " groups");
@@ -57,7 +58,7 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 				}
 
 				List<ResponseItem> clsList = metadataServiceItem.getDDICodeListSchemeFromGroupRoot(id);
-				logger.debug("Root contains contains " + clsList.size() + " CodeListScheme");
+				logger.debug("Root contains " + clsList.size() + " CodeListScheme");
 				for (ResponseItem cls : clsList) {
 					searchService.save("code-list-scheme", cls);
 					saveCodeList(cls.getChildren());

@@ -23,6 +23,8 @@ import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.Relationship;
+import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 
 @Service
@@ -44,7 +46,7 @@ public class MetadataClientImpl implements MetadataClient {
 
 	public ColecticaItem getItem(String id) throws Exception {
 		String url = String.format("%s/api/v1/item/%s/%s?api_key=%s", serviceUrl, agency, id, apiKey);
-		logger.info("GET Item on " + id );
+		logger.info("GET Item on " + id);
 		return restTemplate.getForObject(url, ColecticaItem.class);
 	}
 
@@ -55,7 +57,7 @@ public class MetadataClientImpl implements MetadataClient {
 		HttpEntity<ColecticaItemRefList> request = new HttpEntity<>(query, headers);
 		ResponseEntity<ColecticaItem[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
 				ColecticaItem[].class);
-		logger.info("GET Items with query : " + query.toString() );
+		logger.info("GET Items with query : " + query.toString());
 		return Arrays.asList(response.getBody());
 	}
 
@@ -71,7 +73,7 @@ public class MetadataClientImpl implements MetadataClient {
 
 	public Integer getLastestVersionItem(String id) throws Exception {
 		String url = String.format("%s/api/v1/item/%s/%s/versions/_latest?api_key=%s", serviceUrl, agency, id, apiKey);
-		logger.info("GET LastestVersion for Item " + id );
+		logger.info("GET LastestVersion for Item " + id);
 		return restTemplate.getForObject(url, Integer.class);
 
 	}
@@ -105,7 +107,6 @@ public class MetadataClientImpl implements MetadataClient {
 		ResponseEntity<ColecticaItem[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
 				ColecticaItem[].class);
 		return response.getStatusCode().toString();
-		
 	}
 
 	@Override
@@ -122,6 +123,30 @@ public class MetadataClientImpl implements MetadataClient {
 				ColecticaItem[].class);
 		return response.getStatusCode().toString();
 
+	}
+
+	@Override
+	public Relationship[] getRelationship(ObjectColecticaPost objectColecticaPost) {
+		String url = String.format("%s/api/v1/_query/relationship/byobject?api_key=%s", serviceUrl, apiKey);
+
+		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+		headers.add("Content-type", ContentType.APPLICATION_JSON.getMimeType());
+		HttpEntity<ObjectColecticaPost> request = new HttpEntity<>(objectColecticaPost, headers);
+		ResponseEntity<Relationship[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
+				Relationship[].class);
+		return response.getBody();
+	}
+
+	@Override
+	public Relationship[] getRelationshipChildren(ObjectColecticaPost objectColecticaPost) {
+		String url = String.format("%s/api/v1/_query/relationship/bysubject?api_key=%s", serviceUrl, apiKey);
+
+		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+		headers.add("Content-type", ContentType.APPLICATION_JSON.getMimeType());
+		HttpEntity<ObjectColecticaPost> request = new HttpEntity<>(objectColecticaPost, headers);
+		ResponseEntity<Relationship[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
+				Relationship[].class);
+		return response.getBody();
 	}
 
 }

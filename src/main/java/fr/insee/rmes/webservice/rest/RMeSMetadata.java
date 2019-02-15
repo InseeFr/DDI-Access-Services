@@ -1,11 +1,7 @@
 package fr.insee.rmes.webservice.rest;
 
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -23,17 +19,16 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
-import fr.insee.rmes.metadata.model.ColecticaPostRefDisplayed;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.metadata.service.codeList.CodeListService;
 import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
+import fr.insee.rmes.metadata.service.fragmentInstance.FragmentInstanceService;
+import fr.insee.rmes.metadata.service.groups.GroupsService;
 import fr.insee.rmes.metadata.service.questionnaire.QuestionnaireService;
-import fr.insee.rmes.utils.ddi.ItemFormat;
+import fr.insee.rmes.metadata.service.variableBook.VariableBookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,7 +36,6 @@ import io.swagger.annotations.ApiParam;
 /**
  * Main WebService class of the MetaData service
  *
- * @author I6VWID
  */
 @Path("/meta-data")
 @Api(value = "DDI MetaData API")
@@ -63,6 +57,15 @@ public class RMeSMetadata {
 
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
+
+	@Autowired
+	VariableBookService variableBookServiceItem;
+
+	@Autowired
+	GroupsService groupService;
+
+	@Autowired
+	FragmentInstanceService fragmentInstanceService;
 
 	@GET
 	@Path("colectica-item/{id}")
@@ -133,13 +136,7 @@ public class RMeSMetadata {
 			@PathParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
 			String ddiDocument = metadataService.getDerefDDIDocumentWithExternalRP(id, resourcePackageId);
-			StreamingOutput stream = output -> {
-				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(ddiDocument);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -154,6 +151,36 @@ public class RMeSMetadata {
 	public Response getFullDDI(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String ddiDocument = metadataService.getDDIDocument(id);
+			StreamingOutput stream = stringToStream(ddiDocument);
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("item/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository reference {id}", response = String.class)
+	public Response getDDIDocument(@PathParam(value = "id") String id) throws Exception {
+		try {
+			String ddiDocument = metadataService.getDDIDocument(id);
+			StreamingOutput stream = stringToStream(ddiDocument);
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@GET
+	@Path("group/{id}/ddi")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including a group from a topLevel {id}", response = String.class)
+	public Response getDDIDocumentGroups(@PathParam(value = "id") String id) throws Exception {
+		try {
+			String ddiDocument = groupService.getGroup(id);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
@@ -169,12 +196,12 @@ public class RMeSMetadata {
 	}
 
 	@GET
-	@Path("item/{id}/ddi")
+	@Path("fragmentInstance/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository reference {id}", response = String.class)
-	public Response getDDIDocument(@PathParam(value = "id") String id) throws Exception {
+	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.", response = String.class)
+	public Response getDDIDocumentFragmentInstance(@PathParam(value = "id") String id) throws Exception {
 		try {
-			String ddiDocument = metadataService.getDDIDocument(id);
+			String ddiDocument = fragmentInstanceService.getFragmentInstance(id, null);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
@@ -197,13 +224,7 @@ public class RMeSMetadata {
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
 			String codeList = codeListService.getCodeList(id, resourcePackageId);
-			StreamingOutput stream = output -> {
-				try {
-					output.write(codeList.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(codeList);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -219,15 +240,7 @@ public class RMeSMetadata {
 			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
 		try {
 			String sequence = metadataService.getSequence(id);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(sequence.getBytes(StandardCharsets.UTF_8));
-
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(sequence);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -236,46 +249,35 @@ public class RMeSMetadata {
 	}
 
 	@GET
-	@Path("questionnaire/{id}/ddi")
+	@Path("questionnaire/{idDdiInstrument}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
-	public Response getQuestionnaire(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId,
-			@QueryParam(value = "idDataCollection") String datacollectionId,
-			@QueryParam(value = "idGroup") String groupId, @QueryParam(value = "idSubGroup") String subGroupId)
-			throws Exception {
+	public Response getQuestionnaire(@PathParam(value = "idDdiInstrument") String idDdiInstrument) throws Exception {
 		try {
-			String questionnaire = questionnaireService.getQuestionnaire(id, resourcePackageId, datacollectionId,
-					subGroupId, groupId);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
-
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			String questionnaire = questionnaireService.getQuestionnaire(idDdiInstrument);
+			StreamingOutput stream = stringToStream(questionnaire);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
 	}
+
+
 
 	@GET
 	@Path("ddi-instance/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a DDI instance", notes = "Get a DDI document of a DDI Instance from Colectica repository reference {id}", response = String.class)
 	public Response getDDIInstance(@PathParam(value = "id") String id) throws Exception {
+
 		try {
 			String questionnaire = ddiInstanceService.getDDIInstance(id);
-			StreamingOutput stream = output -> {
-				output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
-			};
+			StreamingOutput stream = stringToStream(questionnaire);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+			e.printStackTrace();
 			throw e;
 		}
 	}
@@ -287,20 +289,38 @@ public class RMeSMetadata {
 	public Response getQuestion(@PathParam(value = "id") String id) throws Exception {
 		try {
 			String questionnaire = metadataService.getQuestion(id);
-
-			StreamingOutput stream = output -> {
-				try {
-					output.write(questionnaire.getBytes(StandardCharsets.UTF_8));
-
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
+			StreamingOutput stream = stringToStream(questionnaire);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
+	}
+
+	@GET
+	@Path("operation/{id}/variableBook")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get all data to create variableBook", notes = "Gets a DDI document with a StudyUnit from Colectica repository reference {id}, and all its variables", response = String.class)
+	public Response getVariableBook(@PathParam(value = "id") String id) throws Exception {
+		try {
+			String variablesBook = variableBookServiceItem.getVariableBook(id);
+			StreamingOutput stream = stringToStream(variablesBook);
+			return Response.ok(stream).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+	
+	private StreamingOutput stringToStream(String string) {
+		StreamingOutput stream = output -> {
+			try {
+				output.write(string.getBytes(StandardCharsets.UTF_8));
+			} catch (Exception e) {
+				throw new RMeSException(500, "Transformation error", e.getMessage());
+			}
+		};
+		return stream;
 	}
 
 }
