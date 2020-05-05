@@ -4,4 +4,4 @@ MAINTAINER bwerquin
 
 RUN rm -rf $CATALINA_HOME/webapps/*
 ADD ddi-access-services.properties $CATALINA_HOME/webapps/ddi-access-services.properties
-ADD /target/*.war $CATALINA_HOME/webapps/ROOT.war
+ADD /*.war $CATALINA_HOME/webapps/ROOT.war
