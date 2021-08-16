@@ -23,10 +23,10 @@ public interface MetadataClient {
 
 	List<Unit> getUnits() throws Exception;
 
-	String postItem(ColecticaItemPostRef ref);
+	String postItem(ColecticaItemPostRef ref) throws Exception;
 
-	Relationship[] getRelationship(ObjectColecticaPost objectColecticaPost);
+	Relationship[] getRelationship(ObjectColecticaPost objectColecticaPost) throws Exception;
 
-	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost);
+	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception;
 
 }
