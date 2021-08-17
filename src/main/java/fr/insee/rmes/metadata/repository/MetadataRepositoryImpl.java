@@ -16,6 +16,8 @@ import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.ColecticaSearchItemRequest;
+import fr.insee.rmes.metadata.model.ColecticaSearchItemResponse;
 import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
@@ -48,6 +50,11 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 	@Override
 	public List<ColecticaItem> getItems(ColecticaItemRefList refs) throws Exception {
 		return metadataClient.getItems(refs);
+	}
+	
+	@Override
+	public ColecticaSearchItemResponse searchItems(ColecticaSearchItemRequest req) throws Exception {
+		return metadataClient.searchItems(req);
 	}
 
 	@Override
@@ -117,7 +124,7 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 	}
 
 	@Override
-	public Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) {
+	public Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception {
 		return metadataClient.getRelationshipChildren(relationshipPost);
 	}
 }
