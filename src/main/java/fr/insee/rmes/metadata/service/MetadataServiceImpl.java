@@ -13,6 +13,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemRef;
+import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.ColecticaSearchItemRequest;
+import fr.insee.rmes.metadata.model.ColecticaSearchItemResponse;
 import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
@@ -381,6 +385,30 @@ public class MetadataServiceImpl implements MetadataService {
 	public Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception {
 		return metadataRepository.getRelationshipChildren(relationshipPost);
 	}
+	
+	/**
+	 * Get items of the specified DDI item type
+	 */
+	@Override
+	public List<ColecticaItem> getItemsByType(DDIItemType type) throws Exception {
+		ColecticaSearchItemRequest req = new ColecticaSearchItemRequest();
+		List<String> DDItypes = new ArrayList<>();
+		DDItypes.add(type.getUUID());
+		List<String> listLanguages = new ArrayList<>();
+		listLanguages.add("fr-FR");
+		req.setCultures(listLanguages);
+		req.setLanguageSortOrder(listLanguages);
+		req.setItemTypes(DDItypes);
+		ColecticaSearchItemResponse response = metadataRepository.searchItems(req);
+		List<ColecticaItemRef> ids = new ArrayList<>();
+		response.getResults().stream().forEach((result) -> {
+			ColecticaItemRef item = new ColecticaItemRef( result.getIdentifier(), result.getVersion(), result.getAgencyId());
+			ids.add(item);
+		});
+		return metadataRepository.getItems(new ColecticaItemRefList(ids));
+	}
+	
+	
 
 	
 

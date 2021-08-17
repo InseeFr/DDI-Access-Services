@@ -3,6 +3,7 @@ package fr.insee.rmes.metadata.service;
 import java.util.List;
 
 import fr.insee.rmes.metadata.model.Relationship;
+import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.search.model.DDIItemType;
@@ -35,5 +36,7 @@ public interface MetadataService {
 	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception;
 	
 	ResourcePackage getResourcePackage(String id) throws Exception;
+	
+	List<ColecticaItem> getItemsByType(DDIItemType type) throws Exception;
 
 }
