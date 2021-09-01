@@ -27,6 +27,7 @@ import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.ColecticaSearchItemRequest;
 import fr.insee.rmes.metadata.model.ColecticaSearchItemResponse;
+import fr.insee.rmes.metadata.model.ColecticaSearchSetRequest;
 import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
@@ -126,6 +127,20 @@ public class MetadataClientImpl implements MetadataClient {
 		ResponseEntity<ColecticaSearchItemResponse> response = restTemplate.exchange(url, HttpMethod.POST, request,
 				ColecticaSearchItemResponse.class);
 		logger.info("GET Items with query : " + req.toString());
+		return response.getBody();
+	}
+	
+	/**/
+	@Override
+	public Relationship[] searchSets(ColecticaSearchSetRequest setRequest) {
+		String url = String.format("%s/api/v1/_query/set", serviceUrl);
+		RestTemplate restTemplate = new RestTemplate();
+		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+		headers.add("Content-type", ContentType.APPLICATION_JSON.getMimeType());
+		headers.add("Authorization", "Bearer " + token);
+		HttpEntity<ColecticaSearchSetRequest> request = new HttpEntity<>(setRequest, headers);
+		ResponseEntity<Relationship[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
+				Relationship[].class);
 		return response.getBody();
 	}
 

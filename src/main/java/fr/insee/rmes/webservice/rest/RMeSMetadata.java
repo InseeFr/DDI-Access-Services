@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.RelationshipOut;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
@@ -108,6 +109,22 @@ public class RMeSMetadata {
 		try {		
 			List<ColecticaItem> children = metadataService.getItemsByType(itemType);
 			return Response.ok().entity(children).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+	
+	@GET
+	@Path("colectica-item/{id}/toplevel-refs/")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Get the colectica item toplevel parents refs with item id {id}", notes = "This will give a list of object containing a triple identifier (reference id, version and agency) and the itemtype. Note that you will"
+			+ "need to map response objects keys to be able to use it for querying items "
+			+ "(see /items doc model)", response = RelationshipOut[].class)
+	public Response gettopLevelRefs(@PathParam(value = "id") String id) throws Exception {
+		try {
+			List<RelationshipOut> refs = metadataServiceItem.getTopLevelRefs(id);
+			return Response.ok().entity(refs).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;

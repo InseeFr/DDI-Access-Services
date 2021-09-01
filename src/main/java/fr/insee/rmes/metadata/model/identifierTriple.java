@@ -16,7 +16,7 @@ public class identifierTriple {
 	private Integer version;
 
 	@JsonProperty("Item3")
-	private String agency;
+	private String agencyId;
 
 	public String getIdentifier() {
 		return identifier;
@@ -34,17 +34,17 @@ public class identifierTriple {
 		this.version = version;
 	}
 
-	public String getAgency() {
-		return agency;
+	public String getAgencyId() {
+		return agencyId;
 	}
 
-	public void setAgency(String agency) {
-		this.agency = agency;
+	public void setAgencyId(String agencyId) {
+		this.agencyId = agencyId;
 	}
 
 	@Override
 	public String toString() {
-		return "identifierTriple [identifier=" + identifier + ", Version=" + version + ", agency=" + agency + "]";
+		return "identifierTriple [identifier=" + identifier + ", Version=" + version + ", agency=" + agencyId + "]";
 	}
 
 }
