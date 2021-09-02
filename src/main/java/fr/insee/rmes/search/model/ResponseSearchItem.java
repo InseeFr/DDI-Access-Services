@@ -1,52 +1,38 @@
 package fr.insee.rmes.search.model;
 
+import java.util.List;
+
 public class ResponseSearchItem {
 
-	private String id;
-
-	private String name;
-
-	private String title;
-
-	private String version;
-
-	private String subgroupId;
-
-	private String studyUnitId;
-
-	private String dataCollectionId;
-
+	private String id = "";
+	private String label = "";
+	private String description ="";
 	private String type;
+	private Integer version;
+	
+	private List<String> modalities;
+	private List<String> subGroups;
+	private List<String> subGroupLabels;
+	private List<String> dataCollections;
+	private List<String> studyUnits;
 
-	public ResponseSearchItem() {
+	public ResponseSearchItem(String id, String label) {
 		super();
-	}
-
-	public ResponseSearchItem(String id, String title, String serie, String operation, String campaign) {
-
 		this.id = id;
-		this.name = id;
-		this.version = "0";
-		this.title = title;
-		this.subgroupId = serie;
-		this.studyUnitId = operation;
-		this.dataCollectionId = campaign;
-		this.type = "Instrument";
-
+		this.label = label;
 	}
-	
-	public ResponseSearchItem(String id, String title, String serie, String operation) {
 
-		this.id = id;
-		this.name = id;
-		this.version = "0";
-		this.title = title;
-		this.subgroupId = serie;
-		this.studyUnitId = operation;
-		this.type = "CodeList";
-
+	/**
+	 * UUID type of the Colectica Repository, the name of this type is available
+	 * through the {@link fr.insee.rmes.search.model.DDIItemType #DDIItemType}
+	 */
+	public String getType() {
+		return type;
 	}
-	
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	public String getId() {
 		return id;
@@ -56,60 +42,75 @@ public class ResponseSearchItem {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getLabel() {
+		return label;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	
+	public String getDescription() {
+		return description;
 	}
 
-	public String getTitle() {
-		return title;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getVersion() {
+	public Integer getVersion() {
 		return version;
 	}
 
-	public void setVersion(String version) {
+	public void setVersion(Integer version) {
 		this.version = version;
 	}
 
-	public String getSubgroupId() {
-		return subgroupId;
+	public List<String> getModalities() {
+		return modalities;
 	}
 
-	public void setSubgroupId(String subgroupId) {
-		this.subgroupId = subgroupId;
+	public void setModalities(List<String> modalities) {
+		this.modalities = modalities;
 	}
 
-	public String getStudyUnitId() {
-		return studyUnitId;
+	public List<String> getSubGroups() {
+		return subGroups;
 	}
 
-	public void setStudyUnitId(String studyUnitId) {
-		this.studyUnitId = studyUnitId;
+	public void setSubGroups(List<String> subGroups) {
+		this.subGroups = subGroups;
+	}
+	
+	public List<String> getSubGroupLabels() {
+		return subGroupLabels;
 	}
 
-	public String getDataCollectionId() {
-		return dataCollectionId;
+	public void setSubGroupLabels(List<String> subgroupLabels) {
+		this.subGroupLabels = subgroupLabels;
 	}
 
-	public void setDataCollectionId(String dataCollectionId) {
-		this.dataCollectionId = dataCollectionId;
+	public List<String> getDataCollections() {
+		return dataCollections;
 	}
 
-	public String getType() {
-		return type;
+	public void setDataCollections(List<String> dataCollections) {
+		this.dataCollections = dataCollections;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public List<String> getStudyUnits() {
+		return studyUnits;
+	}
+
+	public void setStudyUnits(List<String> studyUnits) {
+		this.studyUnits = studyUnits;
+	}
+
+	@Override
+	public String toString() {
+		return "ColecticaItemSolr [id=" + id + ", label=" + label + ", description=" + description + ", type=" + type
+				+ ", version=" + version + ", modalities=" + modalities + ", subGroups=" + subGroups
+				+ ", dataCollections=" + dataCollections + ", studyUnits=" + studyUnits + "]";
 	}
 
 }

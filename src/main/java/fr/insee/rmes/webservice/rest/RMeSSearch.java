@@ -179,5 +179,22 @@ public class RMeSSearch {
 			throw e;
 		}
 	}
+	
+	@GET
+	@Path("items/{label}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Get all items for a given label", notes = "Retrieve all items with a matching label")
+	public List<ResponseSearchItem> getItemsFromLabel(@PathParam(value = "label") String label,
+			@QueryParam(value = "subGroupId") String subGroupId,
+			@QueryParam(value = "studyUnitId") String studyUnitId,
+			@QueryParam(value = "dataCollectionId") String dataCollectionId) throws Exception {
+		try {
+			return searchService.searchByLabel(subGroupId, studyUnitId, dataCollectionId, new DDIQuery(label));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
 
 }
