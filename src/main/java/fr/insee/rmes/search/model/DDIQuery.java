@@ -4,7 +4,7 @@ import java.util.List;
 
 public class DDIQuery {
 
-	private List<String> types;
+	private String type;
 	private String label;
 	
 	public DDIQuery() {
@@ -16,8 +16,12 @@ public class DDIQuery {
 		this.label = label;
 	}
 
-	public List<String> getTypes() {
-		return types;
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public String getLabel() {

@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -17,42 +19,29 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.DisMaxParams;
 import org.apache.solr.common.params.HighlightParams;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import fr.insee.rmes.config.DDIItemRepositoryImplCondition;
 import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.model.DataCollectionContext;
-import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.model.ResponseSearchItem;
 
 @Repository
-@Conditional(value = DDIItemRepositoryImplCondition.class)
 public class DDIItemRepositoryImpl implements DDIItemRepository {
+	
+	private final static Logger logger = LogManager.getLogger(DDIItemRepositoryImpl.class);
 
 	@Value("${fr.insee.rmes.solr.host}")
 	private String solrHost;
-
+	
 	@Autowired
-	RestHighLevelClient client;
-
-	@Override
-	public IndexResponse save(String type, ResponseItem item) throws Exception {
-//		ObjectMapper mapper = new ObjectMapper();
-//		byte[] data = mapper.writeValueAsBytes(item);
-//		IndexRequest request = new IndexRequest(index, type, item.getId()).source(data, XContentType.JSON);
-//		return client.index(request);
-		return null;
-	}
+	JdbcTemplate jdbcTemplate;
 
 	@Override
 	public List<DDIItem> findByLabel(String label, String... types) throws Exception {
@@ -77,64 +66,53 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 
 	@Override
 	public List<DDIItem> getSubGroups() throws Exception {
-//		SearchRequest request = new SearchRequest().indices(index).types("sub-group");
-//		return mapResponse(client.search(request));
-		return null;
+		try {
+			List<DDIItem> ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='sub-group'",
+					new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
+			return ddiItems;
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	@Override
-	public List<DDIItem> getStudyUnits(String subgGroupId) throws Exception {
-//		SearchRequest request = new SearchRequest().indices(index).types("study-unit");
-//		if (subgGroupId != null) {
-//			SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
-//					.query(QueryBuilders.termQuery("parent", subgGroupId));
-//			request.source(srcBuilder);
-//		}
-//		return mapResponse(client.search(request));
-		return null;
+	public List<DDIItem> getStudyUnits(String subGroupId) throws Exception {
+		List<DDIItem> ddiItems;
+		try {
+			String query = "SELECT * FROM ddi_item WHERE type='study-unit' ";
+			if (subGroupId != null) {
+				query = query.concat("and subgroupid=?");
+				ddiItems = jdbcTemplate.query(query, new BeanPropertyRowMapper<DDIItem>(DDIItem.class), subGroupId);
+			} else {
+				ddiItems = jdbcTemplate.query(query, new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
+			}
+			return ddiItems;
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	@Override
 	public List<DDIItem> getDataCollections(String studyUnitId) throws Exception {
-//		SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
-//				.query(QueryBuilders.termQuery("parent", studyUnitId));
-//		SearchRequest request = new SearchRequest().indices(index).types("data-collection").source(srcBuilder);
-//		return mapResponse(client.search(request));
-		return null;
-	}
-
-	@Override
-	public DeleteResponse delete(String type, String id) throws Exception {
-//		DeleteRequest request = new DeleteRequest(index, type, id);
-//		return client.delete(request);
-		return null;
-	}
-
-	private List<DDIItem> mapResponse(SearchResponse response) {
-		List<SearchHit> esHits = Arrays.asList(response.getHits().getHits());
-		return esHits.stream().map(hit -> {
-			DDIItem item = new DDIItem(hit.getId(), hit.getSource().get("label").toString(),
-					hit.getSource().get("parent").toString(), hit.getType());
-			item.setGroupId(getHitValueOrNull(hit, "groupId"));
-			item.setSubGroupId(getHitValueOrNull(hit, "subGroupId"));
-			item.setStudyUnitId(getHitValueOrNull(hit, "studyUnitId"));
-			item.setDataCollectionId(getHitValueOrNull(hit, "dataCollectionId"));
-			item.setResourcePackageId(getHitValueOrNull(hit, "resourcePackageId"));
-			return item;
-		}).collect(Collectors.toList());
-	}
-
-	private String getHitValueOrNull(SearchHit hit, String field) {
-		if (null == hit.getSource().get(field)) {
+		try {
+			List<DDIItem> ddiItems = jdbcTemplate.query(
+					"SELECT * FROM ddi_item WHERE type='data-collection' and studyunitid=?",
+					new BeanPropertyRowMapper<DDIItem>(DDIItem.class), studyUnitId);
+			return ddiItems;
+		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
-		return hit.getSource().get(field).toString();
 	}
 
 	@Override
 	public DataCollectionContext getDataCollectionContext(String dataCollectionId) throws Exception {
-		// TODO
-		return null;
+		List<DDIItem> ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='data-collection' and id=?",
+				new BeanPropertyRowMapper<DDIItem>(DDIItem.class), dataCollectionId);
+		DataCollectionContext dcContext = new DataCollectionContext();
+		dcContext.setDataCollectionId(dataCollectionId);
+		dcContext.setOperationId(ddiItems.get(0).getStudyUnitId());
+		dcContext.setSerieId(ddiItems.get(0).getSubGroupId());
+		return dcContext;
 	}
 
 	@Override
@@ -157,6 +135,8 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 		query.set(HighlightParams.FIELDS, "label");
 		query.set(HighlightParams.BS_TYPE, "WHOLE");
 		
+		//Filters
+		//First filter on subgroups, studyUnits and dataCollections
 		List<String> parentFilterQueries = new ArrayList<>();
 		if (subgroupId != null) {
 			parentFilterQueries.add(String.format("subGroup:%s", subgroupId));
@@ -170,6 +150,11 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 		if (!parentFilterQueries.isEmpty()) {
 			query.addFilterQuery(String.join(" OR ", parentFilterQueries));
 		}
+		
+		//Second filter on type of item
+		if(criteria.getType()!=null) {
+			query.addFilterQuery(String.format("type:%s", criteria.getType()));
+		};
 		
 		QueryResponse response = null;
 		try {
@@ -224,9 +209,13 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 
 	@Override
 	public List<DDIItem> getGroups() throws Exception {
-//		SearchRequest request = new SearchRequest().indices(index).types("group");
-//		return mapResponse(client.search(request));
-		return null;
+		try {
+			List<DDIItem> ddiItems = jdbcTemplate.query("SELECT * FROM ddi_item WHERE type='group'",
+					new BeanPropertyRowMapper<DDIItem>(DDIItem.class));
+			return ddiItems;
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 	
 	/**

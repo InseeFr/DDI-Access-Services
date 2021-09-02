@@ -2,15 +2,12 @@ package fr.insee.rmes.search.service;
 
 import java.util.List;
 
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.index.IndexResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.model.DataCollectionContext;
-import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.model.ResponseSearchItem;
 import fr.insee.rmes.search.repository.DDIItemRepository;
 
@@ -21,11 +18,6 @@ public class SearchServiceImpl implements SearchService {
 	private DDIItemRepository ddiItemRepository;
 
 	@Override
-	public IndexResponse save(String type, ResponseItem item) throws Exception {
-		return ddiItemRepository.save(type, item);
-	}
-
-	@Override
 	public List<DDIItem> searchByLabel(String label, String... types) throws Exception {
 		return ddiItemRepository.findByLabel(label, types);
 	}
@@ -33,11 +25,6 @@ public class SearchServiceImpl implements SearchService {
 	@Override
 	public List<DDIItem> searchByLabelInSubgroup(String label, String subgroupId, String... types) throws Exception {
 		return ddiItemRepository.findByLabelInSubGroup(label, subgroupId, types);
-	}
-
-	@Override
-	public DeleteResponse delete(String type, String id) throws Exception {
-		return ddiItemRepository.delete(type, id);
 	}
 
 	@Override

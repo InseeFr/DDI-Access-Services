@@ -1,12 +1,10 @@
 package fr.insee.rmes.webservice.rest;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,11 +12,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +23,6 @@ import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseSearchItem;
 import fr.insee.rmes.search.service.SearchService;
-import fr.insee.rmes.search.source.ColecticaSourceImporter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,9 +38,6 @@ public class RMeSSearch {
 
 	@Autowired
 	SearchService searchService;
-
-	@Autowired
-	ColecticaSourceImporter colecticaSourceImporter;
 
 	@POST
 	@Consumes(APPLICATION_JSON)
@@ -64,39 +56,6 @@ public class RMeSSearch {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
-	}
-
-	@DELETE
-	@Path("questionnaire/{id}")
-	@Consumes(APPLICATION_JSON)
-	@Produces(APPLICATION_JSON)
-	@ApiOperation(value = "Delete Questionnaire from Index", notes = "Index a new `Questionnaire`")
-	@ApiResponses(value = { @ApiResponse(code = 204, message = "No content"),
-			@ApiResponse(code = 404, message = "Not found"), @ApiResponse(code = 500, message = "Unexpected error") })
-	public Response deleteQuestionnaire(@PathParam(value = "id") String id) throws Exception {
-		try {
-			DeleteResponse response = searchService.delete("questionnaire", id);
-			return Response.status(NO_CONTENT).entity(response).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("import")
-	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Import indexes from Colectica",
-			notes = "This require a living instance of colectica as well as a up and running elasticsearch cluster",
-			response = String.class)
-	public Response source() throws Exception {
-		try {
-			colecticaSourceImporter.source();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-		return Response.ok().build();
 	}
 
 	@GET
