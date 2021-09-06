@@ -130,6 +130,11 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 	}
 	
 	@Override
+	public Relationship[] getItemsReferencingSpecificItem(ObjectColecticaPost objectColecticaPost) throws Exception{
+		return metadataClient.getItemsReferencingSpecificItem(objectColecticaPost);
+	}
+	
+	@Override
 	public Relationship[] searchSets(ColecticaSearchSetRequest setBody) throws Exception {
 		return metadataClient.searchSets(setBody);
 	}

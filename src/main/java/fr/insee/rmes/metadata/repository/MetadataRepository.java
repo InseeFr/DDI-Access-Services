@@ -38,5 +38,7 @@ public interface MetadataRepository {
 
 	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception;
 	
+	Relationship[] getItemsReferencingSpecificItem(ObjectColecticaPost objectColecticaPost) throws Exception;
+	
 	Relationship[] searchSets(ColecticaSearchSetRequest setBody) throws Exception;
 }

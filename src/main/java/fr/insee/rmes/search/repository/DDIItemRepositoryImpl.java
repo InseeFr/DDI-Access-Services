@@ -2,13 +2,9 @@ package fr.insee.rmes.search.repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -34,8 +30,6 @@ import fr.insee.rmes.search.model.ResponseSearchItem;
 
 @Repository
 public class DDIItemRepositoryImpl implements DDIItemRepository {
-	
-	private final static Logger logger = LogManager.getLogger(DDIItemRepositoryImpl.class);
 
 	@Value("${fr.insee.rmes.solr.host}")
 	private String solrHost;
@@ -45,22 +39,13 @@ public class DDIItemRepositoryImpl implements DDIItemRepository {
 
 	@Override
 	public List<DDIItem> findByLabel(String label, String... types) throws Exception {
-//		SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
-//				.query(QueryBuilders.fuzzyQuery("label", label).maxExpansions(1).prefixLength(3));
-//		SearchRequest request = new SearchRequest().indices(index).types(types).source(srcBuilder);
-//		return mapResponse(client.search(request));
+		//TODO
 		return null;
 	}
 
 	@Override
 	public List<DDIItem> findByLabelInSubGroup(String label, String subgroupId, String... types) throws Exception {
-//		SearchSourceBuilder srcBuilder = new SearchSourceBuilder()
-//				.query(QueryBuilders.boolQuery()
-//						.filter(QueryBuilders.fuzzyQuery("label", label).maxExpansions(1)
-//								.prefixLength(label.length() - 2))
-//						.filter(QueryBuilders.termQuery("subGroupId.keyword", subgroupId)));
-//		SearchRequest request = new SearchRequest().indices(index).types(types).source(srcBuilder);
-//		return mapResponse(client.search(request));
+		//TODO
 		return null;
 	}
 

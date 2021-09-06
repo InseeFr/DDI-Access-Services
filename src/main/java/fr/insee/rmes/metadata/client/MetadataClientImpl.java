@@ -249,5 +249,22 @@ public class MetadataClientImpl implements MetadataClient {
 				Relationship[].class);
 		return response.getBody();
 	}
+	
+	/**
+	 * Call Colectica API to retrieve objects of a defined type that are referencing a specific item identified with its triplet
+	 * 
+	 */
+	@Override
+	public Relationship[] getItemsReferencingSpecificItem(ObjectColecticaPost objectColecticaPost) throws ExceptionColecticaUnreachable {
+		String url = String.format("%s/api/v1/_query/relationship/byobject", serviceUrl);
+
+		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + getFreshToken());
+		HttpEntity<ObjectColecticaPost> request = new HttpEntity<>(objectColecticaPost, headers);
+		ResponseEntity<Relationship[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
+				Relationship[].class);
+		return response.getBody();
+	}
 
 }

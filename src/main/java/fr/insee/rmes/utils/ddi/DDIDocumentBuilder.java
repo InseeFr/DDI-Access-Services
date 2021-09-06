@@ -1,7 +1,6 @@
 package fr.insee.rmes.utils.ddi;
 
 import java.io.File;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -9,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -26,7 +23,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import com.google.common.io.Resources;
 

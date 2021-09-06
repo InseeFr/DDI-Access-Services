@@ -1,7 +1,5 @@
 package fr.insee.rmes.search.model;
 
-import java.util.List;
-
 public class DDIQuery {
 
 	private String type;

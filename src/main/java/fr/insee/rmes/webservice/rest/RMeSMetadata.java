@@ -1,7 +1,9 @@
 package fr.insee.rmes.webservice.rest;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.RelationshipOut;
 import fr.insee.rmes.metadata.model.Unit;
@@ -130,6 +133,26 @@ public class RMeSMetadata {
 			throw e;
 		}
 	}
+	
+	@GET
+	@Path("variables/{idQuestion}/ddi")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Get the variables that references a specific question", response = ColecticaItemRef.class, responseContainer = "List")
+	public Response getVariablesFromQuestion(@PathParam(value = "idQuestion") String idQuestion,
+			@QueryParam(value="agency") String agency,
+			@QueryParam(value="version") String version) throws Exception {
+		Map<String,String> params = new HashMap<String,String>();
+		params.put("idQuestion",idQuestion);
+		params.put("agency",agency);
+		params.put("version",version);
+		try {		
+			List<ColecticaItemRef> vars = metadataService.getVariablesFromQuestionId(params);
+			return Response.ok().entity(vars).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
 
 	@GET
 	@Path("units")
@@ -163,73 +186,6 @@ public class RMeSMetadata {
 	}
 
 	@GET
-	@Path("item/{id}/rp/{resourcePackageId}/deref-ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get Deref DDI document (external resource package)", notes = "Get a full Deref DDI document from Colectica repository reference {id} with an external resource package", response = String.class)
-	public Response getFullDDIWithExternalRP(@PathParam(value = "id") String id,
-			@PathParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
-		try {
-			String ddiDocument = metadataService.getDerefDDIDocumentWithExternalRP(id, resourcePackageId);
-			StreamingOutput stream = stringToStream(ddiDocument);
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("item/{id}/deref-ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get Deref DDI document", notes = "Gets a full DDI document from Colectica repository reference {id}", response = String.class)
-	public Response getFullDDI(@PathParam(value = "id") String id) throws Exception {
-		try {
-			String ddiDocument = metadataService.getDDIDocument(id);
-			StreamingOutput stream = stringToStream(ddiDocument);
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("item/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository reference {id}", response = String.class)
-	public Response getDDIDocument(@PathParam(value = "id") String id) throws Exception {
-		try {
-			String ddiDocument = metadataService.getDDIDocument(id);
-			StreamingOutput stream = stringToStream(ddiDocument);
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("group/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including a group from a topLevel {id}", response = String.class)
-	public Response getDDIDocumentGroups(@PathParam(value = "id") String id) throws Exception {
-		try {
-			String ddiDocument = groupService.getGroup(id);
-			StreamingOutput stream = output -> {
-				try {
-					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					throw new RMeSException(500, "Transformation error", e.getMessage());
-				}
-			};
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
 	@Path("fragmentInstance/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.", response = String.class)
@@ -251,55 +207,6 @@ public class RMeSMetadata {
 	}
 
 	@GET
-	@Path("codeList/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get the codeList", notes = "Get a DDI document with a codeList from Colectica repository reference {id}", response = String.class)
-	public Response getCodeList(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
-		try {
-			String codeList = codeListService.getCodeList(id, resourcePackageId);
-			StreamingOutput stream = stringToStream(codeList);
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("sequence/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Gets a DDI document with a sequence from Colectica repository reference {id}", response = String.class)
-	public Response getSequence(@PathParam(value = "id") String id,
-			@QueryParam(value = "resourcePackageId") String resourcePackageId) throws Exception {
-		try {
-			String sequence = metadataService.getSequence(id);
-			StreamingOutput stream = stringToStream(sequence);
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("questionnaire/{idDdiInstrument}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document of a questionnaire", notes = "Gets a DDI document with a Questionnaire from Colectica repository reference {id}", response = String.class)
-	public Response getQuestionnaire(@PathParam(value = "idDdiInstrument") String idDdiInstrument) throws Exception {
-		try {
-			String questionnaire = questionnaireService.getQuestionnaire(idDdiInstrument);
-			StreamingOutput stream = stringToStream(questionnaire);
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-
-
-	@GET
 	@Path("ddi-instance/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document of a DDI instance", notes = "Get a DDI document of a DDI Instance from Colectica repository reference {id}", response = String.class)
@@ -312,36 +219,6 @@ public class RMeSMetadata {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			e.printStackTrace();
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("question/{id}/ddi")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document of a question", notes = "Gets a DDI document with a Question from Colectica repository reference {id}", response = String.class)
-	public Response getQuestion(@PathParam(value = "id") String id) throws Exception {
-		try {
-			String questionnaire = metadataService.getQuestion(id);
-			StreamingOutput stream = stringToStream(questionnaire);
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw e;
-		}
-	}
-
-	@GET
-	@Path("operation/{id}/variableBook")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get all data to create variableBook", notes = "Gets a DDI document with a StudyUnit from Colectica repository reference {id}, and all its variables", response = String.class)
-	public Response getVariableBook(@PathParam(value = "id") String id) throws Exception {
-		try {
-			String variablesBook = variableBookServiceItem.getVariableBook(id);
-			StreamingOutput stream = stringToStream(variablesBook);
-			return Response.ok(stream).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
 			throw e;
 		}
 	}

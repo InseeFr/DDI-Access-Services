@@ -1,9 +1,11 @@
 package fr.insee.rmes.metadata.service;
 
 import java.util.List;
+import java.util.Map;
 
 import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.ColecticaItem;
+import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.search.model.DDIItemType;
@@ -38,5 +40,7 @@ public interface MetadataService {
 	ResourcePackage getResourcePackage(String id) throws Exception;
 	
 	List<ColecticaItem> getItemsByType(DDIItemType type) throws Exception;
+	
+	List<ColecticaItemRef> getVariablesFromQuestionId(Map<String,String> params) throws Exception;
 
 }

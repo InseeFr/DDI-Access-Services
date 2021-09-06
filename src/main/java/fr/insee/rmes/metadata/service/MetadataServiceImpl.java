@@ -18,6 +18,7 @@ import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.ColecticaSearchItemRequest;
 import fr.insee.rmes.metadata.model.ColecticaSearchItemResponse;
 import fr.insee.rmes.metadata.model.Relationship;
+import fr.insee.rmes.metadata.model.TargetItem;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
@@ -408,6 +409,36 @@ public class MetadataServiceImpl implements MetadataService {
 		return metadataRepository.getItems(new ColecticaItemRefList(ids));
 	}
 	
+	@Override
+	public List<ColecticaItemRef> getVariablesFromQuestionId(Map<String, String> params) throws Exception {
+		TargetItem target = new TargetItem();
+		target.setIdentifier(params.get("idQuestion"));
+		if (params.get("agency") != null) {
+			target.setAgencyId(params.get("agency"));
+		} else {
+			target.setAgencyId("fr.insee");
+		}
+		if (params.get("version") != null) {
+			target.setVersion(Integer.parseInt(params.get("version")));
+		} else {
+			target.setVersion(1);
+		}
+		ObjectColecticaPost obj = new ObjectColecticaPost();
+		List<String> itemTypes = new ArrayList<>();
+		itemTypes.add(DDIItemType.VARIABLE.getUUID().toLowerCase());
+		obj.setItemTypes(itemTypes);
+		obj.setTargetItem(target);
+		obj.setUseDistinctResultItem(true);
+		obj.setUseDistinctTargetItem(true);
+		Relationship[] relations = metadataRepository.getItemsReferencingSpecificItem(obj);
+		List<ColecticaItemRef> ids = new ArrayList<>();
+		for (int i = 0; i < relations.length; i++) {
+			ColecticaItemRef item = new ColecticaItemRef(relations[i].getIdentifierTriple().getIdentifier(),
+					relations[i].getIdentifierTriple().getVersion(), relations[i].getIdentifierTriple().getAgencyId());
+			ids.add(item);
+		}
+		return ids;
+	}
 	
 
 	

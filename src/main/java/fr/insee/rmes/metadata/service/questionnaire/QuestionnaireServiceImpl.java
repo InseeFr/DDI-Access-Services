@@ -1,21 +1,12 @@
 package fr.insee.rmes.metadata.service.questionnaire;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRef;
@@ -39,8 +30,6 @@ import fr.insee.rmes.webservice.rest.RMeSException;
 
 @Service
 public class QuestionnaireServiceImpl implements QuestionnaireService {
-
-	private final static Logger logger = LogManager.getLogger(QuestionnaireServiceImpl.class);
 
 	@Autowired
 	MetadataRepository metadataRepository;

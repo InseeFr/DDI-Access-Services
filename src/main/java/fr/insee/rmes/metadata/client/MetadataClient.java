@@ -1,6 +1,8 @@
 package fr.insee.rmes.metadata.client;
 
 import java.util.List;
+
+import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
 import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
@@ -33,6 +35,8 @@ public interface MetadataClient {
 	Relationship[] getRelationship(ObjectColecticaPost objectColecticaPost) throws Exception;
 
 	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception;
+	
+	Relationship[] getItemsReferencingSpecificItem(ObjectColecticaPost objectColecticaPost) throws Exception;
 	
 	Relationship[] searchSets(ColecticaSearchSetRequest setRequest);
 
