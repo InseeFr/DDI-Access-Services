@@ -17,6 +17,7 @@ import org.xml.sax.InputSource;
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
@@ -28,7 +29,7 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 	private MetadataServiceItem metadataServiceItem;
 
 	@Override
-	public String getFragmentInstance(String idTopLevel, DDIItemType itemType) throws Exception {
+	public String getFragmentInstance(String idTopLevel, DDIItemType itemType, boolean withChild) throws Exception {
 
 		// Step 1 : get the topLevelItem
 		ColecticaItem item;
@@ -51,33 +52,19 @@ public class FragmentInstanceServiceImpl implements FragmentInstanceService {
 			replaceValueEnvelope(docBuilder, "r:TypeOfObject", itemType.getName());
 		}
 
-		// Step 4 : add the root Instance and all of its children
-		ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(idTopLevel);
-
-		List<ColecticaItem> items = metadataServiceItem.getItems(refs);
-		for (ColecticaItem itemUnit : items) {
-			Node itemNode = getNode(itemUnit.item, docBuilder.getDocument());
+		// Step 4 : add the root Instance and all of its children if needed
+		if (withChild) {
+			ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(idTopLevel);
+			List<ColecticaItem> items = metadataServiceItem.getItems(refs);
+			for (ColecticaItem itemUnit : items) {
+				Node itemNode = DocumentBuilderUtils.getNode(itemUnit.item, docBuilder);
+				docBuilder.appendChild(itemNode);
+			}
+		} else {
+			Node itemNode = DocumentBuilderUtils.getNode(item.getItem(), docBuilder);
 			docBuilder.appendChild(itemNode);
 		}
 		return docBuilder.toString();
-	}
-
-	private Document getDocument(String fragment) throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		if (null == fragment || fragment.isEmpty()) {
-			return builder.newDocument();
-		}
-		InputSource ddiSource = new InputSource(new StringReader(fragment));
-		return builder.parse(ddiSource);
-	}
-
-	private Node getNode(String fragment, Document doc) throws Exception {
-		Element node = getDocument(fragment).getDocumentElement();
-		Node newNode = node.cloneNode(true);
-		// Transfer ownership of the new node into the destination document
-		doc.adoptNode(newNode);
-		return newNode;
 	}
 
 	/**

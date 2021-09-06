@@ -61,7 +61,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 
 	@Override
 	public ColecticaItem getQuestion(String id) throws Exception {
-		return getItemByType(id, DDIItemType.QUESTION);
+		return getItemByType(id, DDIItemType.QUESTION_ITEM);
 	}
 
 	@Override

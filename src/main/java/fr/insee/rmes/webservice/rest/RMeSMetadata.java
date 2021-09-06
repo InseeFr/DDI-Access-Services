@@ -136,8 +136,8 @@ public class RMeSMetadata {
 	
 	@GET
 	@Path("variables/{idQuestion}/ddi")
-	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get the variables that references a specific question", response = ColecticaItemRef.class, responseContainer = "List")
+	@Produces(MediaType.APPLICATION_XML)
+	@ApiOperation(value = "Get the variables that references a specific question", response = String.class)
 	public Response getVariablesFromQuestion(@PathParam(value = "idQuestion") String idQuestion,
 			@QueryParam(value="agency") String agency,
 			@QueryParam(value="version") String version) throws Exception {
@@ -145,9 +145,16 @@ public class RMeSMetadata {
 		params.put("idQuestion",idQuestion);
 		params.put("agency",agency);
 		params.put("version",version);
-		try {		
-			List<ColecticaItemRef> vars = metadataService.getVariablesFromQuestionId(params);
-			return Response.ok().entity(vars).build();
+		try {
+			String ddiDocument = metadataService.getVariablesFromQuestionId(params);
+			StreamingOutput stream = output -> {
+				try {
+					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					throw new RMeSException(500, "Transformation error", e.getMessage());
+				}
+			};
+			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
@@ -189,9 +196,10 @@ public class RMeSMetadata {
 	@Path("fragmentInstance/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
 	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.", response = String.class)
-	public Response getDDIDocumentFragmentInstance(@PathParam(value = "id") String id) throws Exception {
+	public Response getDDIDocumentFragmentInstance(@PathParam(value = "id") String id,
+			@QueryParam(value="withChild") boolean withChild) throws Exception {
 		try {
-			String ddiDocument = fragmentInstanceService.getFragmentInstance(id, null);
+			String ddiDocument = fragmentInstanceService.getFragmentInstance(id, null, withChild);
 			StreamingOutput stream = output -> {
 				try {
 					output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));

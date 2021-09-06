@@ -41,6 +41,6 @@ public interface MetadataService {
 	
 	List<ColecticaItem> getItemsByType(DDIItemType type) throws Exception;
 	
-	List<ColecticaItemRef> getVariablesFromQuestionId(Map<String,String> params) throws Exception;
+	String getVariablesFromQuestionId(Map<String,String> params) throws Exception;
 
 }

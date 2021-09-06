@@ -1,16 +1,23 @@
 package fr.insee.rmes.metadata.service;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRef;
@@ -23,12 +30,14 @@ import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.search.model.ResourcePackage;
 import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
+import fr.insee.rmes.utils.ddi.Envelope;
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
@@ -410,7 +419,7 @@ public class MetadataServiceImpl implements MetadataService {
 	}
 	
 	@Override
-	public List<ColecticaItemRef> getVariablesFromQuestionId(Map<String, String> params) throws Exception {
+	public String getVariablesFromQuestionId(Map<String, String> params) throws Exception {
 		TargetItem target = new TargetItem();
 		target.setIdentifier(params.get("idQuestion"));
 		if (params.get("agency") != null) {
@@ -437,10 +446,15 @@ public class MetadataServiceImpl implements MetadataService {
 					relations[i].getIdentifierTriple().getVersion(), relations[i].getIdentifierTriple().getAgencyId());
 			ids.add(item);
 		}
-		return ids;
+		ColecticaItemRefList refs = new ColecticaItemRefList(ids);
+		
+		DDIDocumentBuilder docBuilder = new DDIDocumentBuilder(true, Envelope.ROOT);
+		List<ColecticaItem> items = metadataServiceItem.getItems(refs);
+		for (ColecticaItem itemUnit : items) {
+			Node itemNode = DocumentBuilderUtils.getNode(itemUnit.item, docBuilder);
+			docBuilder.appendChild(itemNode);
+		}
+		return docBuilder.toString();
 	}
 	
-
-	
-
 }

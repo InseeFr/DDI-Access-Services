@@ -10,6 +10,6 @@ public interface FragmentInstanceService {
 	 * @throws Exception 
 	 * @return String : fragmentInstance with its children represented as fragments.
 	 */
-	String getFragmentInstance(String idTopLevel, DDIItemType itemType) throws Exception;
+	String getFragmentInstance(String idTopLevel, DDIItemType itemType, boolean withChild) throws Exception;
 
 }
