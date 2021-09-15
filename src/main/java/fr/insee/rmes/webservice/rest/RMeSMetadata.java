@@ -21,18 +21,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.RelationshipOut;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
-import fr.insee.rmes.metadata.service.codeList.CodeListService;
 import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
 import fr.insee.rmes.metadata.service.fragmentInstance.FragmentInstanceService;
-import fr.insee.rmes.metadata.service.groups.GroupsService;
-import fr.insee.rmes.metadata.service.questionnaire.QuestionnaireService;
-import fr.insee.rmes.metadata.service.variableBook.VariableBookService;
 import fr.insee.rmes.search.model.DDIItemType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,22 +47,10 @@ public class RMeSMetadata {
 	MetadataService metadataService;
 
 	@Autowired
-	QuestionnaireService questionnaireService;
-
-	@Autowired
 	DDIInstanceService ddiInstanceService;
-
-	@Autowired
-	CodeListService codeListService;
-
+	
 	@Autowired
 	MetadataServiceItem metadataServiceItem;
-
-	@Autowired
-	VariableBookService variableBookServiceItem;
-
-	@Autowired
-	GroupsService groupService;
 
 	@Autowired
 	FragmentInstanceService fragmentInstanceService;

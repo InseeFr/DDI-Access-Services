@@ -110,12 +110,4 @@ public class ApplicationContext {
 		return jdbcTemplate;
 	}
 	
-	@Bean 
-	public MetaDataRootContext getMetaDataContext(){
-		MetaDataRootContext metaDataContext = new MetaDataRootContext();
-		metaDataContext.setRessourcePackageIds(ressourcePackageIds);
-		metaDataContext.setSubGroupIds(subGroupIds);
-		return metaDataContext;
-	}
-	
 }

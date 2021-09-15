@@ -1,34 +1,26 @@
 package fr.insee.rmes.metadata.service;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.ColecticaSearchItemRequest;
 import fr.insee.rmes.metadata.model.ColecticaSearchItemResponse;
+import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.TargetItem;
-import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
-import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
@@ -52,9 +44,6 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Autowired
 	SearchService searchService;
-
-	@Autowired
-	GroupRepository groupRepository;
 
 	@Autowired
 	XpathProcessor xpathProcessor;
@@ -344,16 +333,6 @@ public class MetadataServiceImpl implements MetadataService {
 		Map<String, String> refs = getChildrenRefs(id);
 		resourcePackage.setReferences(refs);
 		return resourcePackage;
-	}
-
-	@Override
-	public List<String> getGroupIds() throws Exception {
-		return groupRepository.getRootIds();
-	}
-
-	@Override
-	public List<String> getRessourcePackageIds() throws Exception {
-		return groupRepository.getRessourcePackageIds();
 	}
 
 	@Override

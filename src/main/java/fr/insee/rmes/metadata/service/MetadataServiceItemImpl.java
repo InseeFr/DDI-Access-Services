@@ -22,7 +22,6 @@ import fr.insee.rmes.metadata.model.ColecticaItemRefList;
 import fr.insee.rmes.metadata.model.ColecticaSearchSetRequest;
 import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.RelationshipOut;
-import fr.insee.rmes.metadata.repository.GroupRepository;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.DDIItemType;
@@ -38,9 +37,6 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 
 	@Autowired
 	MetadataRepository metadataRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
 
 	@Autowired
 	XpathProcessor xpathProcessor;

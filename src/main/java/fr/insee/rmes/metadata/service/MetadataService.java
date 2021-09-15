@@ -29,10 +29,6 @@ public interface MetadataService {
 
 	List<Unit> getUnits() throws Exception;
 
-	List<String> getGroupIds() throws Exception;
-
-	List<String> getRessourcePackageIds() throws Exception;
-
 	Relationship[] getRelationship(ObjectColecticaPost relationshipPost) throws Exception;
 	
 	Relationship[] getRelationshipChildren(ObjectColecticaPost relationshipPost) throws Exception;
