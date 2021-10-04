@@ -20,6 +20,10 @@
         "label": "jours"
     },
     {
+        "id": "http://id.insee.fr/unit/semaine",
+        "label": "semaines"
+    },
+    {
         "id": "http://id.insee.fr/unit/mois",
         "label": "mois"
     },
@@ -66,5 +70,13 @@
     {
         "id": "http://id.insee.fr/unit/litre",
         "label": "litres"
+    },
+    {
+        "id": "http://id.insee.fr/unit/metre",
+        "label": "mètres"
+    },
+    {
+        "id": "http://id.insee.fr/unit/metrecarre",
+        "label": "mètres carrés"
     }
 ]
