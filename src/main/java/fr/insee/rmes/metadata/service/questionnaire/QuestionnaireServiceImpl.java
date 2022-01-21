@@ -402,8 +402,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 			itemSchemes.add(itemWithParent.getParent());
 			itemSchemeNodes.add(itemWithParent.getParentNode());
 		} else {
+			String details = (itemWithParent != null) ? itemWithParent.toString() : "itemWithParent is null";
 			throw new RMeSException(500, "The parentNode of a Colectica Item was not found or is unreachable.",
-					itemWithParent.toString());
+					details);
 		}
 	}
 

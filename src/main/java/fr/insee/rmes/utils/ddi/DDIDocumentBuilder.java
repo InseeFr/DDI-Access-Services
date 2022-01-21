@@ -157,9 +157,6 @@ public class DDIDocumentBuilder {
 			if (null != itemNode) {
 				// packagedDocument.appendChild(itemNode);
 			}
-			if (null != resourcePackageNode) {
-				packagedDocument.appendChild(resourcePackageNode);
-			}
 		}
 		return this;
 	}
@@ -199,9 +196,6 @@ public class DDIDocumentBuilder {
 		} else {
 			if (null != itemNode) {
 				// packagedDocument.appendChild(itemNode);
-			}
-			if (null != resourcePackageNode) {
-				packagedDocument.appendChild(resourcePackageNode);
 			}
 		}
 		return this;
