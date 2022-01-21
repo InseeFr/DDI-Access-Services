@@ -10,7 +10,9 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.logging.log4j.web.Log4jServletContextListener;
 import org.apache.logging.log4j.web.Log4jWebSupport;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class Log4j2DDIAccessServicesServletContextListener implements ServletContextListener {
 
 	private String log4j2ConfigFile;
