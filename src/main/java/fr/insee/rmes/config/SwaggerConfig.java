@@ -24,8 +24,9 @@ public class SwaggerConfig extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 7852516054619312011L;
 	
-	private final static Logger logger = LogManager.getLogger(SwaggerConfig.class);
+	private static final Logger logger = LogManager.getLogger(SwaggerConfig.class);
 
+	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
 			super.init(config);
@@ -40,7 +41,6 @@ public class SwaggerConfig extends HttpServlet {
 			beanConfig.setResourcePackage("fr.insee.rmes.webservice.rest");
 			beanConfig.setScan(true);
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 	}

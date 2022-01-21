@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -12,6 +14,8 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 public class DDIItemRepositoryImplCondition implements Condition {
 
 	private String ddiItemRepositoryImpl;
+	
+	private static final Logger logger = LogManager.getLogger(DDIItemRepositoryImplCondition.class);
 
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -20,16 +24,9 @@ public class DDIItemRepositoryImplCondition implements Condition {
 			Properties props = getEnvironmentProperties();
 			ddiItemRepositoryImpl = props.getProperty("fr.insee.rmes.search.DDIItemRepository.impl");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("context",e);
 		}
-		
-		if (ddiItemRepositoryImpl.equals("DDIItemRepositoryImpl")) {
-			return true;
-		} else {
-			return false;
-		}
-
+		return ddiItemRepositoryImpl.equals("DDIItemRepositoryImpl");
 	}
 	
 	private Properties getEnvironmentProperties() throws IOException {

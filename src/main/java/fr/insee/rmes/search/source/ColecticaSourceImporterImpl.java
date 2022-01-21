@@ -38,7 +38,7 @@ public class ColecticaSourceImporterImpl implements ColecticaSourceImporter {
 			rootIds = metadataService.getGroupIds();
 			ressourcePackageIds = metadataService.getRessourcePackageIds();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 			throw e;
 		}
 	}

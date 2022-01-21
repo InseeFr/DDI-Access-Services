@@ -277,7 +277,6 @@ public class RMeSMetadata {
 			return Response.ok(stream).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			e.printStackTrace();
 			throw e;
 		}
 	}
