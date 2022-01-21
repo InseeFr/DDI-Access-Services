@@ -62,13 +62,13 @@ public class DDIDocumentBuilder {
 			try {
 				packagedDocument = buildEnvelope();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
 		} else {
 			try {
 				packagedDocument = buildWithoutEnvelope();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
 		}
 	}
