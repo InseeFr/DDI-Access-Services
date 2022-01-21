@@ -1,6 +1,11 @@
 name: DDI Access Services Tests
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "*"
 
 jobs:
   test:
