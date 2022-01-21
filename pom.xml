@@ -5,7 +5,7 @@
 	<groupId>fr.insee</groupId>
 	<artifactId>DDI-Access-Services</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<name>DDI-Access-Services</name>
 
 	<properties>
@@ -15,7 +15,7 @@
 		<spring.version>5.2.16.RELEASE</spring.version>
 		<spring.security.version>5.3.10.RELEASE</spring.security.version>
 		<jackson.version>2.12.1</jackson.version>
-		<log4j.version>2.14.1</log4j.version>
+		<log4j.version>2.17.1</log4j.version>
 		<jacoco.version>0.8.5</jacoco.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
