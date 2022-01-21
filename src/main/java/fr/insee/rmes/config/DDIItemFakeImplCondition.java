@@ -43,16 +43,16 @@ public class DDIItemFakeImplCondition implements Condition {
 		File f = new File(
 				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "ddi-access-services.properties"));
 		if (f.exists() && !f.isDirectory()) {
-			FileReader r = new FileReader(f);
-			props.load(r);
-			r.close();
+			try (FileReader r = new FileReader(f)){
+				props.load(r);
+			}
 		}
 		File f2 = new File(
 				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "ddi-access-services.properties"));
 		if (f2.exists() && !f2.isDirectory()) {
-			FileReader r2 = new FileReader(f2);
-			props.load(r2);
-			r2.close();
+			try (FileReader r2 = new FileReader(f2)){
+				props.load(r2);
+			}
 		}
 		return props;
 	}
