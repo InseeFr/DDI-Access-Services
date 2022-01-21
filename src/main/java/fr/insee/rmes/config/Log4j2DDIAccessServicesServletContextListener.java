@@ -16,6 +16,10 @@ public class Log4j2DDIAccessServicesServletContextListener implements ServletCon
 	private String log4j2ConfigFile;
 
 	private Log4jServletContextListener listener;
+	
+	private static final String LOG4J_CONFIG_FILE = "log4j2.xml";
+	private static final String CATALINA_BASE ="catalina.base";
+	private static final String WEBAPPS = "%s/webapps/%s";
 
 	public Log4j2DDIAccessServicesServletContextListener() {
 		this.listener = new Log4jServletContextListener();
@@ -43,10 +47,10 @@ public class Log4j2DDIAccessServicesServletContextListener implements ServletCon
 		
 		Properties props = this.getProperties();
 		String log4JExternalFile = props.getProperty("fr.insee.rmespogbo.log.configuration");
-		this.log4j2ConfigFile = "log4j2.xml";
-		File f = new File(String.format("%s/webapps/%s", System.getProperty("catalina.base"), "log4j2.xml"));
+		this.log4j2ConfigFile = LOG4J_CONFIG_FILE;
+		File f = new File(String.format(WEBAPPS, System.getProperty(CATALINA_BASE), LOG4J_CONFIG_FILE));
 		if (f.exists() && !f.isDirectory()) {
-			this.log4j2ConfigFile = String.format("%s/webapps/%s", System.getProperty("catalina.base"), "log4j2.xml");
+			this.log4j2ConfigFile = String.format(WEBAPPS, System.getProperty(CATALINA_BASE), LOG4J_CONFIG_FILE);
 		}
 		File f2 = new File(log4JExternalFile);
 		if (f2.exists() && !f2.isDirectory()) {
@@ -65,25 +69,25 @@ public class Log4j2DDIAccessServicesServletContextListener implements ServletCon
 		String propsPath = String.format("env/%s/ddi-access-services.properties", env);
 		props.load(getClass().getClassLoader().getResourceAsStream(propsPath));
 		File f = new File(
-				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "ddi-access-services.properties"));
+				String.format(WEBAPPS, System.getProperty(CATALINA_BASE), "ddi-access-services.properties"));
 		if (f.exists() && !f.isDirectory()) {
-			FileReader r = new FileReader(f);
-			props.load(r);
-			r.close();
+			try (FileReader r = new FileReader(f)){
+				props.load(r);
+			}
 		}
 		File f2 = new File(
-				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "rmspogbo.properties"));
+				String.format(WEBAPPS, System.getProperty(CATALINA_BASE), "rmspogbo.properties"));
 		if (f2.exists() && !f2.isDirectory()) {
-			FileReader r2 = new FileReader(f2);
-			props.load(r2);
-			r2.close();
+			try (FileReader r2 = new FileReader(f2)) {
+				props.load(r2);
+			}
 		}
 		File f3 = new File(
-				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "rmespogbo.properties"));
+				String.format(WEBAPPS, System.getProperty(CATALINA_BASE), "rmespogbo.properties"));
 		if (f3.exists() && !f3.isDirectory()) {
-			FileReader r3 = new FileReader(f3);
-			props.load(r3);
-			r3.close();
+			try (FileReader r3 = new FileReader(f3)){
+				props.load(r3);
+			}
 		}
 		return props;
 	}
