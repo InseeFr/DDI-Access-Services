@@ -3,6 +3,8 @@ package fr.insee.rmes.search.model;
 public enum DDIItemType {
 
 	QUESTION("Question","question","A1BB19BD-A24A-4443-8728-A6AD80EB42B8"),
+	QUESTION_ITEM("QuestionItem","questionItem","A1BB19BD-A24A-4443-8728-A6AD80EB42B8"),
+	QUESTION_GRID("QuestionGrid","questionGrid","A1B8A30E-2F35-4056-8467-40E7ED0E7379"),
 	QUESTIONNAIRE("Instrument","instrument","F196CC07-9C99-4725-AD55-5B34F479CF7D"),
 	SEQUENCE("Sequence","sequence","DF457731-A75C-47C3-AEB4-7969D55AA049"),
 	DATA_COLLECTION("Data Collection","data-collection","C5084916-9936-47A9-A523-93BE9FD816D8"),
