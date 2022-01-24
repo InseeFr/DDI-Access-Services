@@ -1,82 +1,82 @@
 [
     {
-        "id": "http://id.insee.fr/unit/euro",
+        "uri": "http://id.insee.fr/unit/euro",
         "label": "€"
     },
     {
-        "id": "http://id.insee.fr/unit/keuro",
+        "uri": "http://id.insee.fr/unit/keuro",
         "label": "k€"
     },
     {
-        "id": "http://id.insee.fr/unit/percent",
+        "uri": "http://id.insee.fr/unit/percent",
         "label": "%"
     },
     {
-        "id": "http://id.insee.fr/unit/heure",
+        "uri": "http://id.insee.fr/unit/heure",
         "label": "heures"
     },
     {
-        "id": "http://id.insee.fr/unit/jour",
+        "uri": "http://id.insee.fr/unit/jour",
         "label": "jours"
     },
     {
-        "id": "http://id.insee.fr/unit/semaine",
+        "uri": "http://id.insee.fr/unit/semaine",
         "label": "semaines"
     },
     {
-        "id": "http://id.insee.fr/unit/mois",
+        "uri": "http://id.insee.fr/unit/mois",
         "label": "mois"
     },
     {
-        "id": "http://id.insee.fr/unit/annee",
+        "uri": "http://id.insee.fr/unit/annee",
         "label": "années"
     },
     {
-        "id": "http://id.insee.fr/unit/watt",
+        "uri": "http://id.insee.fr/unit/watt",
         "label": "W"
     },
     {
-        "id": "http://id.insee.fr/unit/kilowatt",
+        "uri": "http://id.insee.fr/unit/kilowatt",
         "label": "kW"
     },
     {
-        "id": "http://id.insee.fr/unit/megawatt",
+        "uri": "http://id.insee.fr/unit/megawatt",
         "label": "MW"
     },
     {
-        "id": "http://id.insee.fr/unit/megawattpcs",
+        "uri": "http://id.insee.fr/unit/megawattpcs",
         "label": "MW PCS"
     },
     {
-        "id": "http://id.insee.fr/unit/kilowattthermique",
+        "uri": "http://id.insee.fr/unit/kilowattthermique",
         "label": "kWth"
     },
     {
-        "id": "http://id.insee.fr/unit/tonne",
+        "uri": "http://id.insee.fr/unit/tonne",
         "label": "tonnes"
     },
     {
-        "id": "http://id.insee.fr/unit/tonnematiereseche",
+        "uri": "http://id.insee.fr/unit/tonnematiereseche",
         "label": "tonnes matières sèches"
     },
     {
-        "id": "http://id.insee.fr/unit/degrecelsius",
+        "uri": "http://id.insee.fr/unit/degrecelsius",
         "label": "°C"
     },
     {
-        "id": "http://id.insee.fr/unit/bar",
+        "uri": "http://id.insee.fr/unit/bar",
         "label": "bars"
     },
     {
-        "id": "http://id.insee.fr/unit/litre",
+        "uri": "http://id.insee.fr/unit/litre",
         "label": "litres"
     },
     {
-        "id": "http://id.insee.fr/unit/metre",
+        "uri": "http://id.insee.fr/unit/metre",
         "label": "mètres"
     },
     {
-        "id": "http://id.insee.fr/unit/metrecarre",
+        "uri": "http://id.insee.fr/unit/metrecarre",
         "label": "mètres carrés"
     }
 ]

@@ -43,7 +43,7 @@ public class DDIDocumentBuilder {
 		try {
 			packagedDocument = buildEnvelope();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -58,13 +58,13 @@ public class DDIDocumentBuilder {
 			try {
 				packagedDocument = buildEnvelope();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
 		} else {
 			try {
 				packagedDocument = buildWithoutEnvelope();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
 		}
 	}
@@ -153,9 +153,6 @@ public class DDIDocumentBuilder {
 			if (null != itemNode) {
 				// packagedDocument.appendChild(itemNode);
 			}
-			if (null != resourcePackageNode) {
-				packagedDocument.appendChild(resourcePackageNode);
-			}
 		}
 		return this;
 	}
@@ -195,9 +192,6 @@ public class DDIDocumentBuilder {
 		} else {
 			if (null != itemNode) {
 				// packagedDocument.appendChild(itemNode);
-			}
-			if (null != resourcePackageNode) {
-				packagedDocument.appendChild(resourcePackageNode);
 			}
 		}
 		return this;
