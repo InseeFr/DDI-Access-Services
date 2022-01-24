@@ -24,15 +24,16 @@ public class SwaggerConfig extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 7852516054619312011L;
 	
-	private final static Logger logger = LogManager.getLogger(SwaggerConfig.class);
+	private static final Logger logger = LogManager.getLogger(SwaggerConfig.class);
 
+	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
 			super.init(config);
 			Properties props = getEnvironmentProperties();
 			BeanConfig beanConfig = new BeanConfig();
 			beanConfig.setTitle("DDI Access services");
-			beanConfig.setVersion("0.1");
+			beanConfig.setVersion("1.0.2");
 			beanConfig.setDescription("DDI Access API endpoints");
             beanConfig.setSchemes(new String[]{props.getProperty("fr.insee.rmes.api.scheme")});
             beanConfig.setBasePath(props.getProperty("fr.insee.rmes.api.name"));
@@ -40,7 +41,6 @@ public class SwaggerConfig extends HttpServlet {
 			beanConfig.setResourcePackage("fr.insee.rmes.webservice.rest");
 			beanConfig.setScan(true);
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 	}
@@ -56,23 +56,23 @@ public class SwaggerConfig extends HttpServlet {
 		File f = new File(
 				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "ddi-access-services.properties"));
 		if (f.exists() && !f.isDirectory()) {
-			FileReader r = new FileReader(f);
-			props.load(r);
-			r.close();
+			try (FileReader r = new FileReader(f)){
+				props.load(r);
+			}
 		}
 		File f2 = new File(
 				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "rmspogbo.properties"));
 		if (f2.exists() && !f2.isDirectory()) {
-			FileReader r2 = new FileReader(f2);
-			props.load(r2);
-			r2.close();
+			try (FileReader r2 = new FileReader(f2)){
+				props.load(r2);
+			}
 		}
 		File f3 = new File(
 				String.format("%s/webapps/%s", System.getProperty("catalina.base"), "rmespogbo.properties"));
 		if (f3.exists() && !f3.isDirectory()) {
-			FileReader r3 = new FileReader(f3);
-			props.load(r3);
-			r3.close();
+			try (FileReader r3 = new FileReader(f3)){
+				props.load(r3);
+			}
 		}
 		return props;
 	}

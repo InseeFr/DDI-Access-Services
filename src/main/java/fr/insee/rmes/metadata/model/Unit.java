@@ -26,4 +26,9 @@ public class Unit {
 		this.label = label;
 	}
 
+	@Override
+	public String toString() {
+		return "Unit [uri=" + uri + ", label=" + label + "]";
+	}
+
 }
