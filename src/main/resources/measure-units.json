@@ -52,6 +52,10 @@
         "label": "kWth"
     },
     {
+        "uri": "http://id.insee.fr/unit/kg",
+        "label": "kg"
+    },
+    {
         "uri": "http://id.insee.fr/unit/tonne",
         "label": "tonnes"
     },
@@ -74,6 +78,10 @@
     {
         "uri": "http://id.insee.fr/unit/metre",
         "label": "mètres"
+    },
+    {
+        "uri": "http://id.insee.fr/unit/centimetre",
+        "label": "centimètres"
     },
     {
         "uri": "http://id.insee.fr/unit/metrecarre",
