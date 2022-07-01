@@ -29,7 +29,13 @@
     },
     {
         "uri": "http://id.insee.fr/unit/annee",
-        "label": "années"
+        "label": "années",
+        "note": "To be replaced by http://id.insee.fr/unit/an"
+    },
+    {
+        "uri": "http://id.insee.fr/unit/an",
+        "label": "ans",
+        "note": "Replace http://id.insee.fr/unit/annee"
     },
     {
         "uri": "http://id.insee.fr/unit/watt",

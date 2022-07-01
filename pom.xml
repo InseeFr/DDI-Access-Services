@@ -5,7 +5,7 @@
 	<groupId>fr.insee</groupId>
 	<artifactId>DDI-Access-Services</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<name>DDI-Access-Services</name>
 
 	<properties>
