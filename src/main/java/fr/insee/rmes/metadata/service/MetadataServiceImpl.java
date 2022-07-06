@@ -47,8 +47,6 @@ public class MetadataServiceImpl implements MetadataService {
 
 	@Override
 	public List<Unit> getUnits() throws Exception {
-		// getCodeList("a72e6e56-12a1-49b7-96c4-c724da3da5da",
-		// "c265b595-ced2-4526-88dc-151471de885d");
 		return metadataRepository.getUnits();
 	}
 

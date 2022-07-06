@@ -1,7 +1,9 @@
 package fr.insee.rmes.metadata.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Unit {
 
 	@JsonProperty("uri")
