@@ -50,6 +50,14 @@
         "label": "MW"
     },
     {
+        "uri": "http://id.insee.fr/unit/megawattheurepcs",
+        "label": "MWh PCS"
+    },
+    {
+        "uri": "http://id.insee.fr/unit/megawattheure",
+        "label": "MWh"
+    },
+    {
         "uri": "http://id.insee.fr/unit/megawattpcs",
         "label": "MW PCS"
     },
