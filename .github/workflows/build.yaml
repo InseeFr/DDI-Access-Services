@@ -56,7 +56,7 @@ jobs:
       - run: echo ${{steps.version.outputs.prop}}
 
       - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: inseefr/ddi-access-services
           username: ${{ secrets.DOCKERHUB_USERNAME }}
