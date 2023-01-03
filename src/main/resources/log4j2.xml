@@ -3,8 +3,8 @@
 	<appenders>
 
 		<RollingFile name="RollingFile"
-			fileName="D://logs/ddi-access-services-local.log"
-			filePattern="D://logs/ddi-access-services-local-%d{MM-dd-yyyy}-%i.log.gz"
+			fileName="C://logs/ddi-access-services-local.log"
+			filePattern="C://logs/ddi-access-services-local-%d{MM-dd-yyyy}-%i.log.gz"
 			ignoreExceptions="false">
 			<PatternLayout>
 				<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %level %logger{36} -

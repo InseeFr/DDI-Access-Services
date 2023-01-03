@@ -185,10 +185,9 @@ public class MetadataClientImpl implements MetadataClient {
 		//Change this method when units are available in repository
 		final ObjectMapper objectMapper = new ObjectMapper();
         URL resource = getClass().getClassLoader().getResource("measure-units.json");
-		List<Unit> unitList = objectMapper.readValue(
+		return objectMapper.readValue(
 				new File(resource.toURI()), 
 		        new TypeReference<List<Unit>>(){});
-		return unitList;
 	}
 
 	@Override

@@ -1,0 +1,49 @@
+
+h	java:S112§"FDefine and throw a dedicated exception instead of using a generic one.(¯ª”×ıÿÿÿÿ8åáç¸×0
+b	java:S112Ÿ"FDefine and throw a dedicated exception instead of using a generic one.(éÉŠ8çáç¸×0
+t
+java:S1192N"RDefine a constant instead of duplicating this literal "g:ResourcePackage" 3 times.(ÏÉ¥ğÿÿÿÿÿ8ïáç¸×0
+•
+java:S1319‡"wThe type of "nodesWithParentNames" should be an interface such as "SortedMap" rather than the implementation "TreeMap".(±—â”8âç¸×0
+š
+java:S1319©"wThe type of "nodesWithParentNames" should be an interface such as "SortedMap" rather than the implementation "TreeMap".(›Î´ıÿÿÿÿ8ƒâç¸×0
+~
+java:S1488³"`Immediately return this expression instead of assigning it to the temporary variable "nodeList".(öôœä8‹âç¸×0
+G
+java:S54119"*Use the primitive boolean expression here.(ÄÉøª8âç¸×0
+G
+java:S5411I"*Use the primitive boolean expression here.(ÄÉøª8®âç¸×0
+G
+java:S5411j"*Use the primitive boolean expression here.(ÄÉøª8¼âç¸×0
+H
+java:S5411ˆ"*Use the primitive boolean expression here.(ÄÉøª8Ìâç¸×0
+H
+java:S5411ª"*Use the primitive boolean expression here.(ÄÉøª8Ûâç¸×0
+Q
+java:S2755ì"3Disable access to external entities in XML parsing.(Ò‹ñÙ8‚ïç¸×0
+[
+java:S1124!"EReorder the modifiers to comply with the Java Language Specification.(ö›’­
+Q	java:S125l"<This block of commented-out lines of code should be removed.(¬¹µ
+R	java:S125Š"<This block of commented-out lines of code should be removed.(¬¹µ
+P
+java:S2864"4Iterate over the "entrySet" instead of the "keySet".(—Îó·ÿÿÿÿÿ
+K
+java:S2864"4Iterate over the "entrySet" instead of the "keySet".(ÂºÅú
+W	java:S125š"<This block of commented-out lines of code should be removed.(ı´øÿÿÿÿÿ
+i
+java:S3776¨"RRefactor this method to reduce its Cognitive Complexity from 23 to the 15 allowed.(œ«¨Ô
+P
+java:S2864¯"4Iterate over the "entrySet" instead of the "keySet".(—Îó·ÿÿÿÿÿ
+K
+java:S2864±"4Iterate over the "entrySet" instead of the "keySet".(ÂºÅú
+W	java:S125Â"<This block of commented-out lines of code should be removed.(ı´øÿÿÿÿÿ
+g	java:S128×"LEnd this switch case with an unconditional break, return or throw statement.(¦ÒËüÿÿÿÿ
+g	java:S128Õ"LEnd this switch case with an unconditional break, return or throw statement.(ÑŸ½‘ùÿÿÿÿ
+g	java:S128Ó"LEnd this switch case with an unconditional break, return or throw statement.(´áÛÁüÿÿÿÿ
+=	java:S131Ò""Add a default case to this switch.(Óó¦Œüÿÿÿÿ
+>
+java:S1659¸"(Declare "clonedNode" on a separate line.(­ñ€)
+X
+java:S3457£"AFormat specifiers should be used instead of string concatenation.(ÿĞ
+
+java:S1130­"Remove the declaration of thrown exception 'javax.xml.xpath.XPathExpressionException', as it cannot be thrown from method's body.(é¬ˆªşÿÿÿÿ

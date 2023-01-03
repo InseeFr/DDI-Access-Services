@@ -1,0 +1,33 @@
+
+\
+java:S1192x"FDefine a constant instead of duplicating this literal "label" 4 times.(ÔÇ³û
+{
+java:S14887"`Immediately return this expression instead of assigning it to the temporary variable "ddiItems".(ÖÓ™åüÿÿÿÿ
+v
+java:S1488S"`Immediately return this expression instead of assigning it to the temporary variable "ddiItems".(¢ßÓŞ
+|
+java:S1488Æ"`Immediately return this expression instead of assigning it to the temporary variable "ddiItems".(ˆæÏ®üÿÿÿÿ
+A
+java:S1168+"+Return an empty collection instead of null.(¥¹ï
+H
+java:S1135*"2Complete the task associated to this TODO comment.(…ïœ†
+A
+java:S11681"+Return an empty collection instead of null.(¥¹ï
+H
+java:S11350"2Complete the task associated to this TODO comment.(…ïœ†
+A
+java:S1168;"+Return an empty collection instead of null.(¥¹ï
+A
+java:S1168L"+Return an empty collection instead of null.(¥¹ï
+A
+java:S1168X"+Return an empty collection instead of null.(¥¹ï
+8
+java:S1116"Remove this empty statement.(ôŸìúÿÿÿÿ
+U
+java:S1155">Use isEmpty() to check whether the collection is empty or not.(±İı
+N
+java:S1135º"2Complete the task associated to this TODO comment.(» æÿÿÿÿÿ
+N
+java:S1135¿"2Complete the task associated to this TODO comment.(» æÿÿÿÿÿ
+B
+java:S1168Ê"+Return an empty collection instead of null.(¥¹ï
