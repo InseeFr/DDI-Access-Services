@@ -29,7 +29,13 @@
     },
     {
         "uri": "http://id.insee.fr/unit/annee",
-        "label": "années"
+        "label": "années",
+        "note": "To be replaced by http://id.insee.fr/unit/an"
+    },
+    {
+        "uri": "http://id.insee.fr/unit/an",
+        "label": "ans",
+        "note": "Replace http://id.insee.fr/unit/annee"
     },
     {
         "uri": "http://id.insee.fr/unit/watt",
@@ -44,12 +50,24 @@
         "label": "MW"
     },
     {
+        "uri": "http://id.insee.fr/unit/megawattheurepcs",
+        "label": "MWh PCS"
+    },
+    {
+        "uri": "http://id.insee.fr/unit/megawattheure",
+        "label": "MWh"
+    },
+    {
         "uri": "http://id.insee.fr/unit/megawattpcs",
         "label": "MW PCS"
     },
     {
         "uri": "http://id.insee.fr/unit/kilowattthermique",
         "label": "kWth"
+    },
+    {
+        "uri": "http://id.insee.fr/unit/kg",
+        "label": "kg"
     },
     {
         "uri": "http://id.insee.fr/unit/tonne",
@@ -74,6 +92,10 @@
     {
         "uri": "http://id.insee.fr/unit/metre",
         "label": "mètres"
+    },
+    {
+        "uri": "http://id.insee.fr/unit/centimetre",
+        "label": "centimètres"
     },
     {
         "uri": "http://id.insee.fr/unit/metrecarre",
