@@ -1,9 +1,11 @@
 package fr.insee.rmes.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
 
 @EnableWebSecurity
 public class SecurityContext extends WebSecurityConfigurerAdapter {
@@ -11,6 +13,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 	@Value("${fr.insee.rmes.force.ssl}")
 	Boolean requiresSSL;
 
+	@Bean
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 

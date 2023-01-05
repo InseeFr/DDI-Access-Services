@@ -3,9 +3,10 @@ package fr.insee.rmes.metadata.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.simple.JSONObject;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.json.JSONObject;
 
 public class ColecticaItemPostRefList {
 
