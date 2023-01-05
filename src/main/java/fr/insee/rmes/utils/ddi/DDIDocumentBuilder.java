@@ -1,5 +1,21 @@
 package fr.insee.rmes.utils.ddi;
 
+import com.google.common.io.Resources;
+import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.StringWriter;
 import java.net.URL;
@@ -8,31 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathExpressionException;
-
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-//import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.apache.commons.io.FileUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import com.google.common.io.Resources;
-
-import fr.insee.rmes.metadata.utils.DocumentBuilderUtils;
-
+@Slf4j
 public class DDIDocumentBuilder {
-
-	private final static Logger logger = LogManager.getLogger(DDIDocumentBuilder.class);
 
 	private Boolean envelope;
 	private String nameEnvelope = Envelope.DEFAULT.toString();
@@ -45,7 +38,7 @@ public class DDIDocumentBuilder {
 		try {
 			packagedDocument = buildEnvelope();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			log.error(e.getMessage());
 		}
 	}
 
@@ -60,13 +53,13 @@ public class DDIDocumentBuilder {
 			try {
 				packagedDocument = buildEnvelope();
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				log.error(e.getMessage());
 			}
 		} else {
 			try {
 				packagedDocument = buildWithoutEnvelope();
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				log.error(e.getMessage());
 			}
 		}
 	}
@@ -371,7 +364,7 @@ public class DDIDocumentBuilder {
 			StreamResult streamResult = new StreamResult(stringWriter);
 			transformer.transform(new DOMSource(packagedDocument), streamResult);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			log.error(e.getMessage());
 		}
 		return stringWriter.toString();
 	}
@@ -418,7 +411,7 @@ public class DDIDocumentBuilder {
 		NodeList refChildren = refNode.getChildNodes();
 		for (int i = 0; i < refChildren.getLength(); i++) {
 			if (refChildren.item(i).getNodeName().equals("r:ID")) {
-				logger.info(refNode.getNodeName() + " -> " + refChildren.item(i).getTextContent());
+				log.info(refNode.getNodeName() + " -> " + refChildren.item(i).getTextContent());
 				return refChildren.item(i).getTextContent();
 			}
 		}

@@ -1,34 +1,22 @@
 package fr.insee.rmes.metadata.repository;
 
+import fr.insee.rmes.metadata.client.MetadataClient;
+import fr.insee.rmes.metadata.model.*;
+import fr.insee.rmes.utils.ddi.ItemFormat;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import fr.insee.rmes.metadata.client.MetadataClient;
-import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
-import fr.insee.rmes.metadata.model.ColecticaItemRefList;
-import fr.insee.rmes.metadata.model.ColecticaSearchItemRequest;
-import fr.insee.rmes.metadata.model.ColecticaSearchItemResponse;
-import fr.insee.rmes.metadata.model.ColecticaSearchSetRequest;
-import fr.insee.rmes.metadata.model.Relationship;
-import fr.insee.rmes.metadata.model.ObjectColecticaPost;
-import fr.insee.rmes.metadata.model.Unit;
-import fr.insee.rmes.utils.ddi.ItemFormat;
-
 @Service
+@Slf4j
 public class MetadataRepositoryImpl implements MetadataRepository {
 
-	private final static Logger logger = LogManager.getLogger(MetadataRepositoryImpl.class);
 
 	@Autowired
 	MetadataClient metadataClient;
@@ -79,7 +67,7 @@ public class MetadataRepositoryImpl implements MetadataRepository {
 			colecticaItemPostRef.setItemFormat(ItemFormat.DDI_32);
 
 		}
-		logger.debug(refs.toString());
+		log.debug(refs.toString());
 		String res = metadataClient.postItems(refs);
 
 		for (ColecticaItemPostRef colecticaItemPostRef : refs.getItems()) {

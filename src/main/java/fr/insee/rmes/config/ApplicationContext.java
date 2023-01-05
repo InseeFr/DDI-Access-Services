@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -34,27 +35,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@PropertySource(value = { "classpath:env/${fr.insee.rmes.env:dev}/ddi-access-services.properties",
-		"file:${catalina.base}/webapps/ddi-access-services.properties" ,"file:${catalina.base}/webapps/rmspogbo.properties","file:${catalina.base}/webapps/rmespogbo.properties" }, ignoreResourceNotFound = true)
 public class ApplicationContext {
 
-	@Value("${fr.insee.rmes.search.db.host}")
-	String dbHost;
 
-	@Value("${fr.insee.rmes.search.db.port}")
-	String dbPort;
-
-	@Value("${fr.insee.rmes.search.db.schema}")
-	String dbSchema;
-
-	@Value("${fr.insee.rmes.search.db.user}")
-	private String dbUser;
-
-	@Value("${fr.insee.rmes.search.db.password}")
-	private String dbPassword;
-
-	@Value("${fr.insee.rmes.search.db.driver}")
-	private String dbDriver;
 
 	@Value("${fr.insee.ntlm.user}")
 	private String ntlmUser;
@@ -87,27 +70,12 @@ public class ApplicationContext {
 
 	@Bean
 	public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-		CloseableHttpClient httpClient = httpClientBuilder().build();
-		ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+		HttpClient httpClient = httpClientBuilder().build();
+		//TODO fix httpClient for restremplate
+		ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		RestTemplate restTemplate = new RestTemplate(requestFactory);
 		return restTemplate;
 	}
 
-	@Bean
-	public DataSource dataSource() {
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(dbDriver);
-		dataSource.setUrl(String.format("jdbc:postgresql://%s:%s/%s", dbHost, dbPort, dbSchema));
-		dataSource.setUsername(dbUser);
-		dataSource.setPassword(dbPassword);
-		return dataSource;
-	}
-
-	@Bean
-	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.setResultsMapCaseInsensitive(true);
-		return jdbcTemplate;
-	}
 	
 }
