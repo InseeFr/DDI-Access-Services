@@ -1,12 +1,10 @@
 package fr.insee.rmes.config.keycloak;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Date;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,16 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-
-import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Date;
 
 @Service
+@Slf4j
 public class KeycloakServices {
-	
-	private static final Logger logger = LogManager.getLogger(KeycloakServices.class);
+
 
 	@Value("${fr.insee.rmes.metadata.keycloak.secret}")
     String secret;
@@ -41,7 +37,6 @@ public class KeycloakServices {
     /**
      * Permet de récuperer un jeton keycloak
      * @return jeton
-     * @throws ExceptionNautileInjoingnable
      */
     public String getKeycloakAccessToken() throws ExceptionColecticaUnreachable {
 
@@ -67,7 +62,7 @@ public class KeycloakServices {
                 (String) result.split(",")[0].split(":")[1]
                     .subSequence(1, result.split(",")[0].split(":")[1].length() - 1);
 
-            logger.info("Retrieve Keycloak token");
+            log.info("Retrieve Keycloak token");
 
             return accessToken;
         }
@@ -91,7 +86,7 @@ public class KeycloakServices {
         try {
             DecodedJWT jwt = JWT.decode(token);
             if (jwt.getExpiresAt().after(now)) {
-                logger.info("Token is valid");
+                log.info("Token is valid");
                 isValid = true;
             }
         }

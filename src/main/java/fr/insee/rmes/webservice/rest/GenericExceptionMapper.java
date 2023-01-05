@@ -1,11 +1,11 @@
 package fr.insee.rmes.webservice.rest;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
+
 
 /**
  * Created by acordier on 04/07/17.
@@ -13,13 +13,13 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
 
-	private Status STATUS = Status.INTERNAL_SERVER_ERROR;
+	private Response.Status STATUS = Response.Status.INTERNAL_SERVER_ERROR;
 
 	public Response toResponse(Throwable error) {
 		RestMessage message = new RestMessage(STATUS.getStatusCode(), "An unexpected error occured",
 				error.getMessage());
 		if (error instanceof NotFoundException) {
-			STATUS = Status.NOT_FOUND;
+			STATUS = Response.Status.NOT_FOUND;
 			message.setMessage("Not Found");
 			message.setDetails("No JAX-RS resource found for this path");
 		}

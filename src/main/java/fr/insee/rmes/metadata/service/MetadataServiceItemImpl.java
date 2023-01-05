@@ -1,28 +1,6 @@
 package fr.insee.rmes.metadata.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import fr.insee.rmes.metadata.model.ColecticaFacet;
-import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRef;
-import fr.insee.rmes.metadata.model.ColecticaItemPostRefList;
-import fr.insee.rmes.metadata.model.ColecticaItemRef;
-import fr.insee.rmes.metadata.model.ColecticaItemRefList;
-import fr.insee.rmes.metadata.model.ColecticaSearchSetRequest;
-import fr.insee.rmes.metadata.model.Relationship;
-import fr.insee.rmes.metadata.model.RelationshipOut;
+import fr.insee.rmes.metadata.model.*;
 import fr.insee.rmes.metadata.repository.MetadataRepository;
 import fr.insee.rmes.metadata.utils.XpathProcessor;
 import fr.insee.rmes.search.model.DDIItemType;
@@ -30,11 +8,21 @@ import fr.insee.rmes.search.model.ResponseItem;
 import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import fr.insee.rmes.utils.ddi.Envelope;
 import fr.insee.rmes.webservice.rest.RMeSException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 public class MetadataServiceItemImpl implements MetadataServiceItem {
-
-	private final static Logger logger = LogManager.getLogger(MetadataServiceItemImpl.class);
 
 	@Autowired
 	MetadataRepository metadataRepository;
@@ -120,7 +108,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		ddiRoot.setLabel(xpathProcessor.queryText(rootNode, labelExp));
 		ddiRoot.setResourcePackageId(getResourcePackageId(rootNode));
 		ddiRoot.setChildren(getGroups(rootNode, ddiRoot));
-		logger.debug("ddiRoot : " + ddiRoot.toString());
+		log.debug("ddiRoot : " + ddiRoot.toString());
 		return ddiRoot;
 	}
 
@@ -144,7 +132,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 			cls.setResourcePackageId(idRP);
 			cls.setChildren(getCodeListResponseItem(child, cls));
 			clsList.add(cls);
-			logger.debug("CodeListScheme : " + id);
+			log.debug("CodeListScheme : " + id);
 		}
 		return clsList;
 	}
@@ -152,18 +140,18 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	@Override
 	public List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String idGroupRoot) throws Exception {
 		List<ResponseItem> clsList = new ArrayList<>();
-		logger.debug("GroupRoot id : " + idGroupRoot);
+		log.debug("GroupRoot id : " + idGroupRoot);
 		String fragment = getItem(idGroupRoot).item;
 		String rootExp = "//*[local-name()='Fragment']";
 		Node rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		String childGroupExp = ".//*[local-name()='GroupReference']/*[local-name()='ID']/text()";
 		String idGroup = xpathProcessor.queryString(rootNode, childGroupExp);
-		logger.debug("Group id : " + idGroup);
+		log.debug("Group id : " + idGroup);
 		fragment = getItem(idGroup).item;
 		Node groupNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		String childSubGroupExp = ".//*[local-name()='SubGroupReference']/*[local-name()='ID']/text()";
 		String idSubGroup = xpathProcessor.queryString(groupNode, childSubGroupExp);
-		logger.debug("SubGroup id : " + idSubGroup);
+		log.debug("SubGroup id : " + idSubGroup);
 		String childExp = ".//*[local-name()='ResourcePackageReference']";
 		NodeList children = xpathProcessor.queryList(rootNode, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
@@ -184,7 +172,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 				cls.setSubGroupId(idSubGroup);
 				cls.setChildren(getCodeListResponseItem(child, cls));
 				clsList.add(cls);
-				logger.debug("CodeListScheme : " + id);
+				log.debug("CodeListScheme : " + id);
 			}
 
 		}

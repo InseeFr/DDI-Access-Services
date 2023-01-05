@@ -34,7 +34,7 @@ import fr.insee.rmes.utils.ddi.Envelope;
 @Service
 public class MetadataServiceImpl implements MetadataService {
 
-	private final static Logger logger = LogManager.getLogger(MetadataServiceImpl.class);
+	private final static Logger log = LogManager.getLogger(MetadataServiceImpl.class);
 
 	@Autowired
 	MetadataRepository metadataRepository;
@@ -63,7 +63,7 @@ public class MetadataServiceImpl implements MetadataService {
 		ddiRoot.setLabel(xpathProcessor.queryText(rootNode, labelExp));
 		ddiRoot.setResourcePackageId(getResourcePackageId(rootNode));
 		ddiRoot.setChildren(getGroups(rootNode, ddiRoot));
-		logger.debug("ddiRoot : " + ddiRoot.toString());
+		log.debug("ddiRoot : " + ddiRoot.toString());
 		return ddiRoot;
 	}
 
@@ -86,25 +86,25 @@ public class MetadataServiceImpl implements MetadataService {
 			cls.setResourcePackageId(idRP);
 			cls.setChildren(getCodeListResponseItem(child, cls));
 			clsList.add(cls);
-			logger.debug("CodeListScheme : " + id);
+			log.debug("CodeListScheme : " + id);
 		}
 		return clsList;
 	}
 
 	public List<ResponseItem> getDDICodeListSchemeFromGroupRoot(String idGroupRoot) throws Exception {
 		List<ResponseItem> clsList = new ArrayList<>();
-		logger.debug("GroupRoot id : " + idGroupRoot);
+		log.debug("GroupRoot id : " + idGroupRoot);
 		String fragment = metadataServiceItem.getItem(idGroupRoot).item;
 		String rootExp = "//*[local-name()='Fragment']";
 		Node rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		String childGroupExp = ".//*[local-name()='GroupReference']/*[local-name()='ID']/text()";
 		String idGroup = xpathProcessor.queryString(rootNode, childGroupExp);
-		logger.debug("Group id : " + idGroup);
+		log.debug("Group id : " + idGroup);
 		fragment = metadataServiceItem.getItem(idGroup).item;
 		Node groupNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		String childSubGroupExp = ".//*[local-name()='SubGroupReference']/*[local-name()='ID']/text()";
 		String idSubGroup = xpathProcessor.queryString(groupNode, childSubGroupExp);
-		logger.debug("SubGroup id : " + idSubGroup);
+		log.debug("SubGroup id : " + idSubGroup);
 		String childExp = ".//*[local-name()='ResourcePackageReference']";
 		NodeList children = xpathProcessor.queryList(rootNode, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
@@ -127,7 +127,7 @@ public class MetadataServiceImpl implements MetadataService {
 				cls.setSubGroupId(idSubGroup);
 				cls.setChildren(getCodeListResponseItem(child, cls));
 				clsList.add(cls);
-				logger.debug("CodeListScheme : " + id);
+				log.debug("CodeListScheme : " + id);
 			}
 
 		}
