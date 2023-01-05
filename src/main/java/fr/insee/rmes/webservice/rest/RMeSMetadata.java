@@ -5,17 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,19 +27,17 @@ import fr.insee.rmes.metadata.service.MetadataServiceItem;
 import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
 import fr.insee.rmes.metadata.service.fragmentInstance.FragmentInstanceService;
 import fr.insee.rmes.search.model.DDIItemType;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 /**
  * Main WebService class of the MetaData service
  *
  */
 @Path("/meta-data")
-@Api(value = "DDI MetaData API")
+//@Api(value = "DDI MetaData API")
+@OpenAPIDefinition(info = @Info(description = "DDI MetaData API"))
 public class RMeSMetadata {
 
-	final static Logger logger = LogManager.getLogger(RMeSMetadata.class);
+	final static Logger log = LogManager.getLogger(RMeSMetadata.class);
 
 	@Autowired
 	MetadataService metadataService;
@@ -58,13 +54,13 @@ public class RMeSMetadata {
 	@GET
 	@Path("colectica-item/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get the item with id {id}", notes = "Get an item from Colectica Repository, given it's {id}", response = ColecticaItem.class)
+	@Operation(summary = "Get the item with id {id}", description = "Get an item from Colectica Repository, given it's {id}")
 	public Response getItem(@PathParam(value = "id") String id) throws Exception {
 		try {
 			ColecticaItem item = metadataServiceItem.getItem(id);
 			return Response.ok().entity(item).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -72,15 +68,15 @@ public class RMeSMetadata {
 	@GET
 	@Path("colectica-item/{id}/refs/")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get the colectica item children refs with parent id {id}", notes = "This will give a list of object containing a reference id, version and agency. Note that you will"
+	@Operation(summary = "Get the colectica item children refs with parent id {id}", description = "This will give a list of object containing a reference id, version and agency. Note that you will"
 			+ "need to map response objects keys to be able to use it for querying items "
-			+ "(see /items doc model)", response = ColecticaItemRefList.class)
+			+ "(see /items doc model)")
 	public Response getChildrenRef(@PathParam(value = "id") String id) throws Exception {
 		try {
 			ColecticaItemRefList refs = metadataServiceItem.getChildrenRef(id);
 			return Response.ok().entity(refs).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -89,14 +85,14 @@ public class RMeSMetadata {
 	@Path("colectica-items/{itemType}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get all referenced items of a certain type", notes = "Retrieve a list of ColecticaItem of the type defined", response = ColecticaItem.class, responseContainer = "List")
+	@Operation(summary = "Get all referenced items of a certain type", description = "Retrieve a list of ColecticaItem of the type defined")
 	public Response getItemsByType(@PathParam (value = "itemType") DDIItemType itemType)
 			throws Exception {
 		try {		
 			List<ColecticaItem> children = metadataService.getItemsByType(itemType);
 			return Response.ok().entity(children).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -104,15 +100,15 @@ public class RMeSMetadata {
 	@GET
 	@Path("colectica-item/{id}/toplevel-refs/")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get the colectica item toplevel parents refs with item id {id}", notes = "This will give a list of object containing a triple identifier (reference id, version and agency) and the itemtype. Note that you will"
+	@Operation(summary = "Get the colectica item toplevel parents refs with item id {id}", description = "This will give a list of object containing a triple identifier (reference id, version and agency) and the itemtype. Note that you will"
 			+ "need to map response objects keys to be able to use it for querying items "
-			+ "(see /items doc model)", response = RelationshipOut[].class)
+			+ "(see /items doc model)")
 	public Response gettopLevelRefs(@PathParam(value = "id") String id) throws Exception {
 		try {
 			List<RelationshipOut> refs = metadataServiceItem.getTopLevelRefs(id);
 			return Response.ok().entity(refs).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -120,7 +116,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("variables/{idQuestion}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get the variables that references a specific question", response = String.class)
+	@Operation(summary = "Get the variables that references a specific question")
 	public Response getVariablesFromQuestion(@PathParam(value = "idQuestion") String idQuestion,
 			@QueryParam(value="agency") String agency,
 			@QueryParam(value="version") String version) throws Exception {
@@ -139,7 +135,7 @@ public class RMeSMetadata {
 			};
 			return Response.ok(stream).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -147,13 +143,13 @@ public class RMeSMetadata {
 	@GET
 	@Path("units")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get units measure", notes = "This will give a list of objects containing the uri and the label for all units", response = Unit.class, responseContainer = "List")
+	@Operation(summary = "Get units measure", description = "This will give a list of objects containing the uri and the label for all units")
 	public Response getUnits() throws Exception {
 		try {
 			List<Unit> units = metadataService.getUnits();
 			return Response.ok().entity(units).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -162,15 +158,15 @@ public class RMeSMetadata {
 	@Path("colectica-items")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Get all de-referenced items", notes = "Maps a list of ColecticaItemRef given as a payload to a list of actual full ColecticaItem objects", response = ColecticaItem.class, responseContainer = "List")
+	@Operation(summary = "Get all de-referenced items", description = "Maps a list of ColecticaItemRef given as a payload to a list of actual full ColecticaItem objects")
 	public Response getItems(
-			@ApiParam(value = "Item references query object", required = true) ColecticaItemRefList query)
+			@Parameter(description = "Item references query object", required = true) ColecticaItemRefList query)
 			throws Exception {
 		try {
 			List<ColecticaItem> children = metadataServiceItem.getItems(query);
 			return Response.ok().entity(children).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -178,7 +174,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("fragmentInstance/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document", notes = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.", response = String.class)
+	@Operation(summary = "Get DDI document", description = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.")
 	public Response getDDIDocumentFragmentInstance(@PathParam(value = "id") String id,
 			@QueryParam(value="withChild") boolean withChild) throws Exception {
 		try {
@@ -192,7 +188,7 @@ public class RMeSMetadata {
 			};
 			return Response.ok(stream).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -200,7 +196,7 @@ public class RMeSMetadata {
 	@GET
 	@Path("ddi-instance/{id}/ddi")
 	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Get DDI document of a DDI instance", notes = "Get a DDI document of a DDI Instance from Colectica repository reference {id}", response = String.class)
+	@Operation(summary = "Get DDI document of a DDI instance", description = "Get a DDI document of a DDI Instance from Colectica repository reference {id}")
 	public Response getDDIInstance(@PathParam(value = "id") String id) throws Exception {
 
 		try {
@@ -208,7 +204,7 @@ public class RMeSMetadata {
 			StreamingOutput stream = stringToStream(questionnaire);
 			return Response.ok(stream).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw e;
 		}
 	}

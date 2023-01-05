@@ -40,7 +40,7 @@ import lombok.NonNull;
 @Service
 public class MetadataClientImpl implements MetadataClient {
 
-	private static final Logger logger = LogManager.getLogger(MetadataClientImpl.class);
+	private static final Logger log = LogManager.getLogger(MetadataClientImpl.class);
 
 	@Autowired
 	RestTemplate restTemplate;
@@ -90,7 +90,7 @@ public class MetadataClientImpl implements MetadataClient {
      */
 	public ColecticaItem getItem(String id) throws Exception {
 		String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, id);
-		logger.info("GET Item on " + id);
+		log.info("GET Item on " + id);
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + getFreshToken());
@@ -109,7 +109,7 @@ public class MetadataClientImpl implements MetadataClient {
 		HttpEntity<ColecticaItemRefList> request = new HttpEntity<>(query, headers);
 		ResponseEntity<ColecticaItem[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
 				ColecticaItem[].class);
-		logger.info("GET Items with query : " + query.toString());
+		log.info("GET Items with query : " + query.toString());
 		return Arrays.asList(response.getBody());
 	}
 	
@@ -130,7 +130,7 @@ public class MetadataClientImpl implements MetadataClient {
 		HttpEntity<ColecticaSearchItemRequest> request = new HttpEntity<>(req, headers);
 		ResponseEntity<ColecticaSearchItemResponse> response = restTemplate.exchange(url, HttpMethod.POST, request,
 				ColecticaSearchItemResponse.class);
-		logger.info("GET Items with query : " + req.toString());
+		log.info("GET Items with query : " + req.toString());
 		return response.getBody();
 	}
 	
@@ -161,7 +161,7 @@ public class MetadataClientImpl implements MetadataClient {
 		response = restTemplate.exchange(url, HttpMethod.GET, request, ColecticaItemRef.Unformatted[].class);
 		List<ColecticaItemRef> refs = Arrays.asList(response.getBody()).stream()
 				.map(unformatted -> unformatted.format()).collect(Collectors.toList());
-		logger.info("Get ChildrenRef for id : " + id);
+		log.info("Get ChildrenRef for id : " + id);
 		return new ColecticaItemRefList(refs);
 	}
 
@@ -174,7 +174,7 @@ public class MetadataClientImpl implements MetadataClient {
 		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + getFreshToken());
 		HttpEntity<ColecticaItem> request = new HttpEntity<>(headers);
-		logger.info("GET LastestVersion for Item " + id);
+		log.info("GET LastestVersion for Item " + id);
 		return restTemplate.exchange(url, HttpMethod.GET, request, Integer.class).getBody();
 
 	}
