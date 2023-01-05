@@ -7,12 +7,16 @@ import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import org.apache.logging.log4j.web.Log4jServletContextListener;
 import org.apache.logging.log4j.web.Log4jWebSupport;
 import org.springframework.context.annotation.Configuration;
 
+
+
 @Configuration
+@WebListener
 public class Log4j2DDIAccessServicesServletContextListener implements ServletContextListener {
 
 	private String log4j2ConfigFile;

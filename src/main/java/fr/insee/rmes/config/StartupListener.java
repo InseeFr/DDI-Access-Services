@@ -6,10 +6,13 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.annotation.WebListener;
 import java.util.Enumeration;
 import java.util.Properties;
 
+
 @Component
+@WebListener
 public class StartupListener implements ApplicationListener<ContextRefreshedEvent> {
 
     Logger logger = LogManager.getLogger(StartupListener.class);

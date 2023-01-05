@@ -9,14 +9,17 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 
 import io.swagger.jaxrs.config.BeanConfig;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * ² Created by acordier on 24/07/17.
  */
+
 public class SwaggerConfig extends HttpServlet {
 
 	/**

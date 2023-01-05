@@ -1,7 +1,8 @@
 package fr.insee.rmes.metadata.model;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.NodeList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
