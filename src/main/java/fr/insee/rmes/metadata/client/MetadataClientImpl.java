@@ -44,6 +44,7 @@ public class MetadataClientImpl implements MetadataClient {
 
 	@Autowired
 	RestTemplate restTemplate;
+
 	
 	@NonNull
 	@Autowired

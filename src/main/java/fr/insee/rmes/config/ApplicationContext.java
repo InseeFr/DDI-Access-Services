@@ -67,15 +67,30 @@ public class ApplicationContext {
 				.useSystemProperties().setDefaultAuthSchemeRegistry(authSchemeRegistry)
 				.setDefaultCredentialsProvider(credsProvider);
 	}
-
 	@Bean
-	public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-		HttpClient httpClient = httpClientBuilder().build();
-		//TODO fix httpClient for restremplate
-		ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-		RestTemplate restTemplate = new RestTemplate(requestFactory);
+	public RestTemplate restTemplate(){
+		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate;
 	}
+
+
+//	@Bean
+//	public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+//
+//
+//		CloseableHttpClient httpClient = HttpClients.createDefault();
+//		// CloseableHttpClient utile et nécessaire mais la méthode  HttpComponentsClientHttpRequestFactory n'est compatible qu'avec HttpClient
+//		//TODO fix httpClient for restremplate
+//		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+////		requestFactory.setHttpClient(httpClient);
+////
+////		HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+////		factory.setHttpClient(closeableHttpClient);
+//
+//
+//		RestTemplate restTemplate = new RestTemplate(factory);
+//		return restTemplate;
+//	}
 
 	
 }
