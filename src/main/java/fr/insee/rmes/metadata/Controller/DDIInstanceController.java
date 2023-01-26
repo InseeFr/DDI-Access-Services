@@ -15,7 +15,7 @@ public class DDIInstanceController {
     @Autowired
     private DDIInstanceService ddiInstanceService;
 
-    @GetMapping("/ddi-instance/{id}/ddi")
+    @GetMapping()
     public  String getDDIInstance(@PathVariable String id) throws Exception{
         return ddiInstanceService.getDDIInstance(id);
     }
