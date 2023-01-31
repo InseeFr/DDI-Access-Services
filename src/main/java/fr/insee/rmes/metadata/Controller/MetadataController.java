@@ -154,8 +154,8 @@ public class MetadataController {
         return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
     }
 
-    @PostMapping("colectica-items")
-    public Response
+//    @PostMapping("colectica-items")
+//    public Response
 
 
 }
