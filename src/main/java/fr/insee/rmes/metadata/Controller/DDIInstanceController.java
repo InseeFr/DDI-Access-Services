@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/meta-data")
+@RequestMapping("/ddi-instance")
 public class DDIInstanceController {
 
     @Autowired
     private DDIInstanceService ddiInstanceService;
 
-    @GetMapping()
+    @GetMapping("/")
     public  String getDDIInstance(@PathVariable String id) throws Exception{
         return ddiInstanceService.getDDIInstance(id);
     }
