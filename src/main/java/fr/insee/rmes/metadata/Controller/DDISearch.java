@@ -2,6 +2,7 @@ package fr.insee.rmes.metadata.Controller;
 
 import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DDIQuery;
+import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseSearchItem;
 import fr.insee.rmes.search.service.SearchService;
 import fr.insee.rmes.webservice.rest.RMeSSearch;
@@ -114,6 +115,42 @@ public class DDISearch {
         }
     }
 
+    @GetMapping("context/data-collection/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get data collection context (Sub-group id, StudyUnit id) for a given data collection", description = "Retrieve the context (Sub-group id, StudyUnit id) for a id given as a path parameter")
+    public DataCollectionContext getDataCollectionContext(@PathVariable String id) throws Exception {
+        try {
+            return searchService.getDataCollectionContext(id);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
 
+    @GetMapping("operations/{id}/data-collection")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get all data collections for a given operation", description = "Retrieve all data collections with a parent id matching the operation id given as a path parameter")
+    public List<DDIItem> getDataCollections(@PathVariable String id) throws Exception {
+        try {
+            return searchService.getDataCollections(id);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
 
+//    @GetMapping("items/{label}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Operation(summary = "Get all items for a given label", description = "Retrieve all items with a matching label")
+//    public List<ResponseSearchItem> getItemsFromLabel(@PathParam(value = "label") String label,
+//                                                      @QueryParam(value = "subGroupId") String subGroupId,
+//                                                      @QueryParam(value = "studyUnitId") String studyUnitId,
+//                                                      @QueryParam(value = "dataCollectionId") String dataCollectionId) throws Exception {
+//        try {
+//            return searchService.searchByLabel(subGroupId, studyUnitId, dataCollectionId, new DDIQuery(label));
+//        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+//            throw e;
+//        }
+//    }
 }
