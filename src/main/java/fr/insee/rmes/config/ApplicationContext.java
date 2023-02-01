@@ -27,11 +27,6 @@ import org.apache.http.ssl.SSLContexts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -72,25 +67,4 @@ public class ApplicationContext {
 		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate;
 	}
-
-
-//	@Bean
-//	public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-//
-//
-//		CloseableHttpClient httpClient = HttpClients.createDefault();
-//		// CloseableHttpClient utile et nécessaire mais la méthode  HttpComponentsClientHttpRequestFactory n'est compatible qu'avec HttpClient
-//		//TODO fix httpClient for restremplate
-//		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-////		requestFactory.setHttpClient(httpClient);
-////
-////		HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-////		factory.setHttpClient(closeableHttpClient);
-//
-//
-//		RestTemplate restTemplate = new RestTemplate(factory);
-//		return restTemplate;
-//	}
-
-	
 }

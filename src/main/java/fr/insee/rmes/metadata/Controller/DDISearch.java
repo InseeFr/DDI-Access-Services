@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -27,6 +28,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @RestController
 @RequestMapping("/search")
+@Tag(name = "DDI Search")
 @SecurityRequirement(name = "bearerAuth")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Success"),
