@@ -6,9 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1fd59f16-8582-44f3-8531-70f35c1e398b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/DDIInstanceController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/MetadataController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/MetadataController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/RMeSEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/RMeSEnvironment.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +117,7 @@
       <workItem from="1674117438045" duration="6565000" />
       <workItem from="1674489357668" duration="391000" />
       <workItem from="1674551544324" duration="24470000" />
-      <workItem from="1675151232338" duration="11894000" />
+      <workItem from="1675151232338" duration="13150000" />
     </task>
     <servers />
   </component>

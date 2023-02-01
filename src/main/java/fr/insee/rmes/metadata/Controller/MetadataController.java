@@ -88,17 +88,6 @@ public class MetadataController {
         return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
     }
 
-    @GetMapping("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Object> getDDIDocument(@PathVariable String id) throws Exception{
-        String jsonResultat;
-        try {
-            jsonResultat = metadataService.getDDIDocument(id);
-        } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
-    }
 
     @GetMapping("/sequence/{id}/ddi")
     @Produces(MediaType.APPLICATION_JSON)
