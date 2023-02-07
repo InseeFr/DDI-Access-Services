@@ -20,15 +20,13 @@ import org.springframework.stereotype.Component;
 
 
 
-@Component
-@Path("env")
+//@Path("env")
 //@Api(ref = "RMeS Environment")
-@OpenAPIDefinition(info = @Info(description = "RMeS Environment"))
+//@OpenAPIDefinition(info = @Info(description = "RMeS Environment"))
 public class RMeSEnvironment {
 
     private final static Logger log = LogManager.getLogger(RMeSEnvironment.class);
 
-    @Autowired
     Environment env;
 
     @GET

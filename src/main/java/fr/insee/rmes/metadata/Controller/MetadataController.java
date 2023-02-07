@@ -144,14 +144,12 @@ public class MetadataController {
     @GetMapping("/colectica-item/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get the item with id {id}", description = "Get an item from Colectica Repository, given it's {id}")
-    public ResponseEntity<Object> getItem(@PathVariable String id) throws Exception{
-        ColecticaItem jsonResultat;
+    public  ColecticaItem getItem(@PathVariable String id) throws Exception{
         try {
-            jsonResultat = metadataServiceItem.getItem(id);
+            return metadataServiceItem.getItem(id);
         } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
+            log.error(e.getMessage(), e);
+            throw e;       }
     }
 
     @GetMapping("/colectica-item/{id}/refs")
