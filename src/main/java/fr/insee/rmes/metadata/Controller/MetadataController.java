@@ -3,6 +3,7 @@ package fr.insee.rmes.metadata.Controller;
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
 import fr.insee.rmes.metadata.model.ColecticaItemRefList;
+import fr.insee.rmes.metadata.model.RelationshipOut;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.metadata.service.MetadataService;
 import fr.insee.rmes.metadata.service.MetadataServiceItem;
@@ -64,80 +65,34 @@ public class MetadataController {
     @Autowired
     private MetadataServiceItem metadataServiceItem;
 
-    @GetMapping("/item/{id}/rp/{resourcePackageId}/deref-ddi")
-    @Operation(summary = "Get Deref DDI document")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Object> getDerefDDIDocumentWithExternalRP(@PathVariable String id, @PathVariable String resourcePackageId) throws Exception{
-        String jsonResultat;
-        try {
-            jsonResultat = metadataService.getDerefDDIDocumentWithExternalRP(id,resourcePackageId);
-        } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
-    }
-
-
-    @GetMapping("/item/{id}/deref-ddi")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Object> getDerefDDIDocument(@PathVariable String id) throws Exception{
-        String jsonResultat;
-        try {
-            jsonResultat = metadataService.getDerefDDIDocument(id);
-        } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
-    }
-
-
-    @GetMapping("/sequence/{id}/ddi")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Object> getSequence(@PathVariable String id) throws Exception{
-        String jsonResultat;
-        try {
-            jsonResultat = metadataService.getSequence(id);
-        } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
-    }
-
-
     @GetMapping("/question/{id}/ddi")
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Object>  getQuestion(@PathVariable String id) throws Exception{
-        String jsonResultat;
+    public String  getQuestion(@PathVariable String id) throws Exception{
         try {
-            jsonResultat = metadataService.getQuestion(id);
+            return metadataService.getQuestion(id);
         } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
+            log.error(e.getMessage(), e);
+            throw e;        }
     }
 
     @GetMapping("/units")
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Object> getUnits() throws Exception{
-        List<Unit> jsonResultat;
+    public List<Unit> getUnits() throws Exception{
         try {
-            jsonResultat = metadataService.getUnits();
+            return metadataService.getUnits();
         } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
+            log.error(e.getMessage(), e);
+            throw e;        }
     }
 
     @GetMapping("/ddi-instance/{id}/ddi")
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Object> getDDIInstance(@PathVariable String id) throws Exception{
-        String questionnaire;
+    public  String getDDIInstance(@PathVariable String id) throws Exception{
         try {
-            questionnaire = ddiInstanceService.getDDIInstance(id);
+            return ddiInstanceService.getDDIInstance(id);
         } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(questionnaire);
+            log.error(e.getMessage(), e);
+            throw e;        }
     }
 
 
@@ -157,51 +112,22 @@ public class MetadataController {
     @Operation(summary = "Get the colectica item children refs with parent id {id}", description = "This will give a list of object containing a reference id, version and agency. Note that you will"
             + "need to map response objects keys to be able to use it for querying items "
             + "(see /items doc model)")
-    public ResponseEntity<Object> getChildrenRef(String id) throws Exception{
-        ColecticaItemRefList jsonResultat;
+    public ColecticaItemRefList getChildrenRef(String id) throws Exception{
         try {
-            jsonResultat = metadataServiceItem.getChildrenRef(id);
+            return metadataServiceItem.getChildrenRef(id);
         } catch (Exception e){
-            return (ResponseEntity<Object>) ResponseEntity.status(HttpStatus.NOT_FOUND_404);
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(jsonResultat);
+            log.error(e.getMessage(), e);
+            throw e;        }
     }
 
     @GetMapping("colectica-items/{itemType}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get all referenced items of a certain type", description = "Retrieve a list of ColecticaItem of the type defined")
-    public ResponseEntity<Object> getItemsByType(@PathVariable DDIItemType itemType)
+    public List<ColecticaItem> getItemsByType(@PathVariable DDIItemType itemType)
             throws Exception {
         try {
-            List<ColecticaItem> children = metadataService.getItemsByType(itemType);
-            return ResponseEntity.status(HttpStatus.ACCEPTED_202).body(children);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    @GetMapping("variables/{idQuestion}/ddi")
-    @Produces(MediaType.APPLICATION_XML)
-    @Operation(summary = "Get the variables that references a specific question")
-    public Response getVariablesFromQuestion(@PathParam(value = "idQuestion") String idQuestion,
-                                             @QueryParam(value="agency") String agency,
-                                             @QueryParam(value="version") String version) throws Exception {
-        Map<String,String> params = new HashMap<String,String>();
-        params.put("idQuestion",idQuestion);
-        params.put("agency",agency);
-        params.put("version",version);
-        try {
-            String ddiDocument = metadataService.getVariablesFromQuestionId(params);
-            StreamingOutput stream = output -> {
-                try {
-                    output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
-                } catch (Exception e) {
-                    throw new RMeSException(500, "Transformation error", e.getMessage());
-                }
-            };
-            return Response.ok(stream).build();
+            return metadataService.getItemsByType(itemType);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -211,17 +137,15 @@ public class MetadataController {
 
 
 
-
-    @PostMapping("colectica-items")
+    @GetMapping("colectica-item/{id}/toplevel-refs/")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Get all de-referenced items", description = "Maps a list of ColecticaItemRef given as a payload to a list of actual full ColecticaItem objects")
-    public Response getItems(
-            @Parameter(description = "Item references query object", required = true) ColecticaItemRefList query)
-            throws Exception {
+    @Operation(summary = "Get the colectica item toplevel parents refs with item id {id}", description = "This will give a list of object containing a triple identifier (reference id, version and agency) and the itemtype. Note that you will"
+            + "need to map response objects keys to be able to use it for querying items "
+            + "(see /items doc model)")
+    public Response gettopLevelRefs(@PathVariable String id) throws Exception {
         try {
-            List<ColecticaItem> children = metadataServiceItem.getItems(query);
-            return Response.ok().entity(children).build();
+            List<RelationshipOut> refs = metadataServiceItem.getTopLevelRefs(id);
+            return Response.ok().entity(refs).build();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -231,7 +155,7 @@ public class MetadataController {
     @GetMapping("fragmentInstance/{id}/ddi")
     @Produces(MediaType.APPLICATION_XML)
     @Operation(summary = "Get DDI document", description = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.")
-    public Response getDDIDocumentFragmentInstance(@PathParam(value = "id") String id,
+    public Response getDDIDocumentFragmentInstance(@PathVariable String id,
                                                    @QueryParam(value="withChild") boolean withChild) throws Exception {
         try {
             String ddiDocument = fragmentInstanceService.getFragmentInstance(id, null, withChild);
