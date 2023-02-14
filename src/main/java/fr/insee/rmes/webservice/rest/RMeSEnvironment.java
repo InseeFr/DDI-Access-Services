@@ -1,13 +1,10 @@
 package fr.insee.rmes.webservice.rest;
 
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -16,20 +13,25 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.swing.text.html.parser.Entity;
 
-
-//@Path("env")
-//@Api(ref = "RMeS Environment")
-//@OpenAPIDefinition(info = @Info(description = "RMeS Environment"))
+@RestController
+@RequestMapping("/env")
+@Tag(name = "RMeS Environment")
 public class RMeSEnvironment {
 
-    private final static Logger log = LogManager.getLogger(RMeSEnvironment.class);
+    private final static Logger log = LogManager.getLogger(fr.insee.rmes.webservice.rest.RMeSEnvironment.class);
 
+    @Autowired
     Environment env;
 
-    @GET
+
+
+    @GetMapping
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
             summary = "Get DDI Access Services environment",
@@ -39,15 +41,17 @@ public class RMeSEnvironment {
             @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
-    public Response getEnvironment() throws Exception {
+    public String getEnvironment() throws Exception {
         try {
-            JSONObject entity = new JSONObject();
-            entity.put("Swagger Host", env.getProperty("fr.insee.rmes.api.host"));
-            entity.put("Swagger Name", env.getProperty("fr.insee.rmes.api.name"));   
-            entity.put("Swagger Scheme", env.getProperty("fr.insee.rmes.api.scheme"));
-            entity.put("Database", env.getProperty("fr.insee.rmes.search.db.host"));
-            entity.put("Colectica Metadata services", env.getProperty("fr.insee.rmes.api.remote.metadata.url"));
-            return Response.ok().entity(entity).build();
+            JSONObject envRep = new JSONObject();
+            envRep.put("Swagger Host", env.getProperty("fr.insee.rmes.api.host"));
+            envRep.put("Swagger Name", env.getProperty("fr.insee.rmes.api.name"));
+            envRep.put("Swagger Scheme", env.getProperty("fr.insee.rmes.api.scheme"));
+            envRep.put("Database", env.getProperty("fr.insee.rmes.search.db.host"));
+            envRep.put("Colectica Metadata services", env.getProperty("fr.insee.rmes.api.remote.metadata.url"));
+            System.out.println(envRep.toString());
+            System.out.println(Response.ok().entity(envRep).build());
+            return envRep.toString(2);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw e;

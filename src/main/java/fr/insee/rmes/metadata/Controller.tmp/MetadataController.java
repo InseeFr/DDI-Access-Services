@@ -11,15 +11,12 @@ import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
 import fr.insee.rmes.metadata.service.fragmentInstance.FragmentInstanceService;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.webservice.rest.RMeSException;
-import fr.insee.rmes.webservice.rest.RMeSMetadata;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
@@ -27,15 +24,11 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.jetty.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/meta-data")
@@ -52,7 +45,7 @@ import java.util.Map;
         @ApiResponse(responseCode = "500", description = "Internal server error") })
 public class MetadataController {
 
-    final static Logger log = LogManager.getLogger(RMeSMetadata.class);
+    final static Logger log = LogManager.getLogger(MetadataController.class);
 
     @Autowired
     private MetadataService metadataService;

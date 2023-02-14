@@ -1,11 +1,10 @@
-package fr.insee.rmes.metadata.Controller;
+package fr.insee.rmes.search.controller;
 
 import fr.insee.rmes.search.model.DDIItem;
 import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseSearchItem;
 import fr.insee.rmes.search.service.SearchService;
-import fr.insee.rmes.webservice.rest.RMeSSearch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
@@ -41,7 +39,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
         @ApiResponse(responseCode = "500", description = "Internal server error") })
 public class DDISearch {
 
-    final static Logger log = LogManager.getLogger(RMeSSearch.class);
+    final static Logger log = LogManager.getLogger(DDISearch.class);
 
     @Autowired
     SearchService searchService;

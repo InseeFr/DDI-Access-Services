@@ -6,10 +6,27 @@
   <component name="ChangeListManager">
     <list default="true" id="1fd59f16-8582-44f3-8531-70f35c1e398b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/MetadataController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/MetadataController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/RMeSEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/RMeSEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/META-INF/context.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/WEB-INF/applicationContext.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/WEB-INF/web.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/favicon-16x16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/favicon-32x32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/oauth2-redirect.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/swagger-ui-bundle.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/swagger-ui-bundle.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/swagger-ui-standalone-preset.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/swagger-ui-standalone-preset.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/swagger-ui.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/swagger-ui.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/swagger-ui.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebContent/swagger-ui/dist/swagger-ui.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/DDISearch.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/search/controller/DDISearch.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/MetadataController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/Controller/RMeSEnvironment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/webservice/rest/RMeSEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/webservice/rest/RMeSEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/webservice/rest/RMeSMetadata.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/webservice/rest/RMeSSearch.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +148,7 @@
       <workItem from="1674489357668" duration="391000" />
       <workItem from="1674551544324" duration="24470000" />
       <workItem from="1675151232338" duration="40711000" />
-      <workItem from="1676362306950" duration="8062000" />
+      <workItem from="1676362306950" duration="10697000" />
     </task>
     <servers />
   </component>
