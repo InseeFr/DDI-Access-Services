@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,9 +51,9 @@ public class DDISearch {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Unexpected error") })
     public List<ResponseSearchItem> search(
-            @Parameter(description = "Search only items referring to sub-group id", required = false) @QueryParam("subgroupId") String subgroupId,
-            @Parameter(description = "Search only items referring to study-unit id", required = false) @QueryParam("studyUnitId") String studyUnitId,
-            @Parameter(description = "Search only items referring to data-collection id", required = false) @QueryParam("dataCollectionId") String dataCollectionId,
+            @Parameter(description = "Search only items referring to sub-group id", required = false) @RequestParam("subgroupId") String subgroupId,
+            @Parameter(description = "Search only items referring to study-unit id", required = false) @RequestParam("studyUnitId") String studyUnitId,
+            @Parameter(description = "Search only items referring to data-collection id", required = false) @RequestParam("dataCollectionId") String dataCollectionId,
             DDIQuery criteria) throws Exception {
         try {
             return searchService.searchByLabel(subgroupId, studyUnitId, dataCollectionId, criteria);
@@ -139,18 +138,4 @@ public class DDISearch {
         }
     }
 
-//    @GetMapping("items/{label}")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Operation(summary = "Get all items for a given label", description = "Retrieve all items with a matching label")
-//    public List<ResponseSearchItem> getItemsFromLabel(@PathParam(value = "label") String label,
-//                                                      @QueryParam(value = "subGroupId") String subGroupId,
-//                                                      @QueryParam(value = "studyUnitId") String studyUnitId,
-//                                                      @QueryParam(value = "dataCollectionId") String dataCollectionId) throws Exception {
-//        try {
-//            return searchService.searchByLabel(subGroupId, studyUnitId, dataCollectionId, new DDIQuery(label));
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//            throw e;
-//        }
-//    }
 }

@@ -1,4 +1,4 @@
-package fr.insee.rmes.metadata.Controller;
+package fr.insee.rmes.metadata.controller;
 
 
 import fr.insee.rmes.metadata.model.ColecticaItem;
@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -149,7 +148,7 @@ public class MetadataController {
     @Produces(MediaType.APPLICATION_XML)
     @Operation(summary = "Get DDI document", description = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.")
     public Response getDDIDocumentFragmentInstance(@PathVariable String id,
-                                                   @QueryParam(value="withChild") boolean withChild) throws Exception {
+                                                   @RequestParam(value="withChild") boolean withChild) throws Exception {
         try {
             String ddiDocument = fragmentInstanceService.getFragmentInstance(id, null, withChild);
             StreamingOutput stream = output -> {
@@ -165,9 +164,4 @@ public class MetadataController {
             throw e;
         }
     }
-
-
-
-
-
 }
