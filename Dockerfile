@@ -1,7 +1,7 @@
-FROM tomcat:8.5.16-jre8
+FROM tomcat:9.0.71-jre17
 
-MAINTAINER bwerquin
+MAINTAINER hugobouttes
 
 RUN rm -rf $CATALINA_HOME/webapps/*
-ADD ddi-access-services.properties $CATALINA_HOME/webapps/ddi-access-services.properties
+ADD application.properties $CATALINA_HOME/webapps/application.properties
 ADD /target/*.war $CATALINA_HOME/webapps/ROOT.war
