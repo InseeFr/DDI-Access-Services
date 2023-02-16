@@ -114,12 +114,14 @@ public class MetadataController {
 
     @GetMapping("colectica-items/{itemType}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get all referenced items of a certain type", description = "Retrieve a list of ColecticaItem of the type defined")
-    public List<ColecticaItem> getItemsByType(@PathVariable DDIItemType itemType)
+    public List<ColecticaItem> getItemsByType(@RequestParam DDIItemType ddiItemType)
             throws Exception {
+//        DDIItemType ddiItemType = DDIItemType.searchByName(itemType);
+        System.out.println(ddiItemType.toString());
         try {
-            return metadataService.getItemsByType(itemType);
+//            System.out.println(itemType.toString());
+            return metadataService.getItemsByType(ddiItemType);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw e;

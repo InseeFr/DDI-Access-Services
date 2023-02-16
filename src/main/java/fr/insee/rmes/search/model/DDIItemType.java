@@ -40,28 +40,14 @@ public enum DDIItemType {
 	MANAGEDREPRESENTATION_SCHEME("ManagedRepresentationScheme","managed-representation-scheme","16D4D829-41E1-4677-AA17-81190B6A0E66"),
 	LOGICAL_PRODUCT("LogicalProduct","logical-product","965C8D28-7D48-4950-BEA7-04B27E52BB9B");
 	
-	private String name = "" ; 
+	private String name = "" ;
 	private String type ="";
 	private String UUID ="";
 	
 	DDIItemType(String name, String type, String UUID){
-		this.name=name;
-		this.type=type;
+		this.name = name;
+		this.type = type;
 		this.UUID = UUID;
-	}
-	
-	public static DDIItemType searchByUUID(String uuid) {
-		DDIItemType item = null;
-		for (DDIItemType ddiItemType : values()) {
-			if (ddiItemType.getUUID().equals(uuid)) {
-				item = ddiItemType;
-			}
-		}
-		return item;
-	}
-	
-	public String toString(){
-		return this.name;
 	}
 
 	public String getName() {
@@ -84,11 +70,79 @@ public enum DDIItemType {
 		return UUID;
 	}
 
-	public void setUUID(String uUID) {
-		UUID = uUID;
+	public void setUUID(String UUID) {
+		this.UUID = UUID;
 	}
-	
-	
-	
-	
+
+	public static DDIItemType searchByUUID(String uuid) {
+		DDIItemType item = null;
+		for (DDIItemType ddiItemType : DDIItemType.values()) {
+			if (ddiItemType.getUUID().equals(uuid)) {
+				item = ddiItemType;
+			}
+		}
+		return item;
+	}
+
+
+	public static DDIItemType searchByName(String name){
+		DDIItemType item = null;
+		for (DDIItemType ddiItemType : DDIItemType.values()) {
+			if (ddiItemType.getName().equals(name)){
+				item = ddiItemType;
+			}
+		}
+		return item;
+	}
+
+
+	//	public static DDIItemType searchByUUID(String uuid) {
+//		DDIItemType item = null;
+//		for (DDIItemType ddiItemType : values()) {
+//			if (ddiItemType.getUUID().equals(uuid)) {
+//				item = ddiItemType;
+//			}
+//		}
+//		return item;
+//	}
+//
+//
+//	public static DDIItemType searchByName(String name) {
+//		DDIItemType item = null;
+//		for (DDIItemType ddiItemType : values()) {
+//			if (ddiItemType.getName().equals(name)) {
+//				item = ddiItemType;
+//			}
+//			return item;
+//		}
+//
+//
+//		public String getName () {
+//			return name;
+//		}
+//
+//		public void setName (String name){
+//			this.name = name;
+//		}
+//
+//		public String getType () {
+//			return type;
+//		}
+//
+//		public void setType (String type){
+//			this.type = type;
+//		}
+//
+//		public String getUUID () {
+//			return UUID;
+//		}
+//
+//		public void setUUID (String UUID){
+//			this.UUID = UUID;
+//		}
+//
+//		public void getUUID () {
+//			return UUID;
+//		}
+
 }
