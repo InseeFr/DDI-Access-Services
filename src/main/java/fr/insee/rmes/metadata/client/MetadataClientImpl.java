@@ -43,7 +43,7 @@ public class MetadataClientImpl implements MetadataClient {
 	private static final Logger log = LogManager.getLogger(MetadataClientImpl.class);
 
 	@Autowired
-	RestTemplate restTemplate;
+	private RestTemplate restTemplate;
 
 	
 	@NonNull
@@ -96,6 +96,8 @@ public class MetadataClientImpl implements MetadataClient {
 		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + getFreshToken());
 		HttpEntity<ColecticaItem> request = new HttpEntity<>(headers);
+//		ColecticaItem repDebug = restTemplate.exchange(url, HttpMethod.GET, request, ColecticaItem.class).getBody();
+		restTemplate.exchange(url, HttpMethod.GET, request, ColecticaItem.class).getBody();
 		return restTemplate.exchange(url, HttpMethod.GET, request, ColecticaItem.class).getBody();
 	}
 
