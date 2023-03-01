@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.apache.http.entity.ContentType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -89,6 +90,20 @@ public class MetadataClientImpl implements MetadataClient {
     /**
      * Gets an item with its Colectica id
      */
+//	public ColecticaItem getItem(String id) throws Exception {
+//		RestTemplate restTemplate1 = new RestTemplate();
+//		String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, id);
+//		log.info("GET Item on " + id);
+//		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+//		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+//		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + getFreshToken());
+//		HttpEntity<ColecticaItem> request = new HttpEntity<>(headers);
+//		ColecticaItem repDebug = restTemplate1.getForObject(url, ColecticaItem.class);
+//		System.out.println(restTemplate1.getForObject(url, ColecticaItem.class));
+//		return restTemplate1.getForObject(url, ColecticaItem.class);
+//	}
+
+
 	public ColecticaItem getItem(String id) throws Exception {
 		String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, id);
 		log.info("GET Item on " + id);
@@ -96,8 +111,6 @@ public class MetadataClientImpl implements MetadataClient {
 		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + getFreshToken());
 		HttpEntity<ColecticaItem> request = new HttpEntity<>(headers);
-//		ColecticaItem repDebug = restTemplate.exchange(url, HttpMethod.GET, request, ColecticaItem.class).getBody();
-		restTemplate.exchange(url, HttpMethod.GET, request, ColecticaItem.class).getBody();
 		return restTemplate.exchange(url, HttpMethod.GET, request, ColecticaItem.class).getBody();
 	}
 
