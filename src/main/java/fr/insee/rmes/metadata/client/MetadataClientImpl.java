@@ -90,20 +90,6 @@ public class MetadataClientImpl implements MetadataClient {
     /**
      * Gets an item with its Colectica id
      */
-//	public ColecticaItem getItem(String id) throws Exception {
-//		RestTemplate restTemplate1 = new RestTemplate();
-//		String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, id);
-//		log.info("GET Item on " + id);
-//		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-//		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-//		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + getFreshToken());
-//		HttpEntity<ColecticaItem> request = new HttpEntity<>(headers);
-//		ColecticaItem repDebug = restTemplate1.getForObject(url, ColecticaItem.class);
-//		System.out.println(restTemplate1.getForObject(url, ColecticaItem.class));
-//		return restTemplate1.getForObject(url, ColecticaItem.class);
-//	}
-
-
 	public ColecticaItem getItem(String id) throws Exception {
 		String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, id);
 		log.info("GET Item on " + id);
@@ -138,16 +124,13 @@ public class MetadataClientImpl implements MetadataClient {
 	@Override
 	public ColecticaSearchItemResponse searchItems(ColecticaSearchItemRequest req) throws ExceptionColecticaUnreachable {
 		String url = String.format("%s/api/v1/_query", serviceUrl);
-		RestTemplate restTemplate = new RestTemplate();
-
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
 		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + getFreshToken());
 		HttpEntity<ColecticaSearchItemRequest> request = new HttpEntity<>(req, headers);
-		ResponseEntity<ColecticaSearchItemResponse> response = restTemplate.exchange(url, HttpMethod.POST, request,
-				ColecticaSearchItemResponse.class);
+//		ResponseEntity<ColecticaSearchItemResponse> response = restTemplate.exchange(url, HttpMethod.POST, request, ColecticaSearchItemResponse.class);
 		log.info("GET Items with query : " + req.toString());
-		return response.getBody();
+		return  restTemplate.exchange(url, HttpMethod.POST, request, ColecticaSearchItemResponse.class).getBody();
 	}
 	
 	/**/

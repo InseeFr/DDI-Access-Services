@@ -6,10 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="1fd59f16-8582-44f3-8531-70f35c1e398b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/config/ApplicationContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/config/ApplicationContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/client/MetadataClientImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/client/MetadataClientImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/controller/MetadataController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/controller/MetadataController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/model/ColecticaSearchItemRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/model/ColecticaSearchItemRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/model/ColecticaSearchItemResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/model/ColecticaSearchItemResponse.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +137,8 @@
       <workItem from="1677081138381" duration="8190000" />
       <workItem from="1677147243741" duration="32000" />
       <workItem from="1677147536798" duration="1006000" />
-      <workItem from="1677512048897" duration="10340000" />
+      <workItem from="1677512048897" duration="42902000" />
+      <workItem from="1677849618253" duration="1585000" />
     </task>
     <servers />
   </component>
@@ -158,24 +160,69 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/service/MetadataServiceImpl.java</url>
+          <line>394</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/controller/MetadataController.java</url>
-          <line>108</line>
-          <option name="timeStamp" value="14" />
+          <line>133</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/service/MetadataServiceImpl.java</url>
+          <line>380</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/search/repository/DDIItemRepositoryImpl.java</url>
+          <line>105</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/search/repository/DDIItemRepositoryImpl.java</url>
+          <line>180</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/search/repository/DDIItemRepositoryImpl.java</url>
+          <line>54</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/search/repository/DDIItemRepositoryImpl.java</url>
+          <line>56</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/search/controller/DDISearch.java</url>
+          <line>83</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/service/MetadataServiceImpl.java</url>
+          <line>388</line>
+          <option name="timeStamp" value="35" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/client/MetadataClientImpl.java</url>
-          <line>101</line>
-          <option name="timeStamp" value="16" />
+          <line>129</line>
+          <option name="timeStamp" value="38" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/client/MetadataClientImpl.java</url>
-          <line>113</line>
-          <option name="timeStamp" value="17" />
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/java/fr/insee/rmes/metadata/controller/MetadataController.java</url>
+          <line>117</line>
+          <properties class="fr.insee.rmes.metadata.controller.MetadataController" method="getItemsByType">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
+        <PinnedItemInfo parentTag="fr.insee.rmes.metadata.model.ColecticaSearchItemRequest" memberName="searchTerms" />
         <PinnedItemInfo parentTag="org.springframework.http.HttpEntity" memberName="headers" />
       </pinned-members>
     </pin-to-top-manager>

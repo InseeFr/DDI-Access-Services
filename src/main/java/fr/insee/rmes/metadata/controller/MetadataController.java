@@ -113,7 +113,7 @@ public class MetadataController {
     }
 
     @GetMapping("colectica-items/{itemType}")
-    @Produces(MediaType.APPLICATION_JSON)
+//    @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get all referenced items of a certain type", description = "Retrieve a list of ColecticaItem of the type defined")
     public List<ColecticaItem> getItemsByType(@RequestParam DDIItemType ddiItemType)
             throws Exception {
@@ -125,7 +125,18 @@ public class MetadataController {
         }
     }
 
-
+    @GetMapping("colectica-items/{itemType}/test")
+//    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get all referenced items of a certain type", description = "Retrieve a list of ColecticaItem of the type defined")
+    public void getItemsByTypeTest(@RequestParam DDIItemType ddiItemType)
+            throws Exception {
+        try {
+            System.out.println(metadataService.getItemsByType(ddiItemType));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
 
 
     @GetMapping("colectica-item/{id}/toplevel-refs/")

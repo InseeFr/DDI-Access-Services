@@ -2,8 +2,21 @@ package fr.insee.rmes.metadata.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import javax.annotation.processing.Generated;
+
+
+@JsonPropertyOrder({
+		"Results",
+		"TotalResults",
+		"ReturnedResults",
+		"DatabaseTime",
+		"RepositoryTime"
+})
+@Generated("jsonschema2pojo")
 public class ColecticaSearchItemResponse {
 	
 	@JsonProperty("Results")
@@ -16,6 +29,9 @@ public class ColecticaSearchItemResponse {
 	private String databaseTime;
 	@JsonProperty("RepositoryTime")
 	private String repositoryTime;
+	@JsonCreator
+	public ColecticaSearchItemResponse() {
+	}
 	public List<ColecticaSearchItemResult> getResults() {
 		return results;
 	}
@@ -45,11 +61,6 @@ public class ColecticaSearchItemResponse {
 	}
 	public void setRepositoryTime(String repositoryTime) {
 		this.repositoryTime = repositoryTime;
-	}
-	@Override
-	public String toString() {
-		return "ColecticaSearchResponse [results=" + results + ", totalResults=" + totalResults + ", returnedResults="
-				+ returnedResults + ", databaseTime=" + databaseTime + ", repositoryTime=" + repositoryTime + "]";
 	}
 
 }
