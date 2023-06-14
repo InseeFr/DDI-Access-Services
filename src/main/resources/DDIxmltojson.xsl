@@ -34,7 +34,7 @@
     </xsl:template>
     
     <xsl:template match="log:CodeList"><xsl:param name="item"/>"ItemType": "8b108ef8-b642-4484-9c49-f88e4bf7cf1d",
-        "AgencyId": <xsl:value-of select="r:Agency"/>,
+        "AgencyId": <xsl:value-of select="concat(&quot;&quot;&quot;&quot;,r:Agency,&quot;&quot;&quot;&quot;)"/>,
         "Version": <xsl:value-of select="$version"/>,
         "Identifier": "<xsl:value-of select="r:ID"/>",
         "Item": "<xsl:value-of select="$item"/>",
@@ -46,7 +46,7 @@
         "ItemFormat": "<xsl:value-of select="$ItemFormat"/>"</xsl:template>
     
     <xsl:template match="log:Category"><xsl:param name="item"/>"ItemType": "7e47c269-bcab-40f7-a778-af7bbc4e3d00",
-        "AgencyId": <xsl:value-of select="r:Agency"/>,
+        "AgencyId": <xsl:value-of select="concat(&quot;&quot;&quot;&quot;,r:Agency,&quot;&quot;&quot;&quot;)"/>,
         "Version": <xsl:value-of select="$version"/>,
         "Identifier": "<xsl:value-of select="r:ID"/>",
         "Item": "<xsl:value-of select="$item"/>",
