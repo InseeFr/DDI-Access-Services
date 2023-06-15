@@ -1,4 +1,4 @@
-package fr.insee.rmes.postItem;
+package fr.insee.rmes.ToColecticaApi;
 
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.ItemType;

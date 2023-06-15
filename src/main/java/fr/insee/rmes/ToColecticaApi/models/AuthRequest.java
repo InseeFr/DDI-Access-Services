@@ -1,4 +1,4 @@
-package fr.insee.rmes.postItem.models;
+package fr.insee.rmes.ToColecticaApi.models;
 
 public class AuthRequest {
     private String username;

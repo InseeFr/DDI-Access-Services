@@ -1,4 +1,4 @@
-package fr.insee.rmes.postItem.models;
+package fr.insee.rmes.ToColecticaApi.models;
 
 /*
  * Copyright 2002-2016 the original author or authors.

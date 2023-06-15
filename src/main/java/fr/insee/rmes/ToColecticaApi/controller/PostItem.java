@@ -1,22 +1,18 @@
-package fr.insee.rmes.postItem.controller;
+package fr.insee.rmes.ToColecticaApi.controller;
 
 
-import fr.insee.rmes.postItem.models.CustomMultipartFile;
+import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
-
-
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.rmes.postItem.models.AuthRequest;
-import fr.insee.rmes.postItem.randomUUID;
+import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
+import fr.insee.rmes.ToColecticaApi.randomUUID;
 import fr.insee.rmes.search.controller.DDISearch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -102,7 +98,6 @@ public class PostItem {
                 return ResponseEntity.badRequest().build();
             }
 
-            //String resultFileName = UUID.randomUUID().toString() + ".xml";
             String resultFileName2 = UUID.randomUUID().toString() + ".json";
 
             //Modifier le fichier json en entrée en ajoutant <data> et </data>
@@ -142,13 +137,8 @@ public class PostItem {
             // Charger le fichier json de resultat si on veut l'exporter/le modifier au niveau de quelques clés/valeurs
             Resource resultResource2 = resourceLoader.getResource("file:" + resultFilePath2.toAbsolutePath().toString());
 
-            //reprise du jsonContent pour mapping et mise à jour de certaines variables
-            // ObjectMapper mapper= new ObjectMapper();
-            // Items jsonAmodif = mapper.readValue(JsonContent,Items.class);
-
             // Supprimer le fichier XML temporaire
             // TODO: 05/06/2023 regarder pourquoi ça fonctionne pas bien, je pense qu'on l'appelle dans la réponse donc si on l'efface on a un null pointer
-            //Files.deleteIfExists(resultFilePath);
             ////Files.deleteIfExists(resultFilePath2);
             // Retourner le fichier json résultant
             return ResponseEntity.ok()
