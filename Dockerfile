@@ -5,6 +5,6 @@ RUN mvn -B -f /DDI-Access-Services/pom.xml package
 
 MAINTAINER hugobouttes
 
-FROM openjdk:17-jdk-alpin
+FROM openjdk:17-alpine
 COPY --from=mvn DDI-Access-Services/target/rmes-0.0.4-BetaElastic.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
