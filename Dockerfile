@@ -3,10 +3,8 @@ WORKDIR /DDI-Access-Services
 COPY ./ /DDI-Access-Services/
 RUN mvn -B -f /DDI-Access-Services/pom.xml package
 
-FROM tomcat:9.0.71-jre17
-
 MAINTAINER hugobouttes
 
-RUN rm -rf $CATALINA_HOME/webapps/*
-ADD application.properties $CATALINA_HOME/webapps/application.properties
-ADD /target/*.war $CATALINA_HOME/webapps/ROOT.war
+FROM openjdk:17-jdk-alpin
+COPY --from=mvn DDI-Access-Services/target/rmes-0.0.4-BetaElastic.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
