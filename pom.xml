@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>fr.insee</groupId>
 	<artifactId>rmes</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-BetaElastic</version>
 	<name>rmes</name>
 	<description>DDI-Access Services </description>
 	<properties>
@@ -127,10 +127,6 @@
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
