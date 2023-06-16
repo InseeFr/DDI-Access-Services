@@ -1,4 +1,4 @@
-FROM maven:3.6.2 as mvn
+FROM maven:3.8.3-openjdk-17 as mvn
 WORKDIR /DDI-Access-Services
 COPY ./ /DDI-Access-Services/
 RUN mvn -B -f /DDI-Access-Services/pom.xml package
