@@ -10,6 +10,7 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fr.insee.rmes.search.model.DDIItemType;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.websocket.server.PathParam;
@@ -65,7 +66,7 @@ public class ElasticsearchController {
                     schema = @Schema(
                             type = "string", example="colectica_registered_item")) @PathParam("index") String index) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort +"/"+ index);
+            HttpGet httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort +"/"+ index +"/?pretty");
             httpGet.addHeader("kbn-xsrf", "reporting");
 
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
@@ -92,9 +93,9 @@ public class ElasticsearchController {
                     schema = @Schema(
                             type = "string", example="voyage")) @PathParam("texte") String texte) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort +"/"+index+"/_search?q="+ texte);
+            HttpGet httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort +"/"+index+"/_search?q="+ texte );
             httpGet.addHeader("kbn-xsrf", "reporting");
-
+            httpGet.addHeader("Accept", "application/json");
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
 
@@ -109,7 +110,7 @@ public class ElasticsearchController {
     @PostMapping("/search/elastic/matchAll")
     public ResponseEntity<?> searchElastic() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            String url = "http://" + elasticHost + ":" + elasticHostPort + "/_search";
+            String url = "https://" + elasticHost + ":" + elasticHostPort + "/_search";
             HttpPost httpPost = new HttpPost(url);
             httpPost.addHeader("kbn-xsrf", "reporting");
             httpPost.setHeader("Content-Type", "application/json");
@@ -128,13 +129,57 @@ public class ElasticsearchController {
         }
     }
 
+    @PostMapping("/search/elastic/matchType/{type}")
+    public ResponseEntity<?> ByType(
+            @PathVariable ("type") DDIItemType type
+    ) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            String url = "https://" + elasticHost + ":" + elasticHostPort + "/_search";
+            HttpPost httpPost = new HttpPost(url);
+            httpPost.addHeader("kbn-xsrf", "reporting");
+            httpPost.setHeader("Content-Type", "application/json");
+
+            String requestBody = "{ \"query\": { \"match\": {\"itemType\":\""+ type.getUUID().toLowerCase() +"\"} }, \"size\":10000 }";
+            httpPost.setEntity(new StringEntity(requestBody));
+
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                String responseBody = EntityUtils.toString(response.getEntity());
+
+                return ResponseEntity.ok(responseBody);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+        }
+    }
+
+
 @PostMapping("/search/elastic/{field}/{texte}/search")
     public ResponseEntity<?> searchElastic(
             @PathVariable String texte,
-            @PathVariable String field) {
-        try {
+            @PathVariable String field
+            ) {
+       try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                String url = "https://" + elasticHost + ":" + elasticHostPort + "/_search";
+                HttpPost httpPost = new HttpPost(url);
+                httpPost.addHeader("kbn-xsrf", "reporting");
+                httpPost.setHeader("Content-Type", "application/json");
 
-// Creation du client attention port forward du container elastic pour que ça fonctionne en local
+                String requestBody = "{ \"query\": { \"match\": {\""+field+"\":\"" + texte + "\"} }, \"size\":10000 }";
+                httpPost.setEntity(new StringEntity(requestBody));
+
+                try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                    String responseBody = EntityUtils.toString(response.getEntity());
+
+                    return ResponseEntity.ok(responseBody);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+            }
+
+
+/*
             RestClient restClient = RestClient.builder(
                     new HttpHost(elasticHost, elasticHostPort)).build();
 
@@ -172,12 +217,12 @@ public class ElasticsearchController {
                 sortie.add(String.valueOf(score));
                 logger.info("Found product " + result+ ", score " + hit.score());
 
-            }
+
             return ResponseEntity.ok(sortie);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new String[]{"Erreur lors de l'exécution de la requête Elasticsearch : " + e.getMessage()});
-        }
+        }}*/
     }
 
     @PostMapping("/search/elastic/{date}")
@@ -185,7 +230,6 @@ public class ElasticsearchController {
             @PathVariable String date) {
         try {
 
-// Creation du client attention port forward du container elastic pour que ça fonctionne en local
             RestClient restClient = RestClient.builder(
                     new HttpHost(elasticHost, elasticHostPort)).build();
 

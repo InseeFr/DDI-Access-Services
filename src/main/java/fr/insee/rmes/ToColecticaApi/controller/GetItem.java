@@ -45,10 +45,10 @@ public class GetItem {
                                                    @RequestParam(value="withChild") boolean withChild) throws Exception {
         try {
 
-            String ddiDocument = "toto";
+
             StreamingOutput stream = output -> {
                 try {
-                    //output.write(ddiDocument.getBytes(StandardCharsets.UTF_8));
+
                 } catch (Exception e) {
                     throw new RMeSException(500, "Transformation error", e.getMessage());
                 }

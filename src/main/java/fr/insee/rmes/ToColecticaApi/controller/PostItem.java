@@ -1,19 +1,11 @@
 package fr.insee.rmes.ToColecticaApi.controller;
 
 
-import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
+import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
 import fr.insee.rmes.ToColecticaApi.randomUUID;
-import fr.insee.rmes.search.controller.DDISearch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,8 +14,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -35,10 +31,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.JSONObject;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriUtils;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -67,7 +63,7 @@ import java.util.UUID;
 })
 public class PostItem {
 
-    final static Logger log = LogManager.getLogger(DDISearch.class);
+    final static Logger log = LogManager.getLogger(PostItem.class);
     private final ResourceLoader resourceLoader;
 
     @Value("${auth.api.url}")
