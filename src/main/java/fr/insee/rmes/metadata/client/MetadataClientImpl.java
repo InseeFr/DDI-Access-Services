@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.http.entity.ContentType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,7 +71,7 @@ public class MetadataClientImpl implements MetadataClient {
      * Gets a new token keycloak if expired.
      * @throws ExceptionColecticaUnreachable 
      */
-    public String getFreshToken() throws ExceptionColecticaUnreachable {
+    public String getFreshToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
         if ( ! kc.isTokenValid(token)) {
             token = getToken();
         }
@@ -82,7 +83,7 @@ public class MetadataClientImpl implements MetadataClient {
      * @return token
      * @throws ExceptionColecticaUnreachable 
      */
-    public String getToken() throws ExceptionColecticaUnreachable {
+    public String getToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
         return kc.getKeycloakAccessToken();
 
     }
@@ -122,7 +123,7 @@ public class MetadataClientImpl implements MetadataClient {
 	 * @throws ExceptionColecticaUnreachable 
 	 */
 	@Override
-	public ColecticaSearchItemResponse searchItems(ColecticaSearchItemRequest req) throws ExceptionColecticaUnreachable {
+	public ColecticaSearchItemResponse searchItems(ColecticaSearchItemRequest req) throws ExceptionColecticaUnreachable, JsonProcessingException {
 		String url = String.format("%s/api/v1/_query", serviceUrl);
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
 		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
@@ -203,7 +204,7 @@ public class MetadataClientImpl implements MetadataClient {
 	}
 
 	@Override
-	public String postItem(ColecticaItemPostRef ref) throws ExceptionColecticaUnreachable {
+	public String postItem(ColecticaItemPostRef ref) throws ExceptionColecticaUnreachable, JsonProcessingException {
 
 		List<ColecticaItemPostRef> items = new ArrayList<ColecticaItemPostRef>();
 		ColecticaItemPostRefList colecticaItemsList = new ColecticaItemPostRefList();
@@ -220,7 +221,7 @@ public class MetadataClientImpl implements MetadataClient {
 	}
 
 	@Override
-	public Relationship[] getRelationship(ObjectColecticaPost objectColecticaPost) throws ExceptionColecticaUnreachable {
+	public Relationship[] getRelationship(ObjectColecticaPost objectColecticaPost) throws ExceptionColecticaUnreachable, JsonProcessingException {
 		String url = String.format("%s/api/v1/_query/relationship/byobject", serviceUrl);
 
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
@@ -233,7 +234,7 @@ public class MetadataClientImpl implements MetadataClient {
 	}
 
 	@Override
-	public Relationship[] getRelationshipChildren(ObjectColecticaPost objectColecticaPost) throws ExceptionColecticaUnreachable {
+	public Relationship[] getRelationshipChildren(ObjectColecticaPost objectColecticaPost) throws ExceptionColecticaUnreachable, JsonProcessingException {
 		String url = String.format("%s/api/v1/_query/relationship/bysubject", serviceUrl);
 
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
@@ -250,7 +251,7 @@ public class MetadataClientImpl implements MetadataClient {
 	 * 
 	 */
 	@Override
-	public Relationship[] getItemsReferencingSpecificItem(ObjectColecticaPost objectColecticaPost) throws ExceptionColecticaUnreachable {
+	public Relationship[] getItemsReferencingSpecificItem(ObjectColecticaPost objectColecticaPost) throws ExceptionColecticaUnreachable, JsonProcessingException {
 		String url = String.format("%s/api/v1/_query/relationship/byobject", serviceUrl);
 
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
