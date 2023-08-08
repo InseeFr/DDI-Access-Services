@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,28 +61,28 @@ public class GetItem {
         this.resourceLoader = resourceLoader;
     }
 
-    @GetMapping("Item/{id}/ddi")
-    @Produces(MediaType.APPLICATION_XML)
-    @Operation(summary = "Get DDI document", description = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.")
-    public Response getDDIDocumentFragmentInstance(@PathVariable String id,
-                                                   @RequestParam(value="withChild") boolean withChild) throws Exception {
-        try {
+    /*   @GetMapping("Item/{id}/ddi")
+       @Produces(MediaType.APPLICATION_XML)
+       @Operation(summary = "Get DDI document", description = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.")
+       public Response getDDIDocumentFragmentInstance(@PathVariable String id,
+                                                      @RequestParam(value="withChild") boolean withChild) throws Exception {
+           try {
 
 
-            StreamingOutput stream = output -> {
-                try {
+               StreamingOutput stream = output -> {
+                   try {
 
-                } catch (Exception e) {
-                    throw new RMeSException(500, "Transformation error", e.getMessage());
-                }
-            };
-            return Response.ok(stream).build();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
-        }
-    }
-
+                   } catch (Exception e) {
+                       throw new RMeSException(500, "Transformation error", e.getMessage());
+                   }
+               };
+               return Response.ok(stream).build();
+           } catch (Exception e) {
+               logger.error(e.getMessage(), e);
+               throw e;
+           }
+       }
+   */
     @PostMapping("Item/{type}/json")
     public ResponseEntity<?> ByType (
             @PathVariable ("type") DDIItemType type)
@@ -90,27 +91,49 @@ public class GetItem {
         String token = getAuthToken();
         String accessToken = extractAccessToken(token);
 
-
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String url = colecticaUrlQuery;
             HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Authorization","Bearer " + accessToken);
+            httpPost.setHeader("Authorization", "Bearer " + accessToken);
             httpPost.setHeader("Content-Type", "application/json-patch+json");
             String requestBody = "{ \"ItemTypes\": [\"" + type.getUUID().toLowerCase() + "\"] }";
             httpPost.setEntity(new StringEntity(requestBody));
+
+            StringBuilder result;
             try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
-               /* String regex = "\"Identifier\":\\s\"[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}\"";
-                Pattern p = Pattern.compile(regex,Pattern.DOTALL);
-                Matcher m = p.matcher(responseBody);*/
-                return ResponseEntity.ok(responseBody);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête vers Colectica.");
-        }
+                String regex = "\\\"Identifier\\\":(\\\"[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}\\\")|\\\"Label\\\":\\{\\\"fr-FR\\\":(\\\".+?\\\")\\}";
+                Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
+                Matcher matcher = p.matcher(responseBody);
+                result = new StringBuilder();
+                String m1 = new String();
+                String m2 = new String();
+                while (matcher.find()) {
 
+                    if (!(matcher.group(2) == null)) {
+                        m1 = matcher.group(2);
+                    }
+                    if (!(matcher.group(1) == null)) {
+                        m2 = matcher.group(1);
+
+                        if(m1.hashCode()==0){
+                            m1="non renseigné";
+                        }
+                        System.out.println("match: " + m1);
+                        System.out.println("match: " + m2);
+                        result.append("{\n \"Label\":").append(m1).append(",\n \"uuid\":").append(m2).append("\n}\n");
+                    }
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête vers Colectica.");
+            }
+            return ResponseEntity.ok("{" + System.lineSeparator() + "\"" + type.getName() + "\" : [" + System.lineSeparator() + result + "]" + System.lineSeparator() + "}");
+
+        }
     }
+
     private String getAuthToken() throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
