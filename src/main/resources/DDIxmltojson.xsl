@@ -6,6 +6,7 @@
     xmlns:log="ddi:logicalproduct:3_3"
     exclude-result-prefixes="xs"
     version="2.0">
+    <xsl:param name="idepUtilisateur"/>
     <xsl:output method="text"/>
     
     <xsl:variable name="version">1</xsl:variable>
@@ -33,24 +34,26 @@
         <item>{<xsl:apply-templates><xsl:with-param name="item" select="$item"/></xsl:apply-templates>}</item>
     </xsl:template>
     
-    <xsl:template match="log:CodeList"><xsl:param name="item"/>"ItemType": "8b108ef8-b642-4484-9c49-f88e4bf7cf1d",
+    <xsl:template match="log:CodeList"><xsl:param name="item"/>
+        "ItemType": "8b108ef8-b642-4484-9c49-f88e4bf7cf1d",
         "AgencyId": <xsl:value-of select="concat(&quot;&quot;&quot;&quot;,r:Agency,&quot;&quot;&quot;&quot;)"/>,
-        "Version": <xsl:value-of select="$version"/>,
+        "Version": <xsl:value-of select="r:Version"/>,
         "Identifier": "<xsl:value-of select="r:ID"/>",
         "Item": "<xsl:value-of select="$item"/>",
-        "VersionDate": "2023-01-23T11:53:37.1700000Z",
-        "VersionResponsibility": "<xsl:value-of select="$VersionResponsibility"/>",
+        "VersionDate": <xsl:value-of select="concat(&quot;&quot;&quot;&quot;,@versionDate,&quot;&quot;&quot;&quot;)" />,
+        "VersionResponsibility": "<xsl:value-of select="$idepUtilisateur"/>",
         "IsPublished": <xsl:value-of select="$IsPublished"/>,
         "IsDeprecated": <xsl:value-of select="$IsDeprecated"/>,
         "IsProvisional": <xsl:value-of select="$IsProvisional"/>,
         "ItemFormat": "<xsl:value-of select="$ItemFormat"/>"</xsl:template>
     
-    <xsl:template match="log:Category"><xsl:param name="item"/>"ItemType": "7e47c269-bcab-40f7-a778-af7bbc4e3d00",
+    <xsl:template match="log:Category"><xsl:param name="item"/>
+        "ItemType": "7e47c269-bcab-40f7-a778-af7bbc4e3d00",
         "AgencyId": <xsl:value-of select="concat(&quot;&quot;&quot;&quot;,r:Agency,&quot;&quot;&quot;&quot;)"/>,
         "Version": <xsl:value-of select="$version"/>,
         "Identifier": "<xsl:value-of select="r:ID"/>",
         "Item": "<xsl:value-of select="$item"/>",
-        "VersionResponsibility": "<xsl:value-of select="$VersionResponsibility"/>",
+        "VersionResponsibility": "<xsl:value-of select="$idepUtilisateur"/>",
         "IsPublished": <xsl:value-of select="$IsPublished"/>,
         "IsDeprecated": <xsl:value-of select="$IsDeprecated"/>,
         "IsProvisional": <xsl:value-of select="$IsProvisional"/>,
@@ -63,7 +66,9 @@
         <xsl:for-each select="@*"><xsl:value-of select="concat(' ',name())"/>=\"<xsl:value-of select="data()"/>\"</xsl:for-each>
         <xsl:value-of select="'>'"/>
         <xsl:apply-templates select="*" mode="inline"/>
-        <xsl:value-of select="replace(normalize-space(.),'&quot;','\\&quot;')"/>
+        <xsl:if test="count(*)=0">
+            <xsl:value-of select="replace(normalize-space(.),'&quot;','\\&quot;')"/>
+        </xsl:if>        
         <xsl:value-of select="concat('&lt;/',$nom,'>')"/>
     </xsl:template>
     
@@ -76,8 +81,7 @@
         <xsl:for-each select="namespace-node()[name()='r']"><xsl:value-of select="concat(' xmlns:',name())"/>=\"<xsl:value-of select="data()"/>\"</xsl:for-each>
         <xsl:for-each select="@*"><xsl:value-of select="concat(' ',name())"/>=\"<xsl:value-of select="data()"/>\"</xsl:for-each>
         <xsl:value-of select="'>'"/>
-        <xsl:apply-templates select="*" mode="inline"/>
-        <xsl:value-of select="replace(normalize-space(.),'&quot;','\\&quot;')"/>
+        <xsl:apply-templates select="*" mode="inline"/>      
         <xsl:value-of select="concat('&lt;/',$nom,'>')"/>
     </xsl:template>
     
@@ -88,8 +92,7 @@
         <xsl:for-each select="namespace-node()[name()='']"><xsl:value-of select="concat(' xmlns',name())"/>=\"<xsl:value-of select="data()"/>\"</xsl:for-each>        
         <xsl:for-each select="@*"><xsl:value-of select="concat(' ',name())"/>=\"<xsl:value-of select="data()"/>\"</xsl:for-each>
         <xsl:value-of select="'>'"/>
-        <xsl:apply-templates select="*" mode="inline"/>
-        <xsl:value-of select="replace(normalize-space(.),'&quot;','\\&quot;')"/>
+        <xsl:apply-templates select="*" mode="inline"/>        
         <xsl:value-of select="concat('&lt;/',$nom,'>')"/>
     </xsl:template>
     
@@ -101,7 +104,6 @@
         <xsl:for-each select="@*"><xsl:value-of select="concat(' ',name())"/>=\"<xsl:value-of select="data()"/>\"</xsl:for-each>
         <xsl:value-of select="'>'"/>
         <xsl:apply-templates select="*" mode="inline"/>
-        <xsl:value-of select="replace(normalize-space(.),'&quot;','\\&quot;')"/>
         <xsl:value-of select="concat('&lt;/',$nom,'>')"/>
     </xsl:template>
     

@@ -14,6 +14,7 @@ import fr.insee.rmes.search.model.DDIItemType;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.websocket.server.PathParam;
+
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -35,8 +36,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+
+import static java.util.Base64.getEncoder;
 
 @RestController
 public class ElasticsearchController {
@@ -47,6 +52,11 @@ public class ElasticsearchController {
     @Value("${fr.insee.rmes.elasticsearch.port}")
     private int  elasticHostPort;
 
+    @Value("${fr.insee.rmes.elasticsearch.apiId}")
+    private String apiId;
+
+    @Value("${fr.insee.rmes.elasticsearch.apikey}")
+    private String apiKey;
 
     private final ElasticsearchClient elasticsearchClient;
 
@@ -64,10 +74,20 @@ public class ElasticsearchController {
                     description = "nom de l'index",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="colectica_registered_item")) @PathParam("index") String index) {
+                            type = "string", example="colectica_registered_item")) @PathVariable("index") String index) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort +"/"+ index +"/?pretty");
+            HttpGet httpGet = new HttpGet();
+
+            if (elasticHost.contains("kube")) {
+                httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/?pretty");
+            }
+            else {
+                httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort +"/"+ index +"/?pretty");
+                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
+                httpGet.addHeader("Authorization", "Basic " + token);
+            }
             httpGet.addHeader("kbn-xsrf", "reporting");
+
 
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
@@ -81,21 +101,30 @@ public class ElasticsearchController {
     }
 
     @GetMapping("/search/elastic/_search/{index}/{texte}")
-    public ResponseEntity<?> searchText(
+    public  ResponseEntity<?> searchText(
             @Parameter(
                     description = "nom de l'index",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="colectica_registered_item")) @PathParam("index") String index,
+                            type = "string", example = "colectica_registered_item")) @PathParam("index") String index,
             @Parameter(
                     description = "mot recherché",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="voyage")) @PathParam("texte") String texte) {
+                            type = "string", example = "voyage")) @PathParam("texte") String texte) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort +"/"+index+"/_search?q="+ texte );
-            httpGet.addHeader("kbn-xsrf", "reporting");
-            httpGet.addHeader("Accept", "application/json");
+
+            HttpGet httpGet = new HttpGet();
+
+            if (elasticHost.contains("kube")) {
+                httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q="+ texte);
+            }
+            else {
+                httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + texte);
+                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
+                httpGet.addHeader("Authorization", "Basic " + token);
+            }
+
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
 
@@ -110,11 +139,18 @@ public class ElasticsearchController {
     @PostMapping("/search/elastic/matchAll")
     public ResponseEntity<?> searchElastic() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            String url = "https://" + elasticHost + ":" + elasticHostPort + "/_search";
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.addHeader("kbn-xsrf", "reporting");
-            httpPost.setHeader("Content-Type", "application/json");
+            HttpPost httpPost = new HttpPost();
 
+            if (elasticHost.contains("kube")) {
+                httpPost = new HttpPost("https://" + elasticHost + ":" + elasticHostPort + "/_search");
+            }
+            else {
+                httpPost = new HttpPost("http://" + elasticHost + ":" + elasticHostPort + "/_search");
+                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
+                httpPost.addHeader("Authorization","Basic " + token);
+            }
+            httpPost.addHeader("kbn-xsrf", "reporting");
+            httpPost.addHeader("Content-Type", "application/json");
             String requestBody = "{ \"query\": { \"match_all\": {} }, \"size\":10000 }";
             httpPost.setEntity(new StringEntity(requestBody));
 
@@ -134,11 +170,19 @@ public class ElasticsearchController {
             @PathVariable ("type") DDIItemType type
     ) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            String url = "https://" + elasticHost + ":" + elasticHostPort + "/_search";
-            HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost();
+
+            if (elasticHost.contains("kube")) {
+                httpPost = new HttpPost("https://" + elasticHost + ":" + elasticHostPort + "/_search");
+            }
+            else {
+                httpPost = new HttpPost("http://" + elasticHost + ":" + elasticHostPort + "/_search");
+                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
+                httpPost.addHeader("Authorization","Basic " + token);
+            }
+
             httpPost.addHeader("kbn-xsrf", "reporting");
             httpPost.setHeader("Content-Type", "application/json");
-
             String requestBody = "{ \"query\": { \"match\": {\"itemType\":\""+ type.getUUID().toLowerCase() +"\"} }, \"size\":10000 }";
             httpPost.setEntity(new StringEntity(requestBody));
 
@@ -160,11 +204,21 @@ public class ElasticsearchController {
             @PathVariable String field
             ) {
        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                String url = "https://" + elasticHost + ":" + elasticHostPort + "/_search";
-                HttpPost httpPost = new HttpPost(url);
+
+           HttpPost httpPost = new HttpPost();
+
+           if (elasticHost.contains("kube")) {
+               httpPost = new HttpPost("https://" + elasticHost + ":" + elasticHostPort + "/_search");
+           }
+           else {
+               httpPost = new HttpPost("http://" + elasticHost + ":" + elasticHostPort + "/_search");
+               String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
+               httpPost.addHeader("Authorization","Basic " + token);
+           }
+
+
                 httpPost.addHeader("kbn-xsrf", "reporting");
                 httpPost.setHeader("Content-Type", "application/json");
-
                 String requestBody = "{ \"query\": { \"match\": {\""+field+"\":\"" + texte + "\"} }, \"size\":10000 }";
                 httpPost.setEntity(new StringEntity(requestBody));
 
@@ -179,50 +233,7 @@ public class ElasticsearchController {
             }
 
 
-/*
-            RestClient restClient = RestClient.builder(
-                    new HttpHost(elasticHost, elasticHostPort)).build();
 
-// Creation du mapper
-            ElasticsearchTransport transport = new RestClientTransport(
-                    restClient, new JacksonJsonpMapper());
-
-// Création du client API
-            ElasticsearchClient client = new ElasticsearchClient(transport);
-//Création de la requête
-            SearchResponse<ObjectNode> search = client.search(s -> s
-                            .index("colectica_registered_item")
-                            .query(q -> q
-                                    .match(t -> t
-                                            .field(field)
-                                            .query(texte)
-                                    )),
-                    ObjectNode.class);
-
-            TotalHits total = search.hits().total();
-            boolean isExactResult = total.relation() == TotalHitsRelation.Eq;
-
-            if (isExactResult) {
-                logger.info("There are " + total.value() + " results");
-            } else {
-                logger.info("There are more than " + total.value() + " results");
-            }
-
-            List<Hit<ObjectNode>> hits = search.hits().hits();
-            ArrayList<String> sortie = new ArrayList<>();
-            for (Hit<ObjectNode> hit : search.hits().hits()) {
-                ObjectNode result = hit.source();
-                sortie.add(result.toString());
-                Double score = hit.score();
-                sortie.add(String.valueOf(score));
-                logger.info("Found product " + result+ ", score " + hit.score());
-
-
-            return ResponseEntity.ok(sortie);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new String[]{"Erreur lors de l'exécution de la requête Elasticsearch : " + e.getMessage()});
-        }}*/
     }
 
     @PostMapping("/search/elastic/{date}")

@@ -1,19 +1,24 @@
 package fr.insee.rmes.ToColecticaApi.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
+import fr.insee.rmes.config.keycloak.KeycloakServices;
+import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
+import fr.insee.rmes.search.controller.ElasticsearchController;
 import fr.insee.rmes.search.model.DDIItemType;
-import fr.insee.rmes.webservice.rest.RMeSException;
+import fr.insee.rmes.search.model.IdLabelPair;
+
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
+import lombok.NonNull;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -24,31 +29,34 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @RestController
+@RequestMapping("/Item")
+@Tag(name= "Colectica-suggesters ",description = "Service pour gerer les suggesters dans Colectica")
 public class GetItem {
     final static Logger logger = LogManager.getLogger(GetItem.class);
 
-    private final ResourceLoader resourceLoader;
+    @NonNull
+    @Autowired
+    private KeycloakServices kc;
 
+    private static String token;
     @Value("${auth.api.url}")
     private String authApiUrl;
 
-    @Value("https://colectica-metadonnees.dev.kube.insee.fr/api/v1/_query")
+    @Value("http://metadonnees-operations.developpement3.insee.fr/api/v1/_query")
     private String colecticaUrlQuery;
 
     @Value("${auth.username}")
@@ -57,82 +65,136 @@ public class GetItem {
     @Value("${auth.password}")
     private String password;
 
-    public GetItem(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
+    private static final String API_BASE_URL = "http://metadonnees-operations.developpement3.insee.fr/api/v1/jsonset/fr.insee/";
+
+    private final RestTemplate restTemplate;
+
+    public GetItem(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    /*   @GetMapping("Item/{id}/ddi")
-       @Produces(MediaType.APPLICATION_XML)
-       @Operation(summary = "Get DDI document", description = "Get a DDI document from Colectica repository including an item thanks to its {id} and its children as fragments.")
-       public Response getDDIDocumentFragmentInstance(@PathVariable String id,
-                                                      @RequestParam(value="withChild") boolean withChild) throws Exception {
-           try {
+    @Autowired
+    private ElasticsearchController elasticsearchController;
+
+    @GetMapping("/filtered-search/{index}/{texte}")
+    public ResponseEntity<?> filteredSearchText(
+            @PathVariable("index") String index,
+            @PathVariable("texte") String texte) {
+        ResponseEntity<?> responseEntity = elasticsearchController.searchText(index, texte);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            String responseBody = (String) responseEntity.getBody();
+            String filteredResponse = filterAndTransformResponse(responseBody);
+            return ResponseEntity.ok(filteredResponse);
+        } else {
+            return responseEntity;  // Propagate the original error response
+        }
+    }
+
+    private String filterAndTransformResponse(String responseBody) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonResponse = objectMapper.readTree(responseBody);
+            JsonNode hitsArray = jsonResponse.path("hits").path("hits");
+
+            ArrayNode filteredHitsArray = objectMapper.createArrayNode();
+            for (JsonNode hit : hitsArray) {
+                JsonNode source = hit.path("_source");
+
+                ObjectNode filteredSource = objectMapper.createObjectNode();
+                filteredSource.put("name", source.path("name_fr-FR").asText());
+                filteredSource.put("label", source.path("label_fr-FR").asText());
+
+                String versionlessId = source.path("versionlessId").asText();
+                if (versionlessId.startsWith("fr.insee:")) {
+                    versionlessId = versionlessId.substring("fr.insee:".length());
+                }
+                filteredSource.put("Id",  versionlessId);
+
+                filteredHitsArray.add(filteredSource);
+            }
+
+            return filteredHitsArray.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Une erreur s'est produite lors de la manipulation du JSON.";
+        }
+    }
 
 
-               StreamingOutput stream = output -> {
-                   try {
+    @GetMapping("suggesters/{identifier}/jsonWithChild")
+    @Produces(MediaType.APPLICATION_JSON)
+       @Operation(summary = "Get JSON for Suggester", description = "Get a JSON document from Colectica repository including an item with childs.")
+       public Object getJsonWithChilds(@PathVariable String identifier) throws Exception {
+           String apiUrl = API_BASE_URL + identifier;
+           String token = getFreshToken();
+           HttpHeaders headers = new HttpHeaders();
+           headers.set("Authorization", "Bearer " + token);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-                   } catch (Exception e) {
-                       throw new RMeSException(500, "Transformation error", e.getMessage());
-                   }
-               };
-               return Response.ok(stream).build();
-           } catch (Exception e) {
-               logger.error(e.getMessage(), e);
-               throw e;
-           }
-       }
-   */
-    @PostMapping("Item/{type}/json")
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, String.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                JsonNode jsonNode = objectMapper.readTree(response.getBody());
+                JsonNode codesNode = jsonNode.get("Codes");
+
+                List<IdLabelPair> idLabelPairs = new ArrayList<>();
+                for (JsonNode codeNode : codesNode) {
+                    String id = codeNode.get("Value").asText();
+                    String label = codeNode.get("Category").get("Label").get("fr-FR").asText();
+                    idLabelPairs.add(new IdLabelPair(id, label));
+                }
+
+                return ResponseEntity.ok(idLabelPairs);
+            } else {
+                return ResponseEntity.status(response.getStatusCode()).body(null);
+            }
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        } catch (HttpServerErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+
+    @Hidden
+    @PostMapping("{type}/json")
+    @Operation(summary = "Get JSON for a type of DDI item", description = "Get a JSON list of item for a type of DDI items .")
     public ResponseEntity<?> ByType (
             @PathVariable ("type") DDIItemType type)
-            throws IOException {
+            throws IOException, ExceptionColecticaUnreachable {
 
-        String token = getAuthToken();
-        String accessToken = extractAccessToken(token);
+
+        String token = getFreshToken();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String url = colecticaUrlQuery;
             HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Authorization", "Bearer " + accessToken);
+            httpPost.setHeader("Authorization", "Bearer " + token);
             httpPost.setHeader("Content-Type", "application/json-patch+json");
             String requestBody = "{ \"ItemTypes\": [\"" + type.getUUID().toLowerCase() + "\"] }";
             httpPost.setEntity(new StringEntity(requestBody));
 
             StringBuilder result;
+            String responseBody;
             try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                String responseBody = EntityUtils.toString(response.getEntity());
-                String regex = "\\\"Identifier\\\":(\\\"[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}\\\")|\\\"Label\\\":\\{\\\"fr-FR\\\":(\\\".+?\\\")\\}";
-                Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
-                Matcher matcher = p.matcher(responseBody);
-                result = new StringBuilder();
-                String m1 = new String();
-                String m2 = new String();
-                while (matcher.find()) {
-
-                    if (!(matcher.group(2) == null)) {
-                        m1 = matcher.group(2);
-                    }
-                    if (!(matcher.group(1) == null)) {
-                        m2 = matcher.group(1);
-
-                        if(m1.hashCode()==0){
-                            m1="non renseigné";
-                        }
-                        System.out.println("match: " + m1);
-                        System.out.println("match: " + m2);
-                        result.append("{\n \"Label\":").append(m1).append(",\n \"uuid\":").append(m2).append("\n}\n");
-                    }
-                }
-
+                responseBody = EntityUtils.toString(response.getEntity());
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête vers Colectica.");
             }
-            return ResponseEntity.ok("{" + System.lineSeparator() + "\"" + type.getName() + "\" : [" + System.lineSeparator() + result + "]" + System.lineSeparator() + "}");
-
+            // return ResponseEntity.ok("{" + System.lineSeparator() + "\"" + type.getName() + "\" : [" + System.lineSeparator() + result + "]" + System.lineSeparator() + "}");
+            return ResponseEntity.ok(responseBody);
         }
     }
+
 
     private String getAuthToken() throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
@@ -167,6 +229,18 @@ public class GetItem {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String getFreshToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
+        if ( ! kc.isTokenValid(token)) {
+            token = getToken();
+        }
+        return token;
+    }
+
+    public String getToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
+        return kc.getKeycloakAccessToken();
+
     }
 
 }

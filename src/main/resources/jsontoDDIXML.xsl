@@ -6,6 +6,11 @@
     xmlns:ddi="ddi:instance:3_3"
     exclude-result-prefixes="xs uuid"    
     version="3.0">
+    <xsl:param name="idValue"/>
+    <xsl:param name="suggesterName"/>
+    <xsl:param name="suggesterDescription"/>
+    <xsl:param name="version"/>
+    <xsl:param name="timbre"/>
     <xsl:output indent="yes"/>     
     
     <xsl:template match="data">
@@ -67,7 +72,7 @@
     <xsl:template match="array">       
         <xsl:param name="filename"/>
         <xsl:element name="ddi:FragmentInstance">
-        
+            <xsl:namespace name="r" select="'ddi:reusable:3_3'"/>
             <TopLevelReference>
                 <Agency>fr.insee</Agency>
                 <ID><xsl:value-of select="uuidArray"/></ID>
@@ -81,11 +86,17 @@
                     <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidArray/text(),':1')"/></r:URN>
                     <r:Agency>fr.insee</r:Agency>
                     <r:ID><xsl:value-of select="uuidArray"/></r:ID>                    
-                    <r:Version>1</r:Version>
-                    <r:UserID typeOfUserID="colectica:sourceId">INSEE-<xsl:value-of select="$filename"/></r:UserID>
+                    <r:Version><xsl:value-of select="$version"/></r:Version>
+                    <r:UserID typeOfUserID="colectica:sourceId">INSEE-<xsl:value-of select="$timbre"/></r:UserID>
                     <CodeListName>
-                        <r:String xml:lang="fr-FR"><xsl:value-of select="$filename"/></r:String>
+                        <r:String xml:lang="fr-FR">SUGGESTER_<xsl:value-of select="$idValue"/></r:String>
                     </CodeListName>
+                    <r:Label>
+                        <r:Content xml:lang="fr-FR"><xsl:value-of select="$suggesterName"/></r:Content>
+                    </r:Label>
+                    <r:Description>
+                        <r:Content xml:lang="fr-FR"><xsl:value-of select="$suggesterDescription"/></r:Content>
+                    </r:Description>
                     <xsl:apply-templates select="map" mode="code"/>
                 </CodeList>
             </Fragment>
@@ -97,7 +108,7 @@
     
     <xsl:template match="map" mode="code"> 
         <xsl:param name="filename"/>
-        <Code isUniversallyUnique="true">  <!--xmlns="ddi:logicalproduct:3_3"-->
+        <Code xmlns="ddi:logicalproduct:3_3" isUniversallyUnique="true">  <!--xmlns="ddi:logicalproduct:3_3"-->
             <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidCode/text(),':1')"/></r:URN>
             <r:Agency>fr.insee</r:Agency>
             <r:ID><xsl:value-of select="uuidCode"/></r:ID>                    

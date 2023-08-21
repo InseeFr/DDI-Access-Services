@@ -6,11 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
 import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
 import fr.insee.rmes.ToColecticaApi.randomUUID;
+import fr.insee.rmes.config.keycloak.KeycloakServices;
+import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.NonNull;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
@@ -26,6 +29,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +53,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/postItem")
-@Tag(name = "Post to colectica")
+@Tag(name= "Colectica-suggesters ",description = "Service pour gerer les suggesters dans Colectica")
 @SecurityRequirement(name = "bearerAuth")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Success"),
@@ -66,6 +70,12 @@ public class PostItem {
     final static Logger log = LogManager.getLogger(PostItem.class);
     private final ResourceLoader resourceLoader;
 
+    @NonNull
+    @Autowired
+    private KeycloakServices kc;
+
+    private static String token;
+
     @Value("${auth.api.url}")
     private String authApiUrl;
 
@@ -78,6 +88,9 @@ public class PostItem {
     @Value("${auth.password}")
     private String password;
 
+    @Value("${fr.insee.rmes.api.remote.metadata.url}")
+    private String urlColectica;
+
 
     @Autowired
     public PostItem(ResourceLoader resourceLoader) {
@@ -86,7 +99,13 @@ public class PostItem {
 
     @PostMapping(value = "/transformJsonToJsonForAPi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "transform an JSON Codelist to an another json for Colectica API ", description = "tranform a codeList in json to another json with DDI item inside")
-    public ResponseEntity<?> transformFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> transformFile(@RequestParam("file") MultipartFile file,
+                                           @RequestParam("nom metier") String idValue,
+                                           @RequestParam("label") String nomenclatureName,
+                                           @RequestParam("description") String suggesterDescription,
+                                           @RequestParam("version") String version,
+                                           @RequestParam("idepUtilisateur")String idepUtilisateur,
+                                           @RequestParam("timbre")String timbre) {
 
         try {
             // Générer un nom de fichier unique pour le fichier résultant
@@ -100,7 +119,7 @@ public class PostItem {
             MultipartFile outputFile = null;
             try {
                 outputFile = processFile(file);
-                System.out.println("Le fichier a été traité avec succès !");
+                System.out.println("Le fichier a été modifié avec succès (ajout balise data) !");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -112,19 +131,19 @@ public class PostItem {
             File xsltFile = xsltResource.getFile();
 
             // Transformer le fichier JSON en XML à l'aide de XSLT
-            String xmlContent = transformToXml(outputFile, xsltFile);
+            String xmlContent = transformToXml(outputFile, xsltFile,idValue,nomenclatureName,suggesterDescription,version,timbre);
 
             Path resultFilePath = Files.createTempFile("result_", ".xml");
             Files.writeString(resultFilePath, xmlContent);
 
             // Charger le fichier xml résultant
             Resource resultResource = resourceLoader.getResource("file:" + resultFilePath.toAbsolutePath().toString());
-
+            System.out.println("Le fichier a été modifié avec succès (première transfo xslt) !");
             // Charger le fichier XSLT
             // TODO: 05/06/2023 vérifier que le classpath est correct en qf
             Resource xsltResource2 = resourceLoader.getResource("classpath:DDIxmltojson.xsl");
             File xsltFile2 = xsltResource2.getFile();
-            String JsonContent = transformToJson(new InputStreamResource(resultResource.getInputStream()), xsltFile2);
+            String JsonContent = transformToJson(new InputStreamResource(resultResource.getInputStream()), xsltFile2,idepUtilisateur);
 
             // Enregistrer le contenu XML dans un fichier
             Path resultFilePath2 = Files.createTempFile("result_", ".json");
@@ -132,7 +151,7 @@ public class PostItem {
 
             // Charger le fichier json de resultat si on veut l'exporter/le modifier au niveau de quelques clés/valeurs
             Resource resultResource2 = resourceLoader.getResource("file:" + resultFilePath2.toAbsolutePath().toString());
-
+            System.out.println("Le fichier a été modifié avec succès (deuxième transfo xslt) !");
             // Supprimer le fichier XML temporaire
             // TODO: 05/06/2023 regarder pourquoi ça fonctionne pas bien, je pense qu'on l'appelle dans la réponse donc si on l'efface on a un null pointer
             ////Files.deleteIfExists(resultFilePath2);
@@ -192,7 +211,9 @@ public class PostItem {
         }
 
 
-        private String transformToXml(MultipartFile file, File xsltFile) throws IOException, TransformerException {
+        private String transformToXml(MultipartFile file, File xsltFile,String idValue, String nomenclatureName,
+                                      String suggesterDescription, String version, String timbre)
+                throws IOException, TransformerException {
 
             // Créer un transformateur XSLT
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -210,6 +231,13 @@ public class PostItem {
             Source xslt = new StreamSource(xsltFile);
             Transformer transformer = factory.newTransformer(xslt);
 
+            // param pour la transfo
+
+            transformer.setParameter("idValue", idValue);
+            transformer.setParameter("suggesterName", nomenclatureName);
+            transformer.setParameter("suggesterDescription", suggesterDescription);
+            transformer.setParameter("version", version);
+            transformer.setParameter("timbre", timbre);
             // on lance la transfo
             StreamSource text = new StreamSource(file.getInputStream());
             StringWriter xmlWriter = new StringWriter();
@@ -219,14 +247,14 @@ public class PostItem {
             return xmlContent;
         }
 
-        private String transformToJson(Resource resultResource, File xsltFileJson) throws IOException, TransformerException {
+        private String transformToJson(Resource resultResource, File xsltFileJson,String idepUtilisateur) throws IOException, TransformerException {
 
             // Créer un transformateur XSLT
             TransformerFactory factory = TransformerFactory.newInstance();
 
             Source xslt = new StreamSource(xsltFileJson);
             Transformer transformer = factory.newTransformer(xslt);
-
+            transformer.setParameter("idepUtilisateur", idepUtilisateur);
             // on lance la transfo
             StreamSource text = new StreamSource(resultResource.getInputStream());
             StringWriter xmlWriter = new StringWriter();
@@ -236,26 +264,47 @@ public class PostItem {
             return jsonContent;
         }
 
-        @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-        @Operation(summary = "Send json to Colectica Repository via colectica API", description = "send a json to /api/item/v1")
-        public ResponseEntity<String> uploadItem(@RequestParam("file") MultipartFile file) throws IOException {
-            // Obtenir le token d'authentification
-            String token = getAuthToken();
-            String accessToken = extractAccessToken(token);
-            // Convertir le contenu du fichier en chaîne JSON
-            String fileContent = new String(file.getBytes());
+    @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Send suggester JSON to Colectica Repository via Colectica API",
+            description = "Send a suggester JSON to /api/item/v1")
+    public ResponseEntity<String> uploadItem(@RequestParam("file") MultipartFile file)
+            throws IOException, ExceptionColecticaUnreachable {
 
-            // Envoi du fichier à l'API avec le token d'authentification
-            boolean success = sendFileToApi(fileContent, accessToken);
-
-            if (success) {
-                return ResponseEntity.ok("Le fichier a été envoyé avec succès à l'API.");
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Une erreur s'est produite lors de l'envoi du fichier à l'API.");
-            }
+        String authentToken;
+        if (urlColectica.contains("kube")) {
+            String token2 = getAuthToken();
+            authentToken = extractAccessToken(token2);
+        } else {
+            authentToken = getFreshToken();
         }
+        String fileContent = new String(file.getBytes());
 
+        boolean success = sendFileToApi(fileContent, authentToken);
+
+        if (success) {
+            // Vous pouvez effectuer d'autres opérations ici si nécessaire
+
+            return ResponseEntity.ok("Le fichier a été envoyé avec succès à l'API.");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite lors de l'envoi du fichier à l'API.");
+        }
+    }
+
+
+
+
+    public String getFreshToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
+        if ( ! kc.isTokenValid(token)) {
+            token = getToken();
+        }
+        return token;
+    }
+
+    public String getToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
+        return kc.getKeycloakAccessToken();
+
+    }
         private String getAuthToken() throws JsonProcessingException {
             RestTemplate restTemplate = new RestTemplate();
 
@@ -292,7 +341,13 @@ public class PostItem {
     }
 
     private boolean sendFileToApi(String fileContent, String token) {
-            RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
+
+           SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+           factory.setConnectTimeout(100000); // Temps de connexion en millisecondes
+           factory.setReadTimeout(100000); // Temps de lecture en millisecondes
+
+           restTemplate.setRequestFactory(factory);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -300,7 +355,7 @@ public class PostItem {
 
             HttpEntity<String> request = new HttpEntity<>(fileContent, headers);
 
-            ResponseEntity<String> response = restTemplate.postForEntity(itemApiUrl, request, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(itemApiUrl, HttpMethod.POST,request, String.class);
 
             return response.getStatusCode() == HttpStatus.OK;
         }
