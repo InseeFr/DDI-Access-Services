@@ -63,7 +63,7 @@ public class ElasticsearchController {
 
 
     final static Logger logger = LogManager.getLogger(ElasticsearchController.class);
-    private HttpGet httpGet;
+
 
     @Autowired
     public ElasticsearchController(ElasticsearchClient elasticsearchClient) {
@@ -121,7 +121,7 @@ public class ElasticsearchController {
                     schema = @Schema(
                             type = "string", example = "voyage")) @PathParam("texte") String texte) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-          
+            HttpGet httpGet;
 
             if (elasticHost.contains("kube")) {
                 httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q="+ texte);
