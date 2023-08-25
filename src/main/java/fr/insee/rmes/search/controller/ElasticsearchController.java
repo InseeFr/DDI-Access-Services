@@ -19,6 +19,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -62,6 +63,7 @@ public class ElasticsearchController {
 
 
     final static Logger logger = LogManager.getLogger(ElasticsearchController.class);
+    private HttpGet httpGet;
 
     @Autowired
     public ElasticsearchController(ElasticsearchClient elasticsearchClient) {
@@ -69,34 +71,40 @@ public class ElasticsearchController {
     }
 
     @GetMapping("/search/elastic/{index}/field")
-    public ResponseEntity<?> searchField(
-            @Parameter(
-                    description = "nom de l'index",
-                    required = true,
-                    schema = @Schema(
-                            type = "string", example="colectica_registered_item")) @PathVariable("index") String index) {
+    public ResponseEntity<?> searchField(@PathVariable("index") String index) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet();
+            String apiUrl;
 
+            // Choose the appropriate URL based on the elasticHost value
             if (elasticHost.contains("kube")) {
-                httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/?pretty");
+                apiUrl = "https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/?pretty";
+            } else {
+                apiUrl = "http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/?pretty";
             }
-            else {
-                httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort +"/"+ index +"/?pretty");
+
+            HttpGet httpGet = new HttpGet(apiUrl);
+
+            if (!elasticHost.contains("kube")) {
+                // Add Basic Authentication header if not using Kubernetes
                 String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
                 httpGet.addHeader("Authorization", "Basic " + token);
             }
+
             httpGet.addHeader("kbn-xsrf", "reporting");
 
-
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                int statusCode = response.getStatusLine().getStatusCode();
                 String responseBody = EntityUtils.toString(response.getEntity());
 
-                return ResponseEntity.ok(responseBody);
+                if (statusCode == 200) {
+                    return ResponseEntity.ok(responseBody);
+                } else {
+                    return ResponseEntity.status(statusCode).body("Elasticsearch returned an unexpected status code: " + statusCode);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+            return ResponseEntity.status(500).body("An error occurred while making the Elasticsearch request.");
         }
     }
 
@@ -113,11 +121,11 @@ public class ElasticsearchController {
                     schema = @Schema(
                             type = "string", example = "voyage")) @PathParam("texte") String texte) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-
-            HttpGet httpGet = new HttpGet();
+          
 
             if (elasticHost.contains("kube")) {
                 httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q="+ texte);
+            
             }
             else {
                 httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + texte);
@@ -125,6 +133,7 @@ public class ElasticsearchController {
                 httpGet.addHeader("Authorization", "Basic " + token);
             }
 
+            
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
 

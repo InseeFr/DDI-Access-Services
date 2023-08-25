@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
@@ -47,8 +47,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.UUID;
 
 @Controller
@@ -98,74 +96,44 @@ public class PostItem {
     }
 
     @PostMapping(value = "/transformJsonToJsonForAPi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "transform an JSON Codelist to an another json for Colectica API ", description = "tranform a codeList in json to another json with DDI item inside")
+    @Operation(summary = "transform an JSON Codelist to an another json for Colectica API ",
+            description = "tranform a codeList in json to another json with DDI item inside")
     public ResponseEntity<?> transformFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam("nom metier") String idValue,
                                            @RequestParam("label") String nomenclatureName,
                                            @RequestParam("description") String suggesterDescription,
                                            @RequestParam("version") String version,
-                                           @RequestParam("idepUtilisateur")String idepUtilisateur,
-                                           @RequestParam("timbre")String timbre) {
+                                           @RequestParam("idepUtilisateur") String idepUtilisateur,
+                                           @RequestParam("timbre") String timbre) {
 
         try {
-            // Générer un nom de fichier unique pour le fichier résultant
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
 
             String resultFileName2 = UUID.randomUUID().toString() + ".json";
 
-            //Modifier le fichier json en entrée en ajoutant <data> et </data>
-            MultipartFile outputFile = null;
-            try {
-                outputFile = processFile(file);
-                System.out.println("Le fichier a été modifié avec succès (ajout balise data) !");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            MultipartFile outputFile = processFile(file);
+            System.out.println("Le fichier a été modifié avec succès (ajout balise data) !");
 
+            InputStream xsltStream1 = getClass().getResourceAsStream("/jsontoDDIXML.xsl");
+            String xmlContent = transformToXml(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, version, timbre);
 
-            // Charger le fichier XSLT
-            // TODO: 05/06/2023 vérifier que le classpath est correct en qf
-            Resource xsltResource = resourceLoader.getResource("classpath:jsontoDDIXML.xsl");
-            File xsltFile = xsltResource.getFile();
+            InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojson.xsl");
+            String jsonContent = transformToJson(new ByteArrayResource(xmlContent.getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur);
 
-            // Transformer le fichier JSON en XML à l'aide de XSLT
-            String xmlContent = transformToXml(outputFile, xsltFile,idValue,nomenclatureName,suggesterDescription,version,timbre);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", UriUtils.encode(resultFileName2, StandardCharsets.UTF_8));
 
-            Path resultFilePath = Files.createTempFile("result_", ".xml");
-            Files.writeString(resultFilePath, xmlContent);
-
-            // Charger le fichier xml résultant
-            Resource resultResource = resourceLoader.getResource("file:" + resultFilePath.toAbsolutePath().toString());
-            System.out.println("Le fichier a été modifié avec succès (première transfo xslt) !");
-            // Charger le fichier XSLT
-            // TODO: 05/06/2023 vérifier que le classpath est correct en qf
-            Resource xsltResource2 = resourceLoader.getResource("classpath:DDIxmltojson.xsl");
-            File xsltFile2 = xsltResource2.getFile();
-            String JsonContent = transformToJson(new InputStreamResource(resultResource.getInputStream()), xsltFile2,idepUtilisateur);
-
-            // Enregistrer le contenu XML dans un fichier
-            Path resultFilePath2 = Files.createTempFile("result_", ".json");
-            Files.writeString(resultFilePath2, JsonContent);
-
-            // Charger le fichier json de resultat si on veut l'exporter/le modifier au niveau de quelques clés/valeurs
-            Resource resultResource2 = resourceLoader.getResource("file:" + resultFilePath2.toAbsolutePath().toString());
-            System.out.println("Le fichier a été modifié avec succès (deuxième transfo xslt) !");
-            // Supprimer le fichier XML temporaire
-            // TODO: 05/06/2023 regarder pourquoi ça fonctionne pas bien, je pense qu'on l'appelle dans la réponse donc si on l'efface on a un null pointer
-            ////Files.deleteIfExists(resultFilePath2);
-            // Retourner le fichier json résultant
-            return ResponseEntity.ok()
-                    .header("Content-Disposition", "attachment; filename=\"" + UriUtils.encode(resultFileName2, StandardCharsets.UTF_8) + "\"")
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(new InputStreamResource(resultResource2.getInputStream()));
-        } catch (IOException | TransformerException e) {
+            return new ResponseEntity<>(jsonContent, headers, HttpStatus.OK);
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la transformation du fichier.", e);
         }
     }
 
-   public static MultipartFile processFile(MultipartFile inputFile) throws Exception {
+
+    public static MultipartFile processFile(MultipartFile inputFile) throws Exception {
             byte[] modifiedContent;
             try (InputStream inputStream = inputFile.getInputStream();
                  ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -211,7 +179,7 @@ public class PostItem {
         }
 
 
-        private String transformToXml(MultipartFile file, File xsltFile,String idValue, String nomenclatureName,
+        private String transformToXml(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,
                                       String suggesterDescription, String version, String timbre)
                 throws IOException, TransformerException {
 
@@ -247,7 +215,7 @@ public class PostItem {
             return xmlContent;
         }
 
-        private String transformToJson(Resource resultResource, File xsltFileJson,String idepUtilisateur) throws IOException, TransformerException {
+        private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur) throws IOException, TransformerException {
 
             // Créer un transformateur XSLT
             TransformerFactory factory = TransformerFactory.newInstance();
