@@ -123,8 +123,8 @@ public class GetItem {
 
     @GetMapping("suggesters/{identifier}/jsonWithChild")
     @Produces(MediaType.APPLICATION_JSON)
-       @Operation(summary = "Get JSON for Suggester", description = "Get a JSON document from Colectica repository including an item with childs.")
-       public Object getJsonWithChilds(@PathVariable String identifier) throws Exception {
+    @Operation(summary = "Get JSON for Suggester", description = "Get a JSON document from Colectica repository including an item with childs.")
+       public Object getJsonWithChild(@PathVariable String identifier) throws Exception {
            String apiUrl = API_BASE_URL + identifier;
            String token = getFreshToken();
            HttpHeaders headers = new HttpHeaders();
