@@ -96,7 +96,7 @@ public class PostItem {
     }
 
     @PostMapping(value = "/transformJsonToJsonForAPi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "transform an JSON Codelist to an another json for Colectica API ",
+    @Operation(summary = "transform an JSON Codelist (Id,Label) to an another json for Colectica API ",
             description = "tranform a codeList in json to another json with DDI item inside")
     public ResponseEntity<?> transformFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam("nom metier") String idValue,
@@ -131,6 +131,8 @@ public class PostItem {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la transformation du fichier.", e);
         }
     }
+
+
 
 
     public static MultipartFile processFile(MultipartFile inputFile) throws Exception {

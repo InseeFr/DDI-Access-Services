@@ -15,11 +15,14 @@ import fr.insee.rmes.search.model.IdLabelPair;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import lombok.NonNull;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -65,6 +68,12 @@ public class GetItem {
     @Value("${auth.password}")
     private String password;
 
+    @Value("${fr.insee.rmes.api.remote.metadata.url}")
+    String serviceUrl;
+
+    @Value("${fr.insee.rmes.api.remote.metadata.agency}")
+    String agency;
+
     private static final String API_BASE_URL = "http://metadonnees-operations.developpement3.insee.fr/api/v1/jsonset/fr.insee/";
 
     private final RestTemplate restTemplate;
@@ -76,10 +85,70 @@ public class GetItem {
     @Autowired
     private ElasticsearchController elasticsearchController;
 
-    @GetMapping("/filtered-search/{index}/{texte}")
-    public ResponseEntity<?> filteredSearchText(
-            @PathVariable("index") String index,
-            @PathVariable("texte") String texte) {
+    @GetMapping("ddiInstance/{uuid}")
+    @Operation(summary = "Get ddiInstance of an object by uuid", description = "Get an XML document for a ddiInstance from Colectica repository.")
+    @Produces(MediaType.APPLICATION_XML)
+    public ResponseEntity<?> FindByUuidColectica (
+            @Parameter(
+                    description = "id de l'objet colectica",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
+        ResponseEntity<?> responseEntity = searchColecticaByUuid(uuid);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            String responseBody = (String) responseEntity.getBody();
+            return ResponseEntity.ok(responseBody);
+        } else {
+            return responseEntity;
+        }
+
+    }
+
+    private ResponseEntity<?> searchColecticaByUuid(String uuid) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet httpGet;
+            String authentToken;
+            String url = String.format("%s/api/v1/ddiset/%s/%s", serviceUrl, agency, uuid);
+            httpGet = new HttpGet(url);
+            httpGet.addHeader("Content-Type", "application/xml");
+            httpGet.addHeader("Accept", "application/xml");
+            if (!serviceUrl.contains("kube")){
+            httpGet.setHeader("Authorization", "Bearer " + getFreshToken());}
+            else {
+                String token2 = getAuthToken();
+                authentToken = extractAccessToken(token2);
+                httpGet.setHeader("Authorization", "Bearer " + authentToken);
+            }
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                String preresponseBody = EntityUtils.toString(response.getEntity());
+                String responseBody = preresponseBody.replace("ï»¿","");
+                return ResponseEntity.ok(responseBody);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête vers Colectica.");
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ExceptionColecticaUnreachable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+        @GetMapping("/filtered-search/{index}/{texte}")
+        @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
+        public ResponseEntity<?> filteredSearchText(
+                @Parameter(
+                        description = "nom par défaut de l'index colectica",
+                        required = true,
+                        schema = @Schema(
+                                type = "string", example="portal*"))
+             String index ,
+                @Parameter(
+                        description = "texte à rechercher. le * sert de wildcard",
+                        required = true,
+                        schema = @Schema(
+                                type = "string", example="sugg*")) String texte) {
         ResponseEntity<?> responseEntity = elasticsearchController.searchText(index, texte);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = (String) responseEntity.getBody();
@@ -123,8 +192,13 @@ public class GetItem {
 
     @GetMapping("suggesters/{identifier}/jsonWithChild")
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Get JSON for Suggester", description = "Get a JSON document from Colectica repository including an item with childs.")
-       public Object getJsonWithChild(@PathVariable String identifier) throws Exception {
+    @Operation(summary = "Get JSON for Suggester/codelist", description = "Get a JSON document for suggester or codelist from Colectica repository including an item with childs.")
+       public Object getJsonWithChild(
+            @Parameter(
+            description = "id de l'objet colectica",
+            required = true,
+            schema = @Schema(
+                    type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier) throws Exception {
            String apiUrl = API_BASE_URL + identifier;
            String token = getFreshToken();
            HttpHeaders headers = new HttpHeaders();
