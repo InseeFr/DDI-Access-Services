@@ -5,14 +5,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
 import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
+import fr.insee.rmes.ToColecticaApi.models.Items;
 import fr.insee.rmes.ToColecticaApi.randomUUID;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
+import fr.insee.rmes.metadata.model.Category;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
 import lombok.NonNull;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
@@ -31,9 +35,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -47,7 +49,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.UUID;
+
+import static jakarta.xml.bind.JAXB.unmarshal;
 
 @Controller
 @RequestMapping("/postItem")
@@ -133,6 +138,17 @@ public class PostItem {
     }
 
 
+    @PutMapping (value = "/transformDDIToJsonForAPi/{VersionResponsibility}")
+    @Operation(summary = "Update an DDI object on Colectica Repository ",
+            description = "tranform an DDI object to a json with DDI item inside")
+    public String transformFileXml(@RequestBody String  ddiXml, @PathVariable("VersionResponsibility") String idepUtilisateur) throws IOException, TransformerException {
+
+        //String escapedXmlString = ddiXml.replace("\"", "\\\"");
+        InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojsonForOneObject.xsl");
+        String jsonContent = transformToJson(new ByteArrayResource(ddiXml.getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur);
+        return jsonContent;
+
+    }
 
 
     public static MultipartFile processFile(MultipartFile inputFile) throws Exception {
@@ -236,7 +252,7 @@ public class PostItem {
 
     @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "Send suggester JSON to Colectica Repository via Colectica API",
-            description = "Send a suggester JSON to /api/item/v1")
+            description = "Send a suggester JSON to /api/v1/item. This suggester must be simple, a list of Id,Label transform with transformJsonToJsonForAPi")
     public ResponseEntity<String> uploadItem(@RequestParam("file") MultipartFile file)
             throws IOException, ExceptionColecticaUnreachable {
 

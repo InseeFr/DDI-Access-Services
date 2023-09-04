@@ -11,7 +11,7 @@ import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.controller.ElasticsearchController;
 import fr.insee.rmes.search.model.DDIItemType;
-import fr.insee.rmes.search.model.IdLabelPair;
+import fr.insee.rmes.ToColecticaApi.models.IdLabelPair;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,24 +30,43 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
 @RequestMapping("/Item")
-@Tag(name= "Colectica-suggesters ",description = "Service pour gerer les suggesters dans Colectica")
+@Tag(name= "DEMO-Colectica",description = "Services for upgrade Colectica-API")
 public class GetItem {
     final static Logger logger = LogManager.getLogger(GetItem.class);
 
@@ -86,15 +105,15 @@ public class GetItem {
     private ElasticsearchController elasticsearchController;
 
     @GetMapping("ddiInstance/{uuid}")
-    @Operation(summary = "Get ddiInstance of an object by uuid", description = "Get an XML document for a ddiInstance from Colectica repository.")
+    @Operation(summary = "Get ddiInstance by uuid", description = "Get an XML document for a ddi:Instance from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public ResponseEntity<?> FindByUuidColectica (
+    public ResponseEntity<?> FindInstanceByUuidColectica (
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
                     schema = @Schema(
                             type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
-        ResponseEntity<?> responseEntity = searchColecticaByUuid(uuid);
+        ResponseEntity<?> responseEntity = searchColecticaInstanceByUuid(uuid);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = (String) responseEntity.getBody();
             return ResponseEntity.ok(responseBody);
@@ -104,7 +123,64 @@ public class GetItem {
 
     }
 
-    private ResponseEntity<?> searchColecticaByUuid(String uuid) {
+    @GetMapping("ddiFragment/{uuid}")
+    @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
+    @Produces(MediaType.APPLICATION_XML)
+    public ResponseEntity<?> FindFragmentByUuidColectica (
+            @Parameter(
+                    description = "id de l'objet colectica",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
+        ResponseEntity<?> responseEntity = searchColecticaFragmentByUuid(uuid);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            String responseBody = (String) responseEntity.getBody();
+            return ResponseEntity.ok(responseBody);
+        } else {
+            return responseEntity;
+        }
+
+    }
+
+    private ResponseEntity<?> searchColecticaFragmentByUuid(String uuid) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, uuid);
+            HttpGet httpGet = new HttpGet(url);
+            httpGet.addHeader("Content-Type", "application/xml");
+            httpGet.addHeader("Accept", "application/json");
+
+            String authToken;
+            if (!serviceUrl.contains("kube")) {
+                authToken = getFreshToken();
+            } else {
+                String token2 = getAuthToken();
+                authToken = extractAccessToken(token2);
+            }
+            httpGet.setHeader("Authorization", "Bearer " + authToken);
+
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                if (response.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
+                    return ResponseEntity.status(response.getStatusLine().getStatusCode()).body("Erreur lors de la requête vers Colectica.");
+                }
+
+                String responseBody = EntityUtils.toString(response.getEntity());
+                JSONObject jsonResponse = new JSONObject(responseBody);
+                String xmlContent = jsonResponse.get("Item").toString();
+                xmlContent = xmlContent.replace("\\\"", "\"").replace("ï»¿", ""); // Remove escape characters and special characters
+                return ResponseEntity.ok(xmlContent);
+            } catch (IOException e) {
+                // Log the exception
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur s'est produite lors de la requête vers Colectica.");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ExceptionColecticaUnreachable e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    private ResponseEntity<?> searchColecticaInstanceByUuid(String uuid) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet httpGet;
             String authentToken;
@@ -192,7 +268,7 @@ public class GetItem {
 
     @GetMapping("suggesters/{identifier}/jsonWithChild")
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Get JSON for Suggester/codelist", description = "Get a JSON document for suggester or codelist from Colectica repository including an item with childs.")
+    @Operation(summary = "Get JSON for Suggester/codelist simple (id,label)", description = "Get a JSON document for suggester or codelist from Colectica repository including an item with childs.")
        public Object getJsonWithChild(
             @Parameter(
             description = "id de l'objet colectica",
@@ -316,5 +392,72 @@ public class GetItem {
         return kc.getKeycloakAccessToken();
 
     }
+
+    @PutMapping ("/replace-xml-parameters/{Type}/{Label}/{Version}/{Name}/{VersionResponsibility}")
+    @Operation(summary = "Modify a fragment DDI", description = "Modify a fragment DDI. All field need to be filled with the same data if there are no changes, except for the version number, which takes a plus 1.")
+    public String replaceXmlParameters(@RequestBody String inputXml,
+                                       @PathVariable ("Type") DDIItemType type,
+                                       @PathVariable ("Label") String label,
+                                       @PathVariable ("Version") int version,
+                                       @PathVariable ("Name") String name,
+                                       @PathVariable("VersionResponsibility") String idepUtilisateur) {
+        try {
+            // Create a DocumentBuilder to parse the XML input
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(inputXml)));
+
+            String typeName= type.getName();
+            String typeNameDocument =document.getDocumentElement().getFirstChild().getNodeName();
+
+            if (!typeName.equals(typeNameDocument)) {
+                return "Erreur : Attention ce n'est pas le bon type. L'item chargé n'est pas du type que vous avez sélectionné.";
+            }
+
+            Document document2 = (Document) document.cloneNode(true);
+            Node versionNode = document2.getElementsByTagName("r:Version").item(0);
+            versionNode.setTextContent(String.valueOf(version));
+            Node nameNode= document2.getElementsByTagName("r:String").item(0);
+            nameNode.setTextContent(name);
+            Node labelNode = document2.getElementsByTagName("r:Content").item(0);
+            labelNode.setTextContent(label);
+            Node UrnNode = document2.getElementsByTagName("r:URN").item(0);
+            String IdFragment= UrnNode.getTextContent();
+            UrnNode.setTextContent(IdFragment.substring(0,IdFragment.lastIndexOf(":"))+":"+version);
+            // Convert the modified XML back to string
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document2), new StreamResult(writer));
+            InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojsonForOneObject.xsl");
+            String jsonContent = transformToJson(new ByteArrayResource(writer.toString().getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur,version);
+            return jsonContent;
+            //return writer.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error processing XML";
+        }
+    }
+    private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur, int version) throws IOException, TransformerException {
+
+        // Créer un transformateur XSLT
+        TransformerFactory factory = TransformerFactory.newInstance();
+
+        Source xslt = new StreamSource(xsltFileJson);
+        Transformer transformer = factory.newTransformer(xslt);
+        transformer.setParameter("idepUtilisateur", idepUtilisateur);
+        transformer.setParameter("version", version);
+        // on lance la transfo
+        StreamSource text = new StreamSource(resultResource.getInputStream());
+        StringWriter xmlWriter = new StringWriter();
+        StreamResult xmlResult = new StreamResult(xmlWriter);
+        transformer.transform(text, xmlResult);
+        String jsonContent = xmlWriter.toString();
+        return jsonContent;
+    }
+
 
 }

@@ -19,7 +19,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -41,8 +40,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-
-import static java.util.Base64.getEncoder;
 
 @RestController
 public class ElasticsearchController {
@@ -111,10 +108,10 @@ public class ElasticsearchController {
     @GetMapping("/search/elastic/_search/{index}/{texte}")
     public  ResponseEntity<?> searchText(
             @Parameter(
-                    description = "nom de l'index",
+                    description = "nom de l'index (portal ou colectica)",
                     required = true,
                     schema = @Schema(
-                            type = "string", example = "colectica_registered_item")) @PathParam("index") String index,
+                            type = "string", example = "portal_registered_item")) @PathParam("index") String index,
             @Parameter(
                     description = "mot recherché",
                     required = true,
