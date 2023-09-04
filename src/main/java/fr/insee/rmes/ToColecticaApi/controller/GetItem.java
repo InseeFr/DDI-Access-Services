@@ -11,7 +11,6 @@ import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.controller.ElasticsearchController;
 import fr.insee.rmes.search.model.DDIItemType;
-import fr.insee.rmes.ToColecticaApi.models.IdLabelPair;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -265,7 +264,7 @@ public class GetItem {
     }
 
 
-    @GetMapping("suggesters/{identifier}/jsonWithChild")
+    @GetMapping("suggesters/jsonWithChild")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get JSON for Suggester/codelist simple (id,label)", description = "Get a JSON document for suggester or codelist from Colectica repository including an item with childs.")
        public Object getJsonWithChild(
@@ -273,7 +272,9 @@ public class GetItem {
             description = "id de l'objet colectica",
             required = true,
             schema = @Schema(
-                    type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier) throws Exception {
+                    type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier,
+            @RequestParam(value = "fieldIdName",defaultValue = "id") String outputField,
+            @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws Exception {
            String apiUrl = API_BASE_URL + identifier;
            String token = getFreshToken();
            HttpHeaders headers = new HttpHeaders();
@@ -288,11 +289,15 @@ public class GetItem {
                 JsonNode jsonNode = objectMapper.readTree(response.getBody());
                 JsonNode codesNode = jsonNode.get("Codes");
 
-                List<IdLabelPair> idLabelPairs = new ArrayList<>();
+                List<Map<String, String>> idLabelPairs = new ArrayList<>();
                 for (JsonNode codeNode : codesNode) {
                     String id = codeNode.get("Value").asText();
                     String label = codeNode.get("Category").get("Label").get("fr-FR").asText();
-                    idLabelPairs.add(new IdLabelPair(id, label));
+
+                    Map<String, String> idLabelPair = new HashMap<>();
+                    idLabelPair.put(outputField, id);
+                    idLabelPair.put(fieldLabelName, label);
+                    idLabelPairs.add(idLabelPair);
                 }
 
                 return ResponseEntity.ok(idLabelPairs);
@@ -392,14 +397,14 @@ public class GetItem {
 
     }
 
-    @PutMapping ("/replace-xml-parameters/{Type}/{Label}/{Version}/{Name}/{VersionResponsibility}")
+    @PutMapping ("/replace-xml-parameters")
     @Operation(summary = "Modify a fragment DDI", description = "Modify a fragment DDI. All field need to be filled with the same data if there are no changes, except for the version number, which takes a plus 1.")
     public String replaceXmlParameters(@RequestBody String inputXml,
-                                       @PathVariable ("Type") DDIItemType type,
-                                       @PathVariable ("Label") String label,
-                                       @PathVariable ("Version") int version,
-                                       @PathVariable ("Name") String name,
-                                       @PathVariable("VersionResponsibility") String idepUtilisateur) {
+                                       @RequestParam ("Type") DDIItemType type,
+                                       @RequestParam ("Label") String label,
+                                       @RequestParam ("Version") int version,
+                                       @RequestParam ("Name") String name,
+                                       @RequestParam ("VersionResponsibility") String idepUtilisateur) {
         try {
             // Create a DocumentBuilder to parse the XML input
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

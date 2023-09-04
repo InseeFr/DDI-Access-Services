@@ -6,19 +6,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
 import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
-import fr.insee.rmes.ToColecticaApi.models.Items;
 import fr.insee.rmes.ToColecticaApi.models.TransactionType;
 import fr.insee.rmes.ToColecticaApi.randomUUID;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
-import fr.insee.rmes.metadata.model.Category;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.Produces;
 import lombok.NonNull;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
@@ -37,7 +33,10 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -51,10 +50,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.UUID;
-
-import static jakarta.xml.bind.JAXB.unmarshal;
 
 @Controller
 @RequestMapping("/postItem")
@@ -124,7 +120,7 @@ public class PostItem {
             System.out.println("Le fichier a été modifié avec succès (ajout balise data) !");
 
             InputStream xsltStream1 = getClass().getResourceAsStream("/jsontoDDIXML.xsl");
-            String xmlContent = transformToXml(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, version, timbre);
+            String xmlContent = transformToXml(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, timbre);
 
             InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojson.xsl");
             String jsonContent = transformToJson(new ByteArrayResource(xmlContent.getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur);
@@ -148,7 +144,7 @@ public class PostItem {
             description = "Send a json make with /replace-xml-parameters/{Type}/{Label}/{Version}/{Name}/{VersionResponsibility}")
     public ResponseEntity<String> sendUpdateColectica(
             @RequestBody String DdiUpdatingInJson,
-            @PathVariable("transactionType") TransactionType transactionType
+            @RequestParam("transactionType") TransactionType transactionType
     ) throws IOException {
         try {
             // Étape 1: Initialiser la transaction
@@ -318,7 +314,7 @@ public class PostItem {
 
 
         private String transformToXml(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,
-                                      String suggesterDescription, String version, String timbre)
+                                      String suggesterDescription,  String timbre)
                 throws IOException, TransformerException {
 
             // Créer un transformateur XSLT
@@ -342,7 +338,6 @@ public class PostItem {
             transformer.setParameter("idValue", idValue);
             transformer.setParameter("suggesterName", nomenclatureName);
             transformer.setParameter("suggesterDescription", suggesterDescription);
-            transformer.setParameter("version", version);
             transformer.setParameter("timbre", timbre);
             // on lance la transfo
             StreamSource text = new StreamSource(file.getInputStream());

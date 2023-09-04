@@ -13,6 +13,10 @@ public class IdLabelPair {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getLabel() {
         return label;
     }

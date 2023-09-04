@@ -86,7 +86,7 @@
                     <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidArray/text(),':1')"/></r:URN>
                     <r:Agency>fr.insee</r:Agency>
                     <r:ID><xsl:value-of select="uuidArray"/></r:ID>                    
-                    <r:Version><xsl:value-of select="$version"/></r:Version>
+                    <r:Version>1</r:Version>
                     <r:UserID typeOfUserID="colectica:sourceId">INSEE-<xsl:value-of select="$timbre"/></r:UserID>
                     <CodeListName>
                         <r:String xml:lang="fr-FR">SUGGESTER_<xsl:value-of select="$idValue"/></r:String>
