@@ -12,7 +12,6 @@ import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.controller.ElasticsearchController;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.ToColecticaApi.models.IdLabelPair;
-
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -409,9 +408,9 @@ public class GetItem {
             Document document = builder.parse(new InputSource(new StringReader(inputXml)));
 
             String typeName= type.getName();
-            String typeNameDocument =document.getDocumentElement().getFirstChild().getNodeName();
-
-            if (!typeName.equals(typeNameDocument)) {
+            NodeList typeNodes = document.getElementsByTagNameNS("ddi:logicalproduct:3_3", typeName);
+            Element typeNameDocument = (Element) typeNodes.item(0);
+            if (!typeName.equals(typeNameDocument.getNodeName().toString())) {
                 return "Erreur : Attention ce n'est pas le bon type. L'item chargé n'est pas du type que vous avez sélectionné.";
             }
 

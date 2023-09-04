@@ -2,10 +2,12 @@ package fr.insee.rmes.ToColecticaApi.controller;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
 import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
 import fr.insee.rmes.ToColecticaApi.models.Items;
+import fr.insee.rmes.ToColecticaApi.models.TransactionType;
 import fr.insee.rmes.ToColecticaApi.randomUUID;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
@@ -138,16 +140,134 @@ public class PostItem {
     }
 
 
-    @PutMapping (value = "/transformDDIToJsonForAPi/{VersionResponsibility}")
-    @Operation(summary = "Update an DDI object on Colectica Repository ",
-            description = "tranform an DDI object to a json with DDI item inside")
-    public String transformFileXml(@RequestBody String  ddiXml, @PathVariable("VersionResponsibility") String idepUtilisateur) throws IOException, TransformerException {
+    @Autowired
+    private RestTemplate restTemplate; // Assurez-vous d'avoir configuré un bean RestTemplate dans votre application.
 
-        //String escapedXmlString = ddiXml.replace("\"", "\\\"");
-        InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojsonForOneObject.xsl");
-        String jsonContent = transformToJson(new ByteArrayResource(ddiXml.getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur);
-        return jsonContent;
+    @PostMapping("/UpdateToColecticaRepository/{transactionType}")
+    @Operation(summary = "Send an update to Colectica Repository via Colectica API ",
+            description = "Send a json make with /replace-xml-parameters/{Type}/{Label}/{Version}/{Name}/{VersionResponsibility}")
+    public ResponseEntity<String> sendUpdateColectica(
+            @RequestBody String DdiUpdatingInJson,
+            @PathVariable("transactionType") TransactionType transactionType
+    ) throws IOException {
+        try {
+            // Étape 1: Initialiser la transaction
+            String initTransactionUrl = "http://metadonnees-operations.developpement3.insee.fr/api/v1/transaction";
+            String authentToken;
+            if (urlColectica.contains("kube")) {
+                String token2 = getAuthToken();
+                authentToken = extractAccessToken(token2);
+            } else {
+                authentToken = getFreshToken();
+            }
 
+            HttpHeaders initTransactionHeaders = new HttpHeaders();
+            initTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+            initTransactionHeaders.setBearerAuth(authentToken);
+            HttpEntity<String> initTransactionRequest = new HttpEntity<>(initTransactionHeaders);
+            ResponseEntity<String> initTransactionResponse = restTemplate.exchange(
+                    initTransactionUrl,
+                    HttpMethod.POST,
+                    initTransactionRequest,
+                    String.class
+            );
+
+            if (initTransactionResponse.getStatusCode() == HttpStatus.OK) {
+                String responseBody = initTransactionResponse.getBody();
+
+                // Extraire le TransactionId de la réponse JSON ici
+
+                int transactionId = extractTransactionId(responseBody);
+
+                // Étape 2: Peupler la transaction
+                String populateTransactionUrl = "http://metadonnees-operations.developpement3.insee.fr/api/v1/transaction/_addItemsToTransaction";
+                HttpHeaders populateTransactionHeaders = new HttpHeaders();
+                populateTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+                populateTransactionHeaders.setBearerAuth(authentToken);
+                // Créez un objet de demande pour peupler la transaction ici avec transactionId et DdiUpdatingInJson
+                String updatedJson = DdiUpdatingInJson.replaceFirst("\\{", "{\"TransactionId\":" + transactionId + ",");
+                HttpEntity<String> populateTransactionRequest = new HttpEntity<>(updatedJson, populateTransactionHeaders);
+                ResponseEntity<String> populateTransactionResponse = restTemplate.exchange(
+                        populateTransactionUrl,
+                        HttpMethod.POST,
+                        populateTransactionRequest,
+                        String.class
+                );
+
+                if (populateTransactionResponse.getStatusCode() == HttpStatus.OK) {
+                    // Étape 3: Commit la transaction
+                    String commitTransactionUrl = "http://metadonnees-operations.developpement3.insee.fr/api/v1/transaction/_commitTransaction";
+                    HttpHeaders commitTransactionHeaders = new HttpHeaders();
+                    commitTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+                    commitTransactionHeaders.setBearerAuth(authentToken);
+                    // Créez un objet de demande pour commettre la transaction ici avec transactionId et transactionType
+                    String commitTransactionRequestBody = "{\"TransactionId\":" + transactionId + ",\"TransactionType\":\"" + transactionType + "\"}";
+                    HttpEntity<String> commitTransactionRequest = new HttpEntity<>(commitTransactionRequestBody, commitTransactionHeaders);
+                    ResponseEntity<String> commitTransactionResponse = restTemplate.exchange(
+                            commitTransactionUrl,
+                            HttpMethod.POST,
+                            commitTransactionRequest,
+                            String.class
+                    );
+
+                    if (commitTransactionResponse.getStatusCode() == HttpStatus.OK) {
+                        // Transaction réussie, vous pouvez retourner une réponse appropriée
+                        return ResponseEntity.ok("Transaction réussie.");
+                    } else {
+                        // Échec de la transaction, annuler la transaction
+                        cancelTransaction(transactionId,authentToken);
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Échec de la transaction.");
+                    }
+                } else {
+                    // Échec de la peuplement de la transaction, annuler la transaction
+                    cancelTransaction(transactionId,authentToken);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Échec du peuplement de la transaction.");
+                }
+            } else {
+                // Échec de l'initialisation de la transaction
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Échec de l'initialisation de la transaction.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur s'est produite.");
+        }
+    }
+
+    private int extractTransactionId(String responseBody) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            int transactionId = jsonNode.get("TransactionId").asInt();
+            return transactionId;
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Gérez l'erreur ici, par exemple, lancez une exception ou retournez une valeur par défaut en cas d'échec
+            return -1; // Valeur par défaut en cas d'erreur
+        }
+    }
+
+    private String cancelTransaction(int transactionId, String authentToken) {
+        // Étape 4: Annuler la transaction en cas d'échec
+        String cancelTransactionUrl = "http://metadonnees-operations.developpement3.insee.fr/api/v1/transaction/_cancelTransaction";
+        HttpHeaders cancelTransactionHeaders = new HttpHeaders();
+        cancelTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+        cancelTransactionHeaders.setBearerAuth(authentToken);
+        // Créez un objet de demande pour annuler la transaction ici avec transactionId
+        String cancelTransactionRequestBody = "{\"TransactionId\":" + transactionId + "}";
+        HttpEntity<String> cancelTransactionRequest = new HttpEntity<>(cancelTransactionRequestBody, cancelTransactionHeaders);
+        ResponseEntity<String> cancelTransactionResponse = restTemplate.exchange(
+                cancelTransactionUrl,
+                HttpMethod.POST,
+                cancelTransactionRequest,
+                String.class
+        );
+
+        if (cancelTransactionResponse.getStatusCode() == HttpStatus.OK) {
+            return "Transaction annulée.";
+        } else {
+            // Échec de l'annulation de la transaction
+            return "Échec de l'annulation de la transaction.";
+        }
     }
 
 

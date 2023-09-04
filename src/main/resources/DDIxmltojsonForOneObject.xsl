@@ -10,7 +10,7 @@
     <xsl:param name="version"/>
     <xsl:output method="text"/>
     
-    <xsl:variable name="version">1</xsl:variable>
+
     <xsl:variable name="ItemFormat">DC337820-AF3A-4C0B-82F9-CF02535CDE83</xsl:variable>
     <xsl:variable name="VersionResponsibility">Aremplir</xsl:variable>
     <xsl:variable name="IsPublished">false</xsl:variable>
