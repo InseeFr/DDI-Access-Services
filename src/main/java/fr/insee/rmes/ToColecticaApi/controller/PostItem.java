@@ -98,6 +98,9 @@ public class PostItem {
         this.resourceLoader = resourceLoader;
     }
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     @PostMapping(value = "/transformJsonToJsonForAPi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "transform an JSON Codelist (Id,Label) to an another json for Colectica API ",
             description = "tranform a codeList in json to another json with DDI item inside")
@@ -105,8 +108,9 @@ public class PostItem {
                                            @RequestParam("nom metier") String idValue,
                                            @RequestParam("label") String nomenclatureName,
                                            @RequestParam("description") String suggesterDescription,
-                                           @RequestParam("version") String version,
+                                           @RequestParam(value = "version",defaultValue = "1") String version,
                                            @RequestParam("idepUtilisateur") String idepUtilisateur,
+                                           // peut-être lire le jeton pour recup le timbre directement
                                            @RequestParam("timbre") String timbre) {
 
         try {
@@ -120,7 +124,7 @@ public class PostItem {
             System.out.println("Le fichier a été modifié avec succès (ajout balise data) !");
 
             InputStream xsltStream1 = getClass().getResourceAsStream("/jsontoDDIXML.xsl");
-            String xmlContent = transformToXml(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, timbre);
+            String xmlContent = transformToXml(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, timbre,version);
 
             InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojson.xsl");
             String jsonContent = transformToJson(new ByteArrayResource(xmlContent.getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur);
@@ -136,8 +140,7 @@ public class PostItem {
     }
 
 
-    @Autowired
-    private RestTemplate restTemplate; // Assurez-vous d'avoir configuré un bean RestTemplate dans votre application.
+
 
     @PostMapping("/UpdateToColecticaRepository/{transactionType}")
     @Operation(summary = "Send an update to Colectica Repository via Colectica API ",
@@ -148,7 +151,7 @@ public class PostItem {
     ) throws IOException {
         try {
             // Étape 1: Initialiser la transaction
-            String initTransactionUrl = "http://metadonnees-operations.developpement3.insee.fr/api/v1/transaction";
+            String initTransactionUrl = urlColectica + "/api/v1/transaction";
             String authentToken;
             if (urlColectica.contains("kube")) {
                 String token2 = getAuthToken();
@@ -176,7 +179,7 @@ public class PostItem {
                 int transactionId = extractTransactionId(responseBody);
 
                 // Étape 2: Peupler la transaction
-                String populateTransactionUrl = "http://metadonnees-operations.developpement3.insee.fr/api/v1/transaction/_addItemsToTransaction";
+                String populateTransactionUrl = urlColectica + "/api/v1/transaction/_addItemsToTransaction";
                 HttpHeaders populateTransactionHeaders = new HttpHeaders();
                 populateTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
                 populateTransactionHeaders.setBearerAuth(authentToken);
@@ -192,7 +195,7 @@ public class PostItem {
 
                 if (populateTransactionResponse.getStatusCode() == HttpStatus.OK) {
                     // Étape 3: Commit la transaction
-                    String commitTransactionUrl = "http://metadonnees-operations.developpement3.insee.fr/api/v1/transaction/_commitTransaction";
+                    String commitTransactionUrl = urlColectica + "/api/v1/transaction/_commitTransaction";
                     HttpHeaders commitTransactionHeaders = new HttpHeaders();
                     commitTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
                     commitTransactionHeaders.setBearerAuth(authentToken);
@@ -207,7 +210,6 @@ public class PostItem {
                     );
 
                     if (commitTransactionResponse.getStatusCode() == HttpStatus.OK) {
-                        // Transaction réussie, vous pouvez retourner une réponse appropriée
                         return ResponseEntity.ok("Transaction réussie.");
                     } else {
                         // Échec de la transaction, annuler la transaction
@@ -237,14 +239,13 @@ public class PostItem {
             return transactionId;
         } catch (Exception e) {
             e.printStackTrace();
-            // Gérez l'erreur ici, par exemple, lancez une exception ou retournez une valeur par défaut en cas d'échec
-            return -1; // Valeur par défaut en cas d'erreur
+             return -1;
         }
     }
 
     private String cancelTransaction(int transactionId, String authentToken) {
         // Étape 4: Annuler la transaction en cas d'échec
-        String cancelTransactionUrl = "http://metadonnees-operations.developpement3.insee.fr/api/v1/transaction/_cancelTransaction";
+        String cancelTransactionUrl = urlColectica + "/api/v1/transaction/_cancelTransaction";
         HttpHeaders cancelTransactionHeaders = new HttpHeaders();
         cancelTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
         cancelTransactionHeaders.setBearerAuth(authentToken);
@@ -261,7 +262,6 @@ public class PostItem {
         if (cancelTransactionResponse.getStatusCode() == HttpStatus.OK) {
             return "Transaction annulée.";
         } else {
-            // Échec de l'annulation de la transaction
             return "Échec de l'annulation de la transaction.";
         }
     }
@@ -314,7 +314,7 @@ public class PostItem {
 
 
         private String transformToXml(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,
-                                      String suggesterDescription,  String timbre)
+                                      String suggesterDescription,  String timbre, String version)
                 throws IOException, TransformerException {
 
             // Créer un transformateur XSLT
@@ -339,6 +339,7 @@ public class PostItem {
             transformer.setParameter("suggesterName", nomenclatureName);
             transformer.setParameter("suggesterDescription", suggesterDescription);
             transformer.setParameter("timbre", timbre);
+            transformer.setParameter("version", version);
             // on lance la transfo
             StreamSource text = new StreamSource(file.getInputStream());
             StringWriter xmlWriter = new StringWriter();
@@ -379,12 +380,10 @@ public class PostItem {
             authentToken = getFreshToken();
         }
         String fileContent = new String(file.getBytes());
-
-        boolean success = sendFileToApi(fileContent, authentToken);
+        String itemApiUrl = urlColectica + "/api/v1/item";
+        boolean success = sendFileToApi(fileContent, authentToken,itemApiUrl);
 
         if (success) {
-            // Vous pouvez effectuer d'autres opérations ici si nécessaire
-
             return ResponseEntity.ok("Le fichier a été envoyé avec succès à l'API.");
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -441,7 +440,7 @@ public class PostItem {
         return null;
     }
 
-    private boolean sendFileToApi(String fileContent, String token) {
+    private boolean sendFileToApi(String fileContent, String token, String url) {
         RestTemplate restTemplate = new RestTemplate();
 
            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
@@ -456,7 +455,7 @@ public class PostItem {
 
             HttpEntity<String> request = new HttpEntity<>(fileContent, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(itemApiUrl, HttpMethod.POST,request, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST,request, String.class);
 
             return response.getStatusCode() == HttpStatus.OK;
         }

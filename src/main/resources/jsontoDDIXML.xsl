@@ -76,17 +76,17 @@
             <TopLevelReference>
                 <Agency>fr.insee</Agency>
                 <ID><xsl:value-of select="uuidArray"/></ID>
-                <Version>1</Version>
+                <Version><xsl:value-of select="$version"/></Version>
                 <TypeOfObject>CodeList</TypeOfObject>
             </TopLevelReference>
             <Fragment xmlns="ddi:instance:3_3">
                 <xsl:namespace name="r" select="'ddi:reusable:3_3'"/>
                 <CodeList isUniversallyUnique="true" xmlns="ddi:logicalproduct:3_3" >  <!--xmlns="ddi:logicalproduct:3_3"-->
                     <xsl:attribute name="versionDate" select="concat(translate(substring(xs:string(current-dateTime()),1,23),'+','0'),'0000Z')"></xsl:attribute>
-                    <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidArray/text(),':1')"/></r:URN>
+                    <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidArray/text(),':',$version)"/></r:URN>
                     <r:Agency>fr.insee</r:Agency>
                     <r:ID><xsl:value-of select="uuidArray"/></r:ID>                    
-                    <r:Version>1</r:Version>
+                    <r:Version><xsl:value-of select="$version"/></r:Version>
                     <r:UserID typeOfUserID="colectica:sourceId">INSEE-<xsl:value-of select="$timbre"/></r:UserID>
                     <CodeListName>
                         <r:String xml:lang="fr-FR">SUGGESTER_<xsl:value-of select="$idValue"/></r:String>
@@ -109,15 +109,15 @@
     <xsl:template match="map" mode="code"> 
         <xsl:param name="filename"/>
         <Code xmlns="ddi:logicalproduct:3_3" isUniversallyUnique="true">  <!--xmlns="ddi:logicalproduct:3_3"-->
-            <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidCode/text(),':1')"/></r:URN>
+            <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidCode/text(),':',$version)"/></r:URN>
             <r:Agency>fr.insee</r:Agency>
             <r:ID><xsl:value-of select="uuidCode"/></r:ID>                    
-            <r:Version>1</r:Version>
+            <r:Version><xsl:value-of select="$version"/></r:Version>
             <!-- <r:UserID typeOfUserID="colectica:sourceId">INSEE-<xsl:value-of select="$filename"/><xsl:value-of select="0 + position()"/></r:UserID> -->
             <r:CategoryReference>
                 <r:Agency>fr.insee</r:Agency>
                 <r:ID><xsl:value-of select="uuidFragment"/></r:ID> 
-                <r:Version>1</r:Version>
+                <r:Version><xsl:value-of select="$version"/></r:Version>
                 <r:TypeOfObject>Category</r:TypeOfObject>
             </r:CategoryReference>
             <r:Value><xsl:value-of select="string[@key='id']"/></r:Value>
@@ -128,10 +128,10 @@
         <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3"> <!-- xmlns:r="ddi:reusable:3_3" -->
             <Category isUniversallyUnique="true" isMissing="false" xmlns="ddi:logicalproduct:3_3"> <!-- xmlns="ddi:logicalproduct:3_3"-->
                 <xsl:attribute name="versionDate" select="concat(translate(substring(xs:string(current-dateTime()),1,23),'+','0'),'0000Z')"></xsl:attribute>
-                <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidFragment/text(),':1')"/></r:URN>
+                <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',uuidFragment/text(),':',$version)"/></r:URN>
                 <r:Agency>fr.insee</r:Agency>
                 <r:ID><xsl:value-of select="uuidFragment"/></r:ID>
-                <r:Version>1</r:Version>
+                <r:Version><xsl:value-of select="$version"/></r:Version>
                 <!--<r:UserID typeOfUserID="colectica:sourceId">INSEE-<xsl:value-of select="0 + position()"/></r:UserID> -->
                <CategoryName>
                    <r:String xml:lang="fr-FR"><xsl:value-of select="concat(string-join((tokenize(tokenize(document-uri(/),'/')[last()],'\.')[position()!=last()]),'.'), string[@key='id'])"/></r:String>

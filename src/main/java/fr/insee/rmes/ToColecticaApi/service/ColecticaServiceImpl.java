@@ -12,8 +12,14 @@ import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
 import lombok.NonNull;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,29 +27,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -56,10 +44,15 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 @Service
@@ -140,7 +133,7 @@ public class ColecticaServiceImpl implements ColecticaService {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 JSONObject jsonResponse = new JSONObject(responseBody);
                 String xmlContent = jsonResponse.get("Item").toString();
-                xmlContent = xmlContent.replace("\\\"", "\"").replace("ï»¿", ""); // Remove escape characters and special characters
+                xmlContent = xmlContent.replace("\\\"", "\"").replace("ï»¿", "");
                 return ResponseEntity.ok(xmlContent);
             } catch (IOException e) {
                 // Log the exception
@@ -271,7 +264,13 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Override
     public ResponseEntity<?> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception {
         String apiUrl = serviceUrl+"/api/v1/jsonset/fr.insee/" + identifier;
-        String token = getFreshToken();
+
+        if (!serviceUrl.contains("kube")){
+            token = getFreshToken();
+        } else {
+            String token2 = getAuthToken();
+            token = extractAccessToken(token2);
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
@@ -316,7 +315,7 @@ public class ColecticaServiceImpl implements ColecticaService {
                                        @RequestParam ("Name") String name,
                                        @RequestParam ("VersionResponsibility") String idepUtilisateur) {
         try {
-            // Create a DocumentBuilder to parse the XML input
+
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -330,16 +329,32 @@ public class ColecticaServiceImpl implements ColecticaService {
             }
 
             Document document2 = (Document) document.cloneNode(true);
-            Node versionNode = document2.getElementsByTagName("r:Version").item(0);
-            versionNode.setTextContent(String.valueOf(version));
+            NodeList versionNodes = document2.getElementsByTagName("r:Version");
+            for (int i = 0; i < versionNodes.getLength(); i++) {
+                Node versionNode = versionNodes.item(i);
+                if (versionNode instanceof Element) {
+                    Element versionElement = (Element) versionNode;
+                    versionElement.setTextContent(String.valueOf(version));
+                }
+            }
+
             Node nameNode= document2.getElementsByTagName("r:String").item(0);
             nameNode.setTextContent(name);
+
             Node labelNode = document2.getElementsByTagName("r:Content").item(0);
             labelNode.setTextContent(label);
-            Node UrnNode = document2.getElementsByTagName("r:URN").item(0);
-            String IdFragment= UrnNode.getTextContent();
-            UrnNode.setTextContent(IdFragment.substring(0,IdFragment.lastIndexOf(":"))+":"+version);
-            // Convert the modified XML back to string
+
+            NodeList urnNodes = document2.getElementsByTagName("r:URN");
+
+            for (int i = 0; i < urnNodes.getLength(); i++) {
+                Node urnNode = urnNodes.item(i);
+                if (urnNode instanceof Element) {
+                    Element urnElement = (Element) urnNode;
+                    String urnCode = urnElement.getTextContent();
+                    urnElement.setTextContent(urnCode.substring(0,urnCode.lastIndexOf(":"))+":"+version); // Remplacez par le contenu souhaité
+                }
+            }
+
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -348,7 +363,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojsonForOneObject.xsl");
             String jsonContent = transformToJson(new ByteArrayResource(writer.toString().getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur,version);
             return jsonContent;
-            //return writer.toString();
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -376,7 +391,13 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     @Override
     public ResponseEntity<?> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable {
-        String token = getFreshToken();
+
+        if (!serviceUrl.contains("kube")){
+            token = getFreshToken();
+        } else {
+            String token2 = getAuthToken();
+            token = extractAccessToken(token2);
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
