@@ -1,7 +1,6 @@
 package fr.insee.rmes.ToColecticaApi.controller;
 
 import fr.insee.rmes.ToColecticaApi.service.ColecticaService;
-import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -11,11 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import lombok.NonNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -99,19 +96,6 @@ public class GetItem {
             @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws Exception {
         return colecticaService.getJsonWithChild(identifier, outputField, fieldLabelName);
     }
-
-
-
-    @Hidden
-    @PostMapping("{type}/json")
-    @Operation(summary = "Get JSON for a type of DDI item", description = "Get a JSON list of item for a type of DDI items .")
-    public ResponseEntity<?> ByType (
-            @PathVariable ("type") DDIItemType type)
-            throws IOException, ExceptionColecticaUnreachable {
-
-        return colecticaService.getByType(type);
-    }
-
 
     @PutMapping ("/replace-xml-parameters")
     @Operation(summary = "Modify a fragment DDI", description = "Modify a fragment DDI. All field need to be filled with the same data if there are no changes, except for the version number, which takes a plus 1.")

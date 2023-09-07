@@ -19,11 +19,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Date;
-
-import static fr.insee.rmes.ToColecticaApi.controller.PostItem.extractAccessToken;
 
 @Service
 @Slf4j

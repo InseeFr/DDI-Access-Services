@@ -11,6 +11,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.search.model.DDIItemType;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.websocket.server.PathParam;
@@ -42,6 +43,7 @@ import java.util.Base64;
 import java.util.List;
 
 @RestController
+@Hidden
 public class ElasticsearchController {
 
     @Value("${fr.insee.rmes.elasticsearch.host}")

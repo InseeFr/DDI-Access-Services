@@ -8,10 +8,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
+import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
+import fr.insee.rmes.ToColecticaApi.models.TransactionType;
+import fr.insee.rmes.ToColecticaApi.randomUUID;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
 import lombok.NonNull;
+import net.sf.saxon.TransformerFactoryImpl;
+import net.sf.saxon.s9api.ExtensionFunction;
+import net.sf.saxon.s9api.Processor;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -26,12 +34,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,13 +56,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -421,6 +427,303 @@ public class ColecticaServiceImpl implements ColecticaService {
             return ResponseEntity.ok(responseBody);
         }
     }
+
+    @Override
+    public ResponseEntity<String> sendUpdateColectica(String DdiUpdatingInJson, TransactionType transactionType) throws IOException {
+        try {
+            // Étape 1: Initialiser la transaction
+            String initTransactionUrl = serviceUrl + "/api/v1/transaction";
+            String authentToken;
+            if (serviceUrl.contains("kube")) {
+                String token2 = getAuthToken();
+                authentToken = extractAccessToken(token2);
+            } else {
+                authentToken = getFreshToken();
+            }
+
+            HttpHeaders initTransactionHeaders = new HttpHeaders();
+            initTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+            initTransactionHeaders.setBearerAuth(authentToken);
+            HttpEntity<String> initTransactionRequest = new HttpEntity<>(initTransactionHeaders);
+            ResponseEntity<String> initTransactionResponse = restTemplate.exchange(
+                    initTransactionUrl,
+                    HttpMethod.POST,
+                    initTransactionRequest,
+                    String.class
+            );
+
+            if (initTransactionResponse.getStatusCode() == HttpStatus.OK) {
+                String responseBody = initTransactionResponse.getBody();
+                int transactionId = extractTransactionId(responseBody);
+                // Étape 2: Peupler la transaction
+                String populateTransactionUrl = serviceUrl + "/api/v1/transaction/_addItemsToTransaction";
+                HttpHeaders populateTransactionHeaders = new HttpHeaders();
+                populateTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+                populateTransactionHeaders.setBearerAuth(authentToken);
+                // Créez un objet de demande pour peupler la transaction ici avec transactionId et DdiUpdatingInJson
+                String updatedJson = DdiUpdatingInJson.replaceFirst("\\{", "{\"TransactionId\":" + transactionId + ",");
+                HttpEntity<String> populateTransactionRequest = new HttpEntity<>(updatedJson, populateTransactionHeaders);
+                ResponseEntity<String> populateTransactionResponse = restTemplate.exchange(
+                        populateTransactionUrl,
+                        HttpMethod.POST,
+                        populateTransactionRequest,
+                        String.class
+                );
+
+                if (populateTransactionResponse.getStatusCode() == HttpStatus.OK) {
+                    // Étape 3: Commit la transaction
+                    String commitTransactionUrl = serviceUrl + "/api/v1/transaction/_commitTransaction";
+                    HttpHeaders commitTransactionHeaders = new HttpHeaders();
+                    commitTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+                    commitTransactionHeaders.setBearerAuth(authentToken);
+                    // Créez un objet de demande pour commettre la transaction ici avec transactionId et transactionType
+                    String commitTransactionRequestBody = "{\"TransactionId\":" + transactionId + ",\"TransactionType\":\"" + transactionType + "\"}";
+                    HttpEntity<String> commitTransactionRequest = new HttpEntity<>(commitTransactionRequestBody, commitTransactionHeaders);
+                    ResponseEntity<String> commitTransactionResponse = restTemplate.exchange(
+                            commitTransactionUrl,
+                            HttpMethod.POST,
+                            commitTransactionRequest,
+                            String.class
+                    );
+
+                    if (commitTransactionResponse.getStatusCode() == HttpStatus.OK) {
+                        return ResponseEntity.ok("Transaction réussie.");
+                    } else {
+                        // Échec de la transaction, annuler la transaction
+                        cancelTransaction(transactionId,authentToken);
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Échec de la transaction.");
+                    }
+                } else {
+                    // Échec de la peuplement de la transaction, annuler la transaction
+                    cancelTransaction(transactionId,authentToken);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Échec du peuplement de la transaction.");
+                }
+            } else {
+                // Échec de l'initialisation de la transaction
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Échec de l'initialisation de la transaction.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur s'est produite.");
+        }
+    }
+
+    private int extractTransactionId(String responseBody) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            int transactionId = jsonNode.get("TransactionId").asInt();
+            return transactionId;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    private String cancelTransaction(int transactionId, String authentToken) {
+        // Étape 4: Annuler la transaction en cas d'échec
+        String cancelTransactionUrl = serviceUrl + "/api/v1/transaction/_cancelTransaction";
+        HttpHeaders cancelTransactionHeaders = new HttpHeaders();
+        cancelTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+        cancelTransactionHeaders.setBearerAuth(authentToken);
+        // Créez un objet de demande pour annuler la transaction ici avec transactionId
+        String cancelTransactionRequestBody = "{\"TransactionId\":" + transactionId + "}";
+        HttpEntity<String> cancelTransactionRequest = new HttpEntity<>(cancelTransactionRequestBody, cancelTransactionHeaders);
+        ResponseEntity<String> cancelTransactionResponse = restTemplate.exchange(
+                cancelTransactionUrl,
+                HttpMethod.POST,
+                cancelTransactionRequest,
+                String.class
+        );
+
+        if (cancelTransactionResponse.getStatusCode() == HttpStatus.OK) {
+            return "Transaction annulée.";
+        } else {
+            return "Échec de l'annulation de la transaction.";
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> transformFile(
+            MultipartFile file,
+            String idValue,
+            String nomenclatureName,
+            String suggesterDescription,
+            String version,
+            String idepUtilisateur,
+            String timbre
+    ) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            String resultFileName2 = UUID.randomUUID().toString() + ".json";
+
+            MultipartFile outputFile = processFile(file);
+            System.out.println("Le fichier a été modifié avec succès (ajout balise data) !");
+
+            InputStream xsltStream1 = getClass().getResourceAsStream("/jsontoDDIXML.xsl");
+            String xmlContent = transformToXml(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, timbre,version);
+
+            InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojson.xsl");
+            String jsonContent = transformToJson(new ByteArrayResource(xmlContent.getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", UriUtils.encode(resultFileName2, StandardCharsets.UTF_8));
+
+            return new ResponseEntity<>(jsonContent, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la transformation du fichier.", e);
+        }
+    }
+
+    public static MultipartFile processFile(MultipartFile inputFile) throws Exception {
+        byte[] modifiedContent;
+        try (InputStream inputStream = inputFile.getInputStream();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            // Écriture de la balise d'ouverture "<data>"
+            outputStream.write("<data>".getBytes());
+
+            // Copie du contenu du fichier d'entrée dans le flux de sortie
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            // Écriture de la balise de fermeture "</data>"
+            outputStream.write("</data>".getBytes());
+
+            // Récupération du contenu modifié sous forme de tableau de bytes
+            modifiedContent = outputStream.toByteArray();
+        }
+
+        // Création d'un objet FileItem à partir du contenu modifié
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        FileItem fileItem = factory.createItem(
+                inputFile.getName(),
+                inputFile.getContentType(),
+                false,
+                inputFile.getOriginalFilename()
+        );
+        try (InputStream modifiedInputStream = new ByteArrayInputStream(modifiedContent)) {
+            try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = modifiedInputStream.read(buffer)) != -1) {
+                    output.write(buffer, 0, bytesRead);
+                }
+                fileItem.getOutputStream().write(output.toByteArray());
+            }
+        }
+
+        // Création d'un nouvel objet MultipartFile à partir du FileItem modifié
+        return new CustomMultipartFile(fileItem);
+    }
+
+    private String transformToXml(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,
+                                  String suggesterDescription,  String timbre, String version)
+            throws IOException, TransformerException {
+
+        // Créer un transformateur XSLT
+        TransformerFactory factory = TransformerFactory.newInstance();
+
+        // on doit passer à TransformerFactoryImpl pour pouvoir faire des modifs
+        TransformerFactoryImpl tFactoryImpl = (TransformerFactoryImpl) factory;
+
+        // on appelle le "processor" actuel
+        net.sf.saxon.Configuration saxonConfig = tFactoryImpl.getConfiguration();
+        Processor processor = (Processor) saxonConfig.getProcessor();
+
+        // on injecte ici la class que l'on appelle dans le xslt
+        ExtensionFunction randomUUID = new randomUUID();
+        processor.registerExtensionFunction(randomUUID);
+        Source xslt = new StreamSource(xsltFile);
+        Transformer transformer = factory.newTransformer(xslt);
+
+        // param pour la transfo
+
+        transformer.setParameter("idValue", idValue);
+        transformer.setParameter("suggesterName", nomenclatureName);
+        transformer.setParameter("suggesterDescription", suggesterDescription);
+        transformer.setParameter("timbre", timbre);
+        transformer.setParameter("version", version);
+        // on lance la transfo
+        StreamSource text = new StreamSource(file.getInputStream());
+        StringWriter xmlWriter = new StringWriter();
+        StreamResult xmlResult = new StreamResult(xmlWriter);
+        transformer.transform(text, xmlResult);
+        String xmlContent = xmlWriter.toString();
+        return xmlContent;
+    }
+
+    private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur) throws IOException, TransformerException {
+
+        // Créer un transformateur XSLT
+        TransformerFactory factory = TransformerFactory.newInstance();
+
+        Source xslt = new StreamSource(xsltFileJson);
+        Transformer transformer = factory.newTransformer(xslt);
+        transformer.setParameter("idepUtilisateur", idepUtilisateur);
+        // on lance la transfo
+        StreamSource text = new StreamSource(resultResource.getInputStream());
+        StringWriter xmlWriter = new StringWriter();
+        StreamResult xmlResult = new StreamResult(xmlWriter);
+        transformer.transform(text, xmlResult);
+        String jsonContent = xmlWriter.toString();
+        return jsonContent;
+    }
+
+    @Override
+    public ResponseEntity<String> uploadItem(MultipartFile file) throws IOException, ExceptionColecticaUnreachable {
+        try {
+            String authentToken;
+            if (serviceUrl.contains("kube")) {
+                String token2 = getAuthToken();
+                authentToken = extractAccessToken(token2);
+            } else {
+                authentToken = getFreshToken();
+            }
+            String fileContent = new String(file.getBytes());
+            String itemApiUrl = serviceUrl + "/api/v1/item";
+            boolean success = sendFileToApi(fileContent, authentToken, itemApiUrl);
+
+            if (success) {
+                return ResponseEntity.ok("Le fichier a été envoyé avec succès à l'API.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Une erreur s'est produite lors de l'envoi du fichier à l'API.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite.");
+        }
+    }
+
+    private boolean sendFileToApi(String fileContent, String token, String url) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(100000); // Temps de connexion en millisecondes
+        factory.setReadTimeout(100000); // Temps de lecture en millisecondes
+
+        restTemplate.setRequestFactory(factory);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+
+        HttpEntity<String> request = new HttpEntity<>(fileContent, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST,request, String.class);
+
+        return response.getStatusCode() == HttpStatus.OK;
+    }
+
     private String getAuthToken() throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
