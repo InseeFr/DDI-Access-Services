@@ -16,19 +16,15 @@ package fr.insee.rmes.ToColecticaApi.models;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.springframework.util.StreamUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
 
 /**
  * {@link MultipartFile} implementation for Apache Commons FileUpload.
@@ -86,6 +82,7 @@ public class CommonsMultipartFile implements MultipartFile, Serializable {
 
 
     @Override
+    @NonNull
     public String getName() {
         return this.fileItem.getFieldName();
     }
@@ -94,26 +91,19 @@ public class CommonsMultipartFile implements MultipartFile, Serializable {
     public String getOriginalFilename() {
         String filename = this.fileItem.getName();
         if (filename == null) {
-            // Should never happen.
             return "";
         }
         if (this.preserveFilename) {
-            // Do not try to strip off a path...
             return filename;
         }
 
-        // Check for Unix-style path
         int unixSep = filename.lastIndexOf("/");
-        // Check for Windows-style path
         int winSep = filename.lastIndexOf("\\");
-        // Cut off at latest possible point
-        int pos = (winSep > unixSep ? winSep : unixSep);
+        int pos = Math.max(winSep, unixSep);
         if (pos != -1)  {
-            // Any sort of path separator found...
             return filename.substring(pos + 1);
         }
         else {
-            // A plain name
             return filename;
         }
     }
@@ -134,6 +124,7 @@ public class CommonsMultipartFile implements MultipartFile, Serializable {
     }
 
     @Override
+    @NonNull
     public byte[] getBytes() {
         if (!isAvailable()) {
             throw new IllegalStateException("File has been moved - cannot be read again");
@@ -143,16 +134,17 @@ public class CommonsMultipartFile implements MultipartFile, Serializable {
     }
 
     @Override
+    @NonNull
     public InputStream getInputStream() throws IOException {
         if (!isAvailable()) {
             throw new IllegalStateException("File has been moved - cannot be read again");
         }
         InputStream inputStream = this.fileItem.getInputStream();
-        return (inputStream != null ? inputStream : StreamUtils.emptyInput());
+        return (inputStream != null ? inputStream : new ByteArrayInputStream(new byte[0]));
     }
 
     @Override
-    public void transferTo(File dest) throws IOException, IllegalStateException {
+    public void transferTo( @NonNull File dest) throws IOException, IllegalStateException {
         if (!isAvailable()) {
             throw new IllegalStateException("File has already been moved - cannot be transferred again");
         }

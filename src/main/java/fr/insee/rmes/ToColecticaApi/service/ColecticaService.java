@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface ColecticaService {
     ResponseEntity<?> findFragmentByUuid(String uuid);
@@ -14,6 +15,7 @@ public interface ColecticaService {
     ResponseEntity<?> findInstanceByUuid(String uuid);
 
     ResponseEntity<?> filteredSearchText(String index, String texte);
+    ResponseEntity<?> SearchByType(String index, DDIItemType type);
     ResponseEntity<?> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception;
 
     String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur);
@@ -30,6 +32,18 @@ public interface ColecticaService {
             String version,
             String idepUtilisateur,
             String timbre
+    );
+    ResponseEntity<?> transformFileForComplexList(
+            MultipartFile file,
+            String idValue,
+            String nomenclatureName,
+            String suggesterDescription,
+            String version,
+            String idepUtilisateur,
+            String timbre,
+            String principale,
+            List <String> secondaire,
+            List <String> labelSecondaire
     );
 
     ResponseEntity<String> uploadItem(MultipartFile file) throws IOException, ExceptionColecticaUnreachable;

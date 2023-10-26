@@ -1,9 +1,7 @@
 package fr.insee.rmes.ToColecticaApi.controller;
 
 import fr.insee.rmes.ToColecticaApi.service.ColecticaService;
-import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
-import java.io.IOException;
 
 
 @RestController
@@ -36,7 +32,7 @@ public class GetItem {
     }
 
 
-    @GetMapping("ddiInstance/{uuid}")
+    @GetMapping("ddiInstance/uuid")
     @Operation(summary = "Get ddiInstance by uuid", description = "Get an XML document for a ddi:Instance from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
     public ResponseEntity<?> FindInstanceByUuidColectica (
@@ -49,7 +45,7 @@ public class GetItem {
 
     }
 
-    @GetMapping("ddiFragment/{uuid}")
+    @GetMapping("ddiFragment/uuid")
     @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
     public ResponseEntity<?> FindFragmentByUuidColectica (
@@ -64,7 +60,7 @@ public class GetItem {
 
 
 
-        @GetMapping("/filtered-search/{index}/{texte}")
+        @GetMapping("/filtered-search/texte")
         @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
         public ResponseEntity<?> filteredSearchText(
                 @Parameter(
@@ -79,6 +75,21 @@ public class GetItem {
                         schema = @Schema(
                                 type = "string", example="sugg*")) String texte) {
             return colecticaService.filteredSearchText(index, texte);
+    }
+
+    @GetMapping("/filtered-search/type/")
+    @Operation(summary = "Get list of match by type in elasticsearch database", description = "Get a JSON ")
+    public ResponseEntity<?> SearchByType(
+            @Parameter(
+                    description = "nom par défaut de l'index colectica",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="portal_registered_item"))
+            String index ,
+            @Parameter(
+                    description = "type à selectionner",
+                    required = true)  @RequestParam DDIItemType ddiItemType) {
+        return colecticaService.SearchByType(index, ddiItemType);
     }
 
 

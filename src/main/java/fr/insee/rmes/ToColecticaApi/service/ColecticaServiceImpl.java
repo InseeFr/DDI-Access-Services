@@ -23,6 +23,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -211,6 +212,50 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
+    @Override
+    public ResponseEntity<?> SearchByType(String index, DDIItemType type) {
+        ResponseEntity<?> responseEntity = searchType(index, String.valueOf(type.getUUID()).toLowerCase());
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            String responseBody = (String) responseEntity.getBody();
+            String filteredResponse = filterAndTransformResponse(responseBody);
+            return ResponseEntity.ok(filteredResponse);
+        } else {
+            return responseEntity;
+        }
+    }
+
+    private ResponseEntity<?> searchType(String index,String texte) {
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost httpPost;
+            String jsonBody = "{\"query\": {\"match\": {\"itemType\":\""+ texte + "\"}}, \"_source\": true, \"size\": 10000, \"from\": 0}";
+            StringEntity entity = new StringEntity(jsonBody, ContentType.APPLICATION_JSON);
+
+            if (elasticHost.contains("kube")) {
+                httpPost = new HttpPost("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search");
+                httpPost.setEntity(entity);
+            }
+            else {
+                httpPost = new HttpPost("http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search");
+                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
+                httpPost.setHeader("Authorization", "Basic " + token);
+                httpPost.setHeader("Content-Type", "application/json");
+                httpPost.setEntity(entity);
+            }
+
+
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                String responseBody = EntityUtils.toString(response.getEntity());
+
+                return ResponseEntity.ok(responseBody);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+        }
+    }
+
+
     private ResponseEntity<?> searchText(String index,String texte) {
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -247,18 +292,23 @@ public class ColecticaServiceImpl implements ColecticaService {
             for (JsonNode hit : hitsArray) {
                 JsonNode source = hit.path("_source");
 
-                ObjectNode filteredSource = objectMapper.createObjectNode();
-                filteredSource.put("name", source.path("name_fr-FR").asText());
-                filteredSource.put("label", source.path("label_fr-FR").asText());
+                String name = source.path("name_fr-FR").asText();
+                String label = source.path("label_fr-FR").asText();
 
-                String versionlessId = source.path("versionlessId").asText();
-                if (versionlessId.startsWith("fr.insee:")) {
-                    versionlessId = versionlessId.substring("fr.insee:".length());
-                }
-                filteredSource.put("Id",  versionlessId);
+                // Filtrer les éléments avec name ou label non vide
+                if (!name.isEmpty() || !label.isEmpty()) {
+                    ObjectNode filteredSource = objectMapper.createObjectNode();
+                    filteredSource.put("name", name);
+                    filteredSource.put("label", label);
 
-                filteredHitsArray.add(filteredSource);
-            }
+                    String versionlessId = source.path("versionlessId").asText();
+                    if (versionlessId.startsWith("fr.insee:")) {
+                        versionlessId = versionlessId.substring("fr.insee:".length());
+                    }
+                    filteredSource.put("Id",  versionlessId);
+
+                    filteredHitsArray.add(filteredSource);
+                }}
 
             return filteredHitsArray.toString();
         } catch (IOException e) {
@@ -429,7 +479,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<String> sendUpdateColectica(String DdiUpdatingInJson, TransactionType transactionType) throws IOException {
+    public ResponseEntity<String> sendUpdateColectica(String DdiUpdatingInJson, TransactionType transactionType) {
         try {
             // Étape 1: Initialiser la transaction
             String initTransactionUrl = serviceUrl + "/api/v1/transaction";
@@ -578,6 +628,44 @@ public class ColecticaServiceImpl implements ColecticaService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la transformation du fichier.", e);
         }
     }
+    @Override
+    public ResponseEntity<?> transformFileForComplexList(
+            MultipartFile file,
+            String idValue,
+            String nomenclatureName,
+            String suggesterDescription,
+            String version,
+            String idepUtilisateur,
+            String timbre,
+            String principale,
+            List secondaire,
+            List labelSecondaire
+    ) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            String resultFileName2 = UUID.randomUUID().toString() + ".json";
+
+            MultipartFile outputFile = processFile(file);
+            System.out.println("Le fichier a été modifié avec succès (ajout balise data) !");
+
+            InputStream xsltStream1 = getClass().getResourceAsStream("/jsonToDdiXmlForComplexList.xsl");
+            String xmlContent = transformToXmlForComplexList(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, timbre,version,principale,secondaire,labelSecondaire);
+
+            InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojson.xsl");
+            String jsonContent = transformToJson(new ByteArrayResource(xmlContent.getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", UriUtils.encode(resultFileName2, StandardCharsets.UTF_8));
+
+            return new ResponseEntity<>(jsonContent, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la transformation du fichier.", e);
+        }
+    }
 
     public static MultipartFile processFile(MultipartFile inputFile) throws Exception {
         byte[] modifiedContent;
@@ -660,6 +748,45 @@ public class ColecticaServiceImpl implements ColecticaService {
         return xmlContent;
     }
 
+    private String transformToXmlForComplexList(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,
+                                  String suggesterDescription,  String timbre, String version, String principale,List <String> secondaire, List  <String> labelSecondaire)
+            throws IOException, TransformerException {
+
+        // Créer un transformateur XSLT
+        TransformerFactory factory = TransformerFactory.newInstance();
+
+        // on doit passer à TransformerFactoryImpl pour pouvoir faire des modifs
+        TransformerFactoryImpl tFactoryImpl = (TransformerFactoryImpl) factory;
+
+        // on appelle le "processor" actuel
+        net.sf.saxon.Configuration saxonConfig = tFactoryImpl.getConfiguration();
+        Processor processor = (Processor) saxonConfig.getProcessor();
+
+        // on injecte ici la class que l'on appelle dans le xslt
+        ExtensionFunction randomUUID = new randomUUID();
+        processor.registerExtensionFunction(randomUUID);
+        Source xslt = new StreamSource(xsltFile);
+        Transformer transformer = factory.newTransformer(xslt);
+
+        // param pour la transfo
+
+        transformer.setParameter("idValue", idValue);
+        transformer.setParameter("suggesterName", nomenclatureName);
+        transformer.setParameter("suggesterDescription", suggesterDescription);
+        transformer.setParameter("timbre", timbre);
+        transformer.setParameter("version", version);
+        transformer.setParameter("principale", principale);
+        transformer.setParameter("secondaire", secondaire);
+        transformer.setParameter("labelSecondaire", labelSecondaire);
+        // on lance la transfo
+        StreamSource text = new StreamSource(file.getInputStream());
+        StringWriter xmlWriter = new StringWriter();
+        StreamResult xmlResult = new StreamResult(xmlWriter);
+        transformer.transform(text, xmlResult);
+        String xmlContent = xmlWriter.toString();
+        return xmlContent;
+    }
+
     private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur) throws IOException, TransformerException {
 
         // Créer un transformateur XSLT
@@ -678,7 +805,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<String> uploadItem(MultipartFile file) throws IOException, ExceptionColecticaUnreachable {
+    public ResponseEntity<String> uploadItem(MultipartFile file)  {
         try {
             String authentToken;
             if (serviceUrl.contains("kube")) {

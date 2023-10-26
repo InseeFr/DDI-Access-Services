@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/postItem")
@@ -64,6 +65,24 @@ public class PostItem {
 
             return colecticaService.transformFile(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre);
         }
+
+    @PostMapping(value = "/transformJsonToJsonForApiForComplexCodeList", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "transform an JSON Codelist (Id,Label) to an another json for Colectica API ",
+            description = "tranform a codeList in json to another json with DDI item inside")
+    public ResponseEntity<?> transformFileForComplexCodeList(@RequestParam("file") MultipartFile file,
+                                           @RequestParam("nom metier") String idValue,
+                                           @RequestParam("label") String nomenclatureName,
+                                           @RequestParam("description") String suggesterDescription,
+                                           @RequestParam(value = "version",defaultValue = "1") String version,
+                                           @RequestParam("idepUtilisateur") String idepUtilisateur,
+                                           // peut-être lire le jeton pour recup le timbre directement et l'idep
+                                           @RequestParam("timbre") String timbre,
+                                           @RequestParam("principale") String principale,
+                                           @RequestParam("secondaire") List <String> secondaire,
+                                           @RequestParam("labelSecondaire") List <String> labelSecondaire)  {
+
+        return colecticaService.transformFileForComplexList(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre,principale,secondaire,labelSecondaire);
+    }
 
 
     @PostMapping("/UpdateToColecticaRepository/{transactionType}")
