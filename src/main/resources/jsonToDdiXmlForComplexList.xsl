@@ -176,20 +176,20 @@
         
         <xsl:element name="ddi:FragmentInstance">
         
-            <ddi:TopLevelReference>
+            <TopLevelReference>
                 <r:Agency>fr.insee</r:Agency>
                 <r:ID><xsl:value-of select="FragInst/TopLevRef/uuid"/></r:ID>
-                <r:Version>2</r:Version>
+                <r:Version><xsl:value-of select="$version"/></r:Version>
                 <r:TypeOfObject>ResourcePackage</r:TypeOfObject>
-            </ddi:TopLevelReference>
-            <ddi:Fragment xmlns="ddi:instance:3_3">
-                <xsl:namespace name="r" select="'ddi:reusable:3_3'"/>
+            </TopLevelReference>
+            <Fragment xmlns="ddi:instance:3_3">
+                 <xsl:namespace name="r" select="'ddi:reusable:3_3'"/>
                 <ResourcePackage isUniversallyUnique="true" xmlns="ddi:group:3_3">  <!--xmlns="ddi:logicalproduct:3_3"-->
                     <xsl:attribute name="versionDate" select="concat(translate(substring(xs:string(current-dateTime()),1,23),'+','0'),'0000Z')"></xsl:attribute>
-                    <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',FragInst/TopLevRef/uuid/text(),':2')"/></r:URN>
+                    <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',FragInst/TopLevRef/uuid/text(),':',$version)"/></r:URN>
                     <r:Agency>fr.insee</r:Agency>
                     <r:ID><xsl:value-of select="FragInst/TopLevRef/uuid"/></r:ID>                    
-                    <r:Version>2</r:Version>
+                    <r:Version><xsl:value-of select="$version"/></r:Version>
                     <r:Citation>
                         <r:Title>
                             <r:String xml:lang="fr-FR"><xsl:value-of select="$ResourcePackageCitationTitle"/></r:String>
@@ -198,24 +198,25 @@
                     <r:CategorySchemeReference>
                         <r:Agency>fr.insee</r:Agency>
                         <r:ID><xsl:value-of select="FragInst/FragResPac/ResPac/CatSchRef/uuid/text()"/></r:ID>
-                        <r:Version>1</r:Version>
+                        <r:Version><xsl:value-of select="$version"/></r:Version>
                         <r:TypeOfObject>CategoryScheme</r:TypeOfObject>
                     </r:CategorySchemeReference>
                     <r:CodeListSchemeReference>
                         <r:Agency>fr.insee</r:Agency>
                         <r:ID><xsl:value-of select="FragInst/FragResPac/ResPac/CodLisSch/uuid/text()"/></r:ID>
-                        <r:Version>2</r:Version>
+                        <r:Version><xsl:value-of select="$version"/></r:Version>
                         <r:TypeOfObject>CodeListScheme</r:TypeOfObject>
                     </r:CodeListSchemeReference>
                 </ResourcePackage>
-            </ddi:Fragment>
-            <ddi:Fragment xmlns:r="ddi:reusable:3_3">
+            </Fragment>
+            <Fragment xmlns="ddi:instance:3_3">
+                <xsl:namespace name="r" select="'ddi:reusable:3_3'"/>
                 <CategoryScheme isUniversallyUnique="true" xmlns="ddi:logicalproduct:3_3">  <!--xmlns="ddi:logicalproduct:3_3"-->
                     <xsl:attribute name="versionDate" select="concat(translate(substring(xs:string(current-dateTime()),1,23),'+','0'),'0000Z')"></xsl:attribute>
-                    <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',FragInst/FragResPac/ResPac/CatSchRef/uuid/text(),':1')"/></r:URN>
+                    <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',FragInst/FragResPac/ResPac/CatSchRef/uuid/text(),':',$version)"/> </r:URN>
                     <r:Agency>fr.insee</r:Agency>
                     <r:ID><xsl:value-of select="FragInst/FragResPac/ResPac/CatSchRef/uuid/text()"/></r:ID>                    
-                    <r:Version>1</r:Version>
+                    <r:Version><xsl:value-of select="$version"/></r:Version>
                     <CategorySchemeName>
                         <r:String xml:lang="fr-FR"><xsl:value-of select="$CategorySchemeNameString"/></r:String>
                     </CategorySchemeName>
@@ -227,7 +228,7 @@
                     </r:Description>
                     <xsl:apply-templates select="FragInst/FragCatSch/CatSch/CatRef"/>
                 </CategoryScheme>
-            </ddi:Fragment>
+            </Fragment>
             
             
             <xsl:for-each select="1 to count(FragInst/FragCatSch/CatSch/CatRef)">          
@@ -244,32 +245,33 @@
             
     
                                    
-            <ddi:Fragment xmlns:r="ddi:reusable:3_3">
+            <Fragment xmlns="ddi:instance:3_3">
+                <xsl:namespace name="r" select="'ddi:reusable:3_3'"/>
                 <CodeListScheme isUniversallyUnique="true"  xmlns="ddi:logicalproduct:3_3">
                     <xsl:attribute name="versionDate" select="concat(translate(substring(xs:string(current-dateTime()),1,23),'+','0'),'0000Z')"></xsl:attribute>
-                    <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',FragInst/FragResPac/ResPac/CodLisSch/uuid/text(),':1')"/></r:URN>
+                    <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',FragInst/FragResPac/ResPac/CodLisSch/uuid/text(),':',$version)"/></r:URN>
                     <r:Agency>fr.insee</r:Agency>
                     <r:ID><xsl:value-of select="FragInst/FragResPac/ResPac/CodLisSch/uuid/text()"/></r:ID>
-                    <r:Version>2</r:Version>
+                    <r:Version><xsl:value-of select="$version"/></r:Version>
                     <r:Label>
                         <r:Content xml:lang="fr-FR"><xsl:value-of select="$CodeListSchemeLabelContent"/></r:Content>
                     </r:Label>
                     <xsl:apply-templates select="FragInst/FragCodLisRef/CodLisRef"/>
                 </CodeListScheme>
-            </ddi:Fragment>   
+            </Fragment>   
             
             
             
             <xsl:for-each select="1 to count(FragInst/FragCodLisRef/CodLisRef/uuid)">  
                 <xsl:variable name="pos" select="."/> 
                 <xsl:variable name="uuidpos" select="$arbre//FragInst/FragCodLisRef/CodLisRef[$pos]/uuid/text()"/>
-                <ddi:Fragment xmlns:r="ddi:reusable:3_3">
+                <Fragment xmlns="ddi:instance:3_3" xmlns:r="ddi:reusable:3_3">
                     <CodeList isUniversallyUnique="true" xmlns="ddi:logicalproduct:3_3">
                         <xsl:attribute name="versionDate" select="concat(translate(substring(xs:string(current-dateTime()),1,23),'+','0'),'0000Z')"></xsl:attribute>
-                        <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',$uuidpos,':2')"/></r:URN>
+                        <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',$uuidpos,':',$version)"/></r:URN>
                         <r:Agency>fr.insee</r:Agency>
                         <r:ID><xsl:value-of select="$uuidpos"/></r:ID>
-                        <r:Version>2</r:Version>
+                        <r:Version><xsl:value-of select="$version"/></r:Version>
                         <CodeListName>
                             <r:String xml:lang="fr-FR"><xsl:value-of select="concat('CL_',$LabelListe[$pos])"/></r:String>
                         </CodeListName>
@@ -283,14 +285,14 @@
                                 <xsl:value-of select="uuid:randomUUID()"/>
                             </xsl:variable>
                             <Code isUniversallyUnique="true"> 
-                                <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',$uuidCode,':2')"/></r:URN>
+                                <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',$uuidCode,':',$version)"/></r:URN>
                                 <r:Agency>fr.insee</r:Agency>
                                 <r:ID><xsl:value-of select="$uuidCode"/></r:ID>                    
-                                <r:Version>2</r:Version>                                
+                                <r:Version><xsl:value-of select="$version"/></r:Version>                                
                                 <r:CategoryReference>
                                     <r:Agency>fr.insee</r:Agency>
                                     <r:ID><xsl:value-of select="$arbre//FragInst/FragCatSch/CatSch/CatRef[$pos2]/uuid/text()"/></r:ID> 
-                                    <r:Version>1</r:Version>
+                                    <r:Version><xsl:value-of select="$version"/></r:Version>
                                     <r:TypeOfObject>Category</r:TypeOfObject>
                                 </r:CategoryReference>
                                 <r:Value><xsl:value-of select="$arbre//func:array/func:map[$pos2]/func:string[@key=$keyz[$pos]]"/></r:Value>
@@ -299,7 +301,7 @@
                         
                         
                     </CodeList>
-                </ddi:Fragment>
+                </Fragment>
             </xsl:for-each>
             
             
@@ -314,7 +316,7 @@
         <r:CategoryReference>  
             <r:Agency>fr.insee</r:Agency>
             <r:ID><xsl:value-of select="uuid"/></r:ID>                    
-            <r:Version>1</r:Version>
+            <r:Version><xsl:value-of select="$version"/></r:Version>
             <r:TypeOfObject>Category</r:TypeOfObject>
         </r:CategoryReference>
     </xsl:template>
@@ -324,7 +326,7 @@
         <r:CodeListReference>  
             <r:Agency>fr.insee</r:Agency>
             <r:ID><xsl:value-of select="uuid"/></r:ID>                    
-            <r:Version>1</r:Version>
+            <r:Version><xsl:value-of select="$version"/></r:Version>
             <r:TypeOfObject>CodeList</r:TypeOfObject>
         </r:CodeListReference>
     </xsl:template>
@@ -333,13 +335,13 @@
     
     <xsl:template match="func:map" mode="category">   
         <xsl:param name="uuidpos"/>        
-        <ddi:Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3"> 
+        <Fragment xmlns="ddi:instance:3_3" xmlns:r="ddi:reusable:3_3"> 
             <Category isUniversallyUnique="true" isMissing="false" xmlns="ddi:logicalproduct:3_3">
                 <xsl:attribute name="versionDate" select="concat(translate(substring(xs:string(current-dateTime()),1,23),'+','0'),'0000Z')"></xsl:attribute>
-                <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',$uuidpos,':1')"/></r:URN>
+                <r:URN><xsl:value-of select="concat('urn:ddi:fr.insee:',$uuidpos,':',$version)"/></r:URN>
                 <r:Agency>fr.insee</r:Agency>
                 <r:ID><xsl:value-of select="$uuidpos"/></r:ID>
-                <r:Version>1</r:Version>                
+                <r:Version><xsl:value-of select="$version"/></r:Version>                
                 <CategoryName>
                     <r:String xml:lang="fr-FR"><xsl:value-of select="concat('CAT_',*[@key=$principal]/text())"/></r:String>
                 </CategoryName>
@@ -347,7 +349,7 @@
                     <r:Content xml:lang="fr-FR"><xsl:value-of select="*[@key=$principal]/text()"/></r:Content>
                 </r:Label>
             </Category>
-        </ddi:Fragment>
+        </Fragment>
     </xsl:template>
  
 </xsl:stylesheet>

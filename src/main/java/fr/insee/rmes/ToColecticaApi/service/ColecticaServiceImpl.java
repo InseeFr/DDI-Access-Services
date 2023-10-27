@@ -654,7 +654,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             InputStream xsltStream1 = getClass().getResourceAsStream("/jsonToDdiXmlForComplexList.xsl");
             String xmlContent = transformToXmlForComplexList(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, timbre,version,principale,secondaire,labelSecondaire);
 
-            InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojson.xsl");
+            InputStream xsltStream2 = getClass().getResourceAsStream("/DDIComplexxmltojson.xsl");
             String jsonContent = transformToJson(new ByteArrayResource(xmlContent.getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur);
 
             HttpHeaders headers = new HttpHeaders();

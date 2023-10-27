@@ -103,8 +103,8 @@ public class PostItem {
             description = "Send a suggester JSON to /api/v1/item. This suggester must be simple, a list of Id,Label transform with transformJsonToJsonForAPi")
     public ResponseEntity<String> uploadItem(@RequestParam("file") MultipartFile file)
             throws IOException, ExceptionColecticaUnreachable {
-
-        return colecticaService.uploadItem(file);
+        String fileContent = new String(file.getBytes());
+        return colecticaService.sendUpdateColectica(fileContent, TransactionType.COPYCOMMIT);
          }
 
 
