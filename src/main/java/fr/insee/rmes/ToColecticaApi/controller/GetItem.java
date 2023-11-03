@@ -1,6 +1,8 @@
 package fr.insee.rmes.ToColecticaApi.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.rmes.ToColecticaApi.service.ColecticaService;
+import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -106,6 +108,12 @@ public class GetItem {
             @RequestParam(value = "fieldIdName",defaultValue = "id") String outputField,
             @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws Exception {
         return colecticaService.getJsonWithChild(identifier, outputField, fieldLabelName);
+    }
+
+    @PostMapping("/RessourcePackageToJson")
+    public String convertXmlToJson(
+            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
+        return colecticaService.convertXmlToJson(uuid);
     }
 
     @PutMapping ("/replace-xml-parameters")

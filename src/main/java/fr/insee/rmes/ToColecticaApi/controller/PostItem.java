@@ -87,7 +87,7 @@ public class PostItem {
 
     @PostMapping("/UpdateToColecticaRepository/{transactionType}")
     @Operation(summary = "Send an update to Colectica Repository via Colectica API ",
-            description = "Send a json make with /replace-xml-parameters/{Type}/{Label}/{Version}/{Name}/{VersionResponsibility}")
+            description = "Send a json make with /replace-xml-parameters/{Type}/{Label}/{Version}/{Name}/{VersionResponsibility} COPYCOMMIT is for Upload a new object not for update")
     public ResponseEntity<String> sendUpdateColectica(
             @RequestBody String DdiUpdatingInJson,
             @RequestParam("transactionType") TransactionType transactionType

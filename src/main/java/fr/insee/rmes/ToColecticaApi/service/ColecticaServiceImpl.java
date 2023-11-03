@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
 import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
+import fr.insee.rmes.ToColecticaApi.models.RessourcePackage;
 import fr.insee.rmes.ToColecticaApi.models.TransactionType;
 import fr.insee.rmes.ToColecticaApi.randomUUID;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
@@ -364,6 +365,44 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
+    public String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
+
+        String apiUrl = serviceUrl + "/api/v1/jsonset/fr.insee/" + uuid;
+
+        if (!serviceUrl.contains("kube")) {
+            token = getFreshToken();
+        } else {
+            String token2 = getAuthToken();
+            token = extractAccessToken(token2);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiUrl,
+                HttpMethod.GET,
+                requestEntity,
+                String.class
+        );
+
+        String result = null;
+        if (response.getStatusCode() == HttpStatus.OK) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                RessourcePackage ressourcePackage = mapper.readValue(response.getBody(), RessourcePackage.class);
+                List<Map<String, String>> countriesWithCodesAndLabels = ressourcePackage.mapCodesToLabels();
+                ObjectMapper mapperFinal= new ObjectMapper();
+                result = mapperFinal.writeValueAsString(countriesWithCodesAndLabels);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+        @Override
     public String replaceXmlParameters(@RequestBody String inputXml,
                                        @RequestParam("Type") DDIItemType type,
                                        @RequestParam ("Label") String label,
@@ -544,7 +583,7 @@ public class ColecticaServiceImpl implements ColecticaService {
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Échec de la transaction.");
                     }
                 } else {
-                    // Échec de la peuplement de la transaction, annuler la transaction
+                    // Échec du peuplement de la transaction, annuler la transaction
                     cancelTransaction(transactionId,authentToken);
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Échec du peuplement de la transaction.");
                 }

@@ -1,5 +1,6 @@
 package fr.insee.rmes.ToColecticaApi.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.rmes.ToColecticaApi.models.TransactionType;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
@@ -18,6 +19,7 @@ public interface ColecticaService {
     ResponseEntity<?> SearchByType(String index, DDIItemType type);
     ResponseEntity<?> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception;
 
+    String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException;
     String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur);
 
     ResponseEntity<?> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable;
