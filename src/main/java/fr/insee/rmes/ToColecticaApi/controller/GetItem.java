@@ -110,7 +110,7 @@ public class GetItem {
         return colecticaService.getJsonWithChild(identifier, outputField, fieldLabelName);
     }
 
-    @PostMapping("/RessourcePackageToJson")
+    @GetMapping("/RessourcePackageToJson")
     public String convertXmlToJson(
             @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
         return colecticaService.convertXmlToJson(uuid);
