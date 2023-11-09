@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>fr.insee</groupId>
 	<artifactId>rmes</artifactId>
-	<version>0.0.10-BetaElastic</version>
+	<version>0.1.10-BetaElastic</version>
 	<name>rmes</name>
 	<description>DDI-Access Services </description>
 	<properties>
@@ -54,12 +54,6 @@
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
 			<version>9.1.0</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jdbc -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jdbc</artifactId>
 		</dependency>
 
 
@@ -109,11 +103,6 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-		</dependency>
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>

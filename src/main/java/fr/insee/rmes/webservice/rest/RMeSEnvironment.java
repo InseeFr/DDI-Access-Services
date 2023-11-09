@@ -47,10 +47,7 @@ public class RMeSEnvironment {
             envRep.put("Swagger Host", env.getProperty("fr.insee.rmes.api.host"));
             envRep.put("Swagger Name", env.getProperty("fr.insee.rmes.api.name"));
             envRep.put("Swagger Scheme", env.getProperty("fr.insee.rmes.api.scheme"));
-            envRep.put("Database", env.getProperty("fr.insee.rmes.search.db.host"));
             envRep.put("Colectica Metadata services", env.getProperty("fr.insee.rmes.api.remote.metadata.url"));
-            System.out.println(envRep.toString());
-            System.out.println(Response.ok().entity(envRep).build());
             return envRep.toString(2);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
