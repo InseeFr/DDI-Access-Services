@@ -1,44 +1,33 @@
-# Compiled class file
-*.class
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-#IntelliJ
-\.idea/
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-# Log file
-*.log
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
 
-# BlueJ files
-*.ctxt
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-/target/
-
-\.classpath
-
-\.project
-
-\.settings/org\.eclipse\.core\.resources\.prefs
-
-\.settings/org\.eclipse\.jdt\.core\.prefs
-
-\.settings/org\.eclipse\.m2e\.core\.prefs
-
-src/main/resources/env/dev/ddi-access-services\.properties
-
-src/main/resources/env/dv/ddi-access-services\.properties
-
-src/main/resources/env/qa/ddi-access-services\.properties
-
-\.settings/
+### VS Code ###
+.vscode/
