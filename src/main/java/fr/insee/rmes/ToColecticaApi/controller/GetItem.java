@@ -79,6 +79,28 @@ public class GetItem {
             return colecticaService.filteredSearchText(index, texte);
     }
 
+    @GetMapping("/filtered-search/texteByType")
+    @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
+    public ResponseEntity<?> filteredSearchTextByType(
+            @Parameter(
+                    description = "nom par défaut de l'index colectica",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="portal*"))
+            String index ,
+            @Parameter(
+                    description = "texte à rechercher. le * sert de wildcard",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="sugg*"))
+            String texte,
+            @Parameter(
+                    description = "type à selectionner",
+                    required = true)  @RequestParam DDIItemType ddiItemType
+            ) {
+        return colecticaService.SearchTexteByType(index, texte, ddiItemType );
+    }
+
     @GetMapping("/filtered-search/type/")
     @Operation(summary = "Get list of match by type in elasticsearch database", description = "Get a JSON ")
     public ResponseEntity<?> SearchByType(

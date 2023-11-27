@@ -5,6 +5,7 @@ import fr.insee.rmes.search.model.DDIQuery;
 import fr.insee.rmes.search.model.DataCollectionContext;
 import fr.insee.rmes.search.model.ResponseSearchItem;
 import fr.insee.rmes.search.service.SearchService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,10 +24,12 @@ import java.util.List;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
+@Hidden
 @RestController
 @RequestMapping("/search")
 @Tag(name = "DDI Search")
 @SecurityRequirement(name = "bearerAuth")
+
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Success"),
         @ApiResponse(responseCode = "204", description = "No Content"),

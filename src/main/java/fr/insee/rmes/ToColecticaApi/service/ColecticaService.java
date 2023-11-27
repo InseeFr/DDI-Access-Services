@@ -16,6 +16,8 @@ public interface ColecticaService {
     ResponseEntity<?> findInstanceByUuid(String uuid);
 
     ResponseEntity<?> filteredSearchText(String index, String texte);
+
+    ResponseEntity<?> SearchTexteByType(String index, String texte, DDIItemType type);
     ResponseEntity<?> SearchByType(String index, DDIItemType type);
     ResponseEntity<?> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception;
 

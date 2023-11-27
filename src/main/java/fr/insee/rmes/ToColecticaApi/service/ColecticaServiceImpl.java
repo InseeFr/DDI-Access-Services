@@ -21,6 +21,7 @@ import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -59,6 +60,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -225,11 +227,24 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
-    private ResponseEntity<?> searchType(String index,String texte) {
+    @Override
+    public ResponseEntity<?> SearchTexteByType(String index,String texte, DDIItemType type) {
+        ResponseEntity<?> responseEntity = searchTextByType(index, texte, String.valueOf(type.getUUID()).toLowerCase());
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            String responseBody = (String) responseEntity.getBody();
+            String filteredResponse = filterAndTransformResponse(responseBody);
+            return ResponseEntity.ok(filteredResponse);
+        } else {
+            return responseEntity;
+        }
+    }
+
+
+    private ResponseEntity<?> searchType(String index,String type) {
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost;
-            String jsonBody = "{\"query\": {\"match\": {\"itemType\":\""+ texte + "\"}}, \"_source\": true, \"size\": 10000, \"from\": 0}";
+            String jsonBody = "{\"query\": {\"match\": {\"itemType\":\""+ type + "\"}}, \"_source\": true, \"size\": 10000, \"from\": 0}";
             StringEntity entity = new StringEntity(jsonBody, ContentType.APPLICATION_JSON);
 
             if (elasticHost.contains("kube")) {
@@ -257,25 +272,21 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
 
-    private ResponseEntity<?> searchText(String index,String texte) {
-
+    private ResponseEntity<?> searchText(String index, String texte) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            String encodedTexte = URLEncoder.encode(texte, StandardCharsets.UTF_8.toString());
             HttpGet httpGet;
 
             if (elasticHost.contains("kube")) {
-                httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q="+ texte);
-
-            }
-            else {
-                httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + texte);
+                httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + encodedTexte);
+            } else {
+                httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=*" + encodedTexte + "*");
                 String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
                 httpGet.addHeader("Authorization", "Basic " + token);
             }
 
-
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
-
                 return ResponseEntity.ok(responseBody);
             }
         } catch (IOException e) {
@@ -283,6 +294,47 @@ public class ColecticaServiceImpl implements ColecticaService {
             return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
         }
     }
+
+    private ResponseEntity<?> searchTextByType(String index, String texte, String type) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost httpPost = new HttpPost("http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search");
+
+            // Ajouter l'en-tête pour l'authentification et le type de contenu si nécessaire
+            if (!elasticHost.contains("kube")) {
+                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
+                httpPost.setHeader("Authorization", "Basic " + token);
+                httpPost.setHeader("Content-Type", "application/json");
+            }
+
+            // Construction de la requête wildcard pour chercher 'texte' dans tous les champs indexés
+            StringEntity entity = new StringEntity(
+                    "{\n" +
+                    "  \"query\": {\n" +
+                    "    \"bool\": {\n" +
+                    "      \"must\": [\n" +
+                    "        { \"match\": { \"itemType\":\"" + type + "\" }},\n" +
+                    "        { \"query_string\": {\n" +
+                    "            \"query\": \"*" + texte + "*\",\n" +
+                    "            \"fields\": [\"*\"]\n" +
+                    "          }\n" +
+                    "        }\n" +
+                    "      ]\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}", ContentType.APPLICATION_JSON);
+
+            httpPost.setEntity(entity);
+
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                String responseBody = EntityUtils.toString(response.getEntity());
+                return ResponseEntity.ok(responseBody);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+        }
+    }
+
     private String filterAndTransformResponse(String responseBody) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
