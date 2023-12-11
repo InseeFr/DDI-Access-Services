@@ -1,10 +1,14 @@
 package fr.insee.rmes;
 
 import fr.insee.rmes.config.PropertiesLogger;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
+@OpenAPIDefinition(info = @Info(title = "DDI-AS", version = "${fr.insee.rmes.ddias.version}"))
 @SpringBootApplication
 public class RmesApplication {
 
