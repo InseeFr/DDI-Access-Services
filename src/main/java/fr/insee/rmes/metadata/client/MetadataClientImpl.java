@@ -140,8 +140,8 @@ public class MetadataClientImpl implements MetadataClient {
 		String url = String.format("%s/api/v1/_query/set", serviceUrl);
 		RestTemplate restTemplate = new RestTemplate();
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
-		headers.add("Content-type", ContentType.APPLICATION_JSON.getMimeType());
-		headers.add("Authorization", "Bearer " + token);
+		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + token);
 		HttpEntity<ColecticaSearchSetRequest> request = new HttpEntity<>(setRequest, headers);
 		ResponseEntity<Relationship[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
 				Relationship[].class);
