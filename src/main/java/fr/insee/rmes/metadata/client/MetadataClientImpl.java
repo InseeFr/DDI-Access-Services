@@ -52,7 +52,7 @@ public class MetadataClientImpl implements MetadataClient {
 	@Autowired
 	private KeycloakServices kc;
 
-	private static String token;
+	private String token;
 
 	@Value("${fr.insee.rmes.api.remote.metadata.url}")
 	String serviceUrl;
