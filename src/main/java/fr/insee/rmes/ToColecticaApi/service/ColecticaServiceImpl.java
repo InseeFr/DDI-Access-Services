@@ -21,7 +21,6 @@ import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -88,7 +87,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Autowired
     private KeycloakServices kc;
 
-    private static String token;
+    private String token;
     @Value("${auth.api.url}")
     private String authApiUrl;
 
