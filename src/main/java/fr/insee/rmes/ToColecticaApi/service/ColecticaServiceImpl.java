@@ -124,8 +124,8 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<?> findFragmentByUuid(String uuid) {
-        ResponseEntity<?> responseEntity = searchColecticaFragmentByUuid(uuid);
+    public ResponseEntity<String> findFragmentByUuid(String uuid) {
+        ResponseEntity<String> responseEntity = searchColecticaFragmentByUuid(uuid);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = (String) responseEntity.getBody();
             return ResponseEntity.ok(responseBody);
@@ -134,7 +134,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
-    private ResponseEntity<?> searchColecticaFragmentByUuid(String uuid) {
+    private ResponseEntity<String> searchColecticaFragmentByUuid(String uuid) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, uuid);
             HttpGet httpGet = new HttpGet(url);
@@ -220,8 +220,8 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<?> filteredSearchText(String index, String texte) {
-        ResponseEntity<?> responseEntity = searchText(index, texte);
+    public ResponseEntity<String> filteredSearchText(String index, String texte) {
+        ResponseEntity<String> responseEntity = searchText(index, texte);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = (String) responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
@@ -232,8 +232,8 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<?> SearchByType(String index, DDIItemType type) {
-        ResponseEntity<?> responseEntity = searchType(index, String.valueOf(type.getUUID()).toLowerCase());
+    public ResponseEntity<String> SearchByType(String index, DDIItemType type) {
+        ResponseEntity<String> responseEntity = searchType(index, String.valueOf(type.getUUID()).toLowerCase());
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = (String) responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
@@ -244,8 +244,8 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<?> SearchTexteByType(String index,String texte, DDIItemType type) {
-        ResponseEntity<?> responseEntity = searchTextByType(index, texte, String.valueOf(type.getUUID()).toLowerCase());
+    public ResponseEntity<String> SearchTexteByType(String index,String texte, DDIItemType type) {
+        ResponseEntity<String> responseEntity = searchTextByType(index, texte, String.valueOf(type.getUUID()).toLowerCase());
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = (String) responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
@@ -256,7 +256,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
 
-    private ResponseEntity<?> searchType(String index,String type) {
+    private ResponseEntity<String> searchType(String index,String type) {
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost;
@@ -288,7 +288,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
 
-    private ResponseEntity<?> searchText(String index, String texte) {
+    private ResponseEntity<String> searchText(String index, String texte) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String encodedTexte = URLEncoder.encode(texte, StandardCharsets.UTF_8.toString());
             HttpGet httpGet;
@@ -311,7 +311,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
-    private ResponseEntity<?> searchTextByType(String index, String texte, String type) {
+    private ResponseEntity<String> searchTextByType(String index, String texte, String type) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + "/" + index + SEARCH);
 
@@ -387,7 +387,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<?> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception {
+    public ResponseEntity<List<Map<String,String>>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception {
         String apiUrl = serviceUrl+"/api/v1/jsonset/fr.insee/" + identifier;
 
         if (!serviceUrl.contains("kube")){

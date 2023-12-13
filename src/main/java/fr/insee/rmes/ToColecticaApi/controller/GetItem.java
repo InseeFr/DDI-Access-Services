@@ -50,7 +50,7 @@ public class GetItem {
     @GetMapping("ddiFragment/uuid")
     @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public ResponseEntity<?> FindFragmentByUuidColectica (
+    public ResponseEntity<String> FindFragmentByUuidColectica (
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
@@ -64,7 +64,7 @@ public class GetItem {
 
         @GetMapping("/filtered-search/texte")
         @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
-        public ResponseEntity<?> filteredSearchText(
+        public ResponseEntity<String> filteredSearchText(
                 @Parameter(
                         description = "nom par défaut de l'index colectica",
                         required = true,
@@ -81,7 +81,7 @@ public class GetItem {
 
     @GetMapping("/filtered-search/texteByType")
     @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
-    public ResponseEntity<?> filteredSearchTextByType(
+    public ResponseEntity<String> filteredSearchTextByType(
             @Parameter(
                     description = "nom par défaut de l'index colectica",
                     required = true,
@@ -103,7 +103,7 @@ public class GetItem {
 
     @GetMapping("/filtered-search/type/")
     @Operation(summary = "Get list of match by type in elasticsearch database", description = "Get a JSON ")
-    public ResponseEntity<?> SearchByType(
+    public ResponseEntity<String> SearchByType(
             @Parameter(
                     description = "nom par défaut de l'index colectica",
                     required = true,

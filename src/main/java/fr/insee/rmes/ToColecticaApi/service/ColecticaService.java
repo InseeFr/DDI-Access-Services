@@ -9,17 +9,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface ColecticaService {
-    ResponseEntity<?> findFragmentByUuid(String uuid);
+    ResponseEntity<String> findFragmentByUuid(String uuid);
 
     ResponseEntity<String> findInstanceByUuid(String uuid);
 
-    ResponseEntity<?> filteredSearchText(String index, String texte);
+    ResponseEntity<String> filteredSearchText(String index, String texte);
 
-    ResponseEntity<?> SearchTexteByType(String index, String texte, DDIItemType type);
-    ResponseEntity<?> SearchByType(String index, DDIItemType type);
-    ResponseEntity<?> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception;
+    ResponseEntity<String> SearchTexteByType(String index, String texte, DDIItemType type);
+    ResponseEntity<String> SearchByType(String index, DDIItemType type);
+    ResponseEntity<List<Map<String,String>>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception;
 
     String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException;
     String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur);
