@@ -178,8 +178,8 @@ public class ColecticaServiceImpl implements ColecticaService {
 
 
     @Override
-    public ResponseEntity<?> findInstanceByUuid(String uuid) {
-        ResponseEntity<?> responseEntity = searchColecticaInstanceByUuid(uuid);
+    public ResponseEntity<String> findInstanceByUuid(String uuid) {
+        ResponseEntity<String> responseEntity = searchColecticaInstanceByUuid(uuid);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = (String) responseEntity.getBody();
             return ResponseEntity.ok(responseBody);
@@ -188,7 +188,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
-    private ResponseEntity<?> searchColecticaInstanceByUuid(String uuid) {
+    private ResponseEntity<String> searchColecticaInstanceByUuid(String uuid) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet httpGet;
             String authentToken;

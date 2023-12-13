@@ -37,7 +37,7 @@ public class GetItem {
     @GetMapping("ddiInstance/uuid")
     @Operation(summary = "Get ddiInstance by uuid", description = "Get an XML document for a ddi:Instance from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public ResponseEntity<?> FindInstanceByUuidColectica (
+    public ResponseEntity<String> FindInstanceByUuidColectica (
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
