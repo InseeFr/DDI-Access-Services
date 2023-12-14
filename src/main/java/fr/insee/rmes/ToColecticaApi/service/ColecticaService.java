@@ -13,6 +13,8 @@ import java.util.List;
 public interface ColecticaService {
     ResponseEntity<?> findFragmentByUuid(String uuid);
 
+    String findFragmentByUuidWithChildren(String uuid) throws Exception;
+
     ResponseEntity<?> findInstanceByUuid(String uuid);
 
     ResponseEntity<?> filteredSearchText(String index, String texte);
