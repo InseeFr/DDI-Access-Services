@@ -35,7 +35,7 @@ import java.io.*;
  * @see CommonsMultipartResolver
  */
 @SuppressWarnings("serial")
-public class CommonsMultipartFile implements MultipartFile, Serializable {
+public class CommonsMultipartFile implements MultipartFile {
 
     protected static final Log logger = LogFactory.getLog(CommonsMultipartFile.class);
 
