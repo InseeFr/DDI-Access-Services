@@ -143,7 +143,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		List<ResponseItem> clsList = new ArrayList<>();
 		log.debug("GroupRoot id : " + idGroupRoot);
 		String fragment = getItem(idGroupRoot).item;
-		String rootExp = "//*[local-name()='Fragment']";
+		String rootExp = NAME_FRAGMENT;
 		Node rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		String childGroupExp = ".//*[local-name()='GroupReference']/*[local-name()='ID']/text()";
 		String idGroup = xpathProcessor.queryString(rootNode, childGroupExp);
