@@ -27,6 +27,7 @@ import java.util.TreeMap;
 @Slf4j
 public class DDIDocumentBuilder {
 
+	private final static String RESOURCE_PACKAGE = "g:ResourcePackage";
 	private Boolean envelope;
 	private String nameEnvelope = Envelope.DEFAULT.toString();
 	private Node itemNode;
@@ -70,7 +71,7 @@ public class DDIDocumentBuilder {
 				if (this.nameEnvelope.equals(Envelope.DEFAULT.toString())) {
 					packagedDocument.getDocumentElement().appendChild(itemNode);
 				} else {
-					appendChildByParent("g:ResourcePackage", itemNode);
+					appendChildByParent(RESOURCE_PACKAGE, itemNode);
 					refactor(itemNode, packagedDocument);
 				}
 			}
@@ -101,7 +102,7 @@ public class DDIDocumentBuilder {
 		if (envelope) {
 			if (null != itemNode) {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
-				appendChildByParent("g:ResourcePackage", itemNode);
+				appendChildByParent(RESOURCE_PACKAGE, itemNode);
 				importChildByParent(nameParent, node);
 				refactor(itemNode, packagedDocument);
 			}
@@ -131,7 +132,7 @@ public class DDIDocumentBuilder {
 		if (envelope) {
 			if (null != itemNode) {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
-				appendChildByParent("g:ResourcePackage", itemNode);
+				appendChildByParent(RESOURCE_PACKAGE, itemNode);
 				refactor(itemNode, packagedDocument);
 			}
 			for (Integer key : nodesWithParentNames.keySet()) {

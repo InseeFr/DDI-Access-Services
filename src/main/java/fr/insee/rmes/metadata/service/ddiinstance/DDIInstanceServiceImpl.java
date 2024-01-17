@@ -23,7 +23,7 @@ import fr.insee.rmes.utils.ddi.UtilXML;
 
 @Service
 public class DDIInstanceServiceImpl implements DDIInstanceService {
-	
+	private final static String FRAGMENT = "/Fragment[1]/*";
 	@Autowired
 	MetadataRepository metadataRepository;
 
@@ -70,7 +70,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 		for (ColecticaItem rpItem : RPitems) {
 			String rpString = xpathProcessor.queryString(rpItem.getItem(), "/*");
 			List<Node> rpSchemes = getReferencesInListOfNodes(rpString, docBuilder);
-			Node rpItemNode = getNodeByXpath(docBuilder, rpItem, "/Fragment[1]/*");
+			Node rpItemNode = getNodeByXpath(docBuilder, rpItem, FRAGMENT);
 			removeReferences(rpItemNode);
 			for (Node node : rpSchemes) {
 				rpItemNode.appendChild(node);
@@ -132,7 +132,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 	}
 
 	private String itemToString(ColecticaItem colecticaItem) throws Exception {
-		return UtilXML.nodeToString(xpathProcessor.queryList(colecticaItem.getItem(), "/Fragment[1]/*").item(0));
+		return UtilXML.nodeToString(xpathProcessor.queryList(colecticaItem.getItem(), FRAGMENT).item(0));
 	}
 
 	private Node getNodeByXpath(DDIDocumentBuilder docBuilder, ColecticaItem ddiInstance, String xpathExpression)
@@ -155,7 +155,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 	private List<Node> getReferencesInListOfNodes(String fragment, DDIDocumentBuilder doc) throws Exception {
 		List<Node> referencesNodes = new ArrayList<Node>();
 		List<NodeList> fragmentsSchemes = new ArrayList<NodeList>();
-		NodeList fragmentNodes = xpathProcessor.queryList(fragment, "/Fragment[1]/*");
+		NodeList fragmentNodes = xpathProcessor.queryList(fragment, FRAGMENT);
 		Node fragmentNode = null;
 		for (int n = 0; n < fragmentNodes.getLength(); n++) {
 			fragmentNode = fragmentNodes.item(n);
@@ -170,7 +170,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 							if (childRefNode.getNodeName().contains("r:ID")) {
 								ColecticaItem item = metadataServiceItem
 										.getItem(childRefNode.getChildNodes().item(0).getNodeValue());
-								fragmentsSchemes.add(xpathProcessor.queryList(item.getItem(), "/Fragment[1]/*"));
+								fragmentsSchemes.add(xpathProcessor.queryList(item.getItem(), FRAGMENT));
 
 							}
 						}

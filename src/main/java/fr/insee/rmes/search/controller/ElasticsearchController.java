@@ -45,6 +45,16 @@ import java.util.List;
 @RestController
 @Hidden
 public class ElasticsearchController {
+    private final static String HTTPS = "https://";
+    private final static String HTTP = "http://";
+    private final static String AUTHORIZATION = "Authorization";
+    private final static String BASIC = "Basic ";
+    private final static String KBN = "kbn-xsrf";
+    private final static String REPORTING = "reporting";
+    private final static String ERREUR_ES = "Une erreur s'est produite lors de la requête Elasticsearch.";
+    private final static String SEARCH = "/_search";
+    private final static String CONTENT_TYPE = "Content-Type";
+    private final static String APPLI_JSON = "application/json";
 
     @Value("${fr.insee.rmes.elasticsearch.host}")
     private String  elasticHost;
@@ -76,9 +86,9 @@ public class ElasticsearchController {
 
             // Choose the appropriate URL based on the elasticHost value
             if (elasticHost.contains("kube")) {
-                apiUrl = "https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/?pretty";
+                apiUrl = HTTPS + elasticHost + ":" + elasticHostPort + "/" + index + "/?pretty";
             } else {
-                apiUrl = "http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/?pretty";
+                apiUrl = HTTP + elasticHost + ":" + elasticHostPort + "/" + index + "/?pretty";
             }
 
             HttpGet httpGet = new HttpGet(apiUrl);
@@ -86,10 +96,10 @@ public class ElasticsearchController {
             if (!elasticHost.contains("kube")) {
                 // Add Basic Authentication header if not using Kubernetes
                 String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-                httpGet.addHeader("Authorization", "Basic " + token);
+                httpGet.addHeader(AUTHORIZATION, BASIC + token);
             }
 
-            httpGet.addHeader("kbn-xsrf", "reporting");
+            httpGet.addHeader(KBN, REPORTING);
 
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 int statusCode = response.getStatusLine().getStatusCode();
@@ -123,13 +133,13 @@ public class ElasticsearchController {
             HttpGet httpGet;
 
             if (elasticHost.contains("kube")) {
-                httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q="+ texte);
+                httpGet = new HttpGet(HTTPS + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q="+ texte);
             
             }
             else {
-                httpGet = new HttpGet("http://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + texte);
+                httpGet = new HttpGet(HTTP + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + texte);
                 String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-                httpGet.addHeader("Authorization", "Basic " + token);
+                httpGet.addHeader(AUTHORIZATION, BASIC + token);
             }
 
             
@@ -140,7 +150,7 @@ public class ElasticsearchController {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+            return ResponseEntity.status(500).body(ERREUR_ES);
         }
     }
 
@@ -150,15 +160,15 @@ public class ElasticsearchController {
             HttpPost httpPost = new HttpPost();
 
             if (elasticHost.contains("kube")) {
-                httpPost = new HttpPost("https://" + elasticHost + ":" + elasticHostPort + "/_search");
+                httpPost = new HttpPost(HTTPS + elasticHost + ":" + elasticHostPort + SEARCH);
             }
             else {
-                httpPost = new HttpPost("http://" + elasticHost + ":" + elasticHostPort + "/_search");
+                httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + SEARCH);
                 String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-                httpPost.addHeader("Authorization","Basic " + token);
+                httpPost.addHeader(AUTHORIZATION,BASIC + token);
             }
-            httpPost.addHeader("kbn-xsrf", "reporting");
-            httpPost.addHeader("Content-Type", "application/json");
+            httpPost.addHeader(KBN, REPORTING);
+            httpPost.addHeader(CONTENT_TYPE, APPLI_JSON);
             String requestBody = "{ \"query\": { \"match_all\": {} }, \"size\":10000 }";
             httpPost.setEntity(new StringEntity(requestBody));
 
@@ -169,7 +179,7 @@ public class ElasticsearchController {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+            return ResponseEntity.status(500).body(ERREUR_ES);
         }
     }
 
@@ -181,16 +191,16 @@ public class ElasticsearchController {
             HttpPost httpPost = new HttpPost();
 
             if (elasticHost.contains("kube")) {
-                httpPost = new HttpPost("https://" + elasticHost + ":" + elasticHostPort + "/_search");
+                httpPost = new HttpPost(HTTPS + elasticHost + ":" + elasticHostPort + SEARCH);
             }
             else {
-                httpPost = new HttpPost("http://" + elasticHost + ":" + elasticHostPort + "/_search");
+                httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + SEARCH);
                 String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-                httpPost.addHeader("Authorization","Basic " + token);
+                httpPost.addHeader(AUTHORIZATION,BASIC + token);
             }
 
-            httpPost.addHeader("kbn-xsrf", "reporting");
-            httpPost.setHeader("Content-Type", "application/json");
+            httpPost.addHeader(KBN, REPORTING);
+            httpPost.setHeader(CONTENT_TYPE, APPLI_JSON);
             String requestBody = "{ \"query\": { \"match\": {\"itemType\":\""+ type.getUUID().toLowerCase() +"\"} }, \"size\":10000 }";
             httpPost.setEntity(new StringEntity(requestBody));
 
@@ -201,7 +211,7 @@ public class ElasticsearchController {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+            return ResponseEntity.status(500).body(ERREUR_ES);
         }
     }
 
@@ -216,17 +226,17 @@ public class ElasticsearchController {
            HttpPost httpPost = new HttpPost();
 
            if (elasticHost.contains("kube")) {
-               httpPost = new HttpPost("https://" + elasticHost + ":" + elasticHostPort + "/_search");
+               httpPost = new HttpPost(HTTPS + elasticHost + ":" + elasticHostPort + SEARCH);
            }
            else {
-               httpPost = new HttpPost("http://" + elasticHost + ":" + elasticHostPort + "/_search");
+               httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + SEARCH);
                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-               httpPost.addHeader("Authorization","Basic " + token);
+               httpPost.addHeader(AUTHORIZATION,BASIC + token);
            }
 
 
-                httpPost.addHeader("kbn-xsrf", "reporting");
-                httpPost.setHeader("Content-Type", "application/json");
+                httpPost.addHeader(KBN, REPORTING);
+                httpPost.setHeader(CONTENT_TYPE, APPLI_JSON);
                 String requestBody = "{ \"query\": { \"match\": {\""+field+"\":\"" + texte + "\"} }, \"size\":10000 }";
                 httpPost.setEntity(new StringEntity(requestBody));
 
@@ -237,7 +247,7 @@ public class ElasticsearchController {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                return ResponseEntity.status(500).body("Une erreur s'est produite lors de la requête Elasticsearch.");
+                return ResponseEntity.status(500).body(ERREUR_ES);
             }
 
 
