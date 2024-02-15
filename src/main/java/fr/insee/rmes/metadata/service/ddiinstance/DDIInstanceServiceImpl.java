@@ -138,8 +138,7 @@ public class DDIInstanceServiceImpl implements DDIInstanceService {
 	private Node getNodeByXpath(DDIDocumentBuilder docBuilder, ColecticaItem ddiInstance, String xpathExpression)
 			throws Exception {
 		String fragment = xpathProcessor.queryString(ddiInstance.getItem(), xpathExpression);
-		Node node = DocumentBuilderUtils.getNode(fragment.trim(), docBuilder);
-		return node;
+		return DocumentBuilderUtils.getNode(fragment.trim(), docBuilder);
 	}
 
 	/**

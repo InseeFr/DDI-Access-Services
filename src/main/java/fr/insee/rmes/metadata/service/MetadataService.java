@@ -5,7 +5,6 @@ import java.util.Map;
 
 import fr.insee.rmes.metadata.model.Relationship;
 import fr.insee.rmes.metadata.model.ColecticaItem;
-import fr.insee.rmes.metadata.model.ColecticaItemRef;
 import fr.insee.rmes.metadata.model.ObjectColecticaPost;
 import fr.insee.rmes.metadata.model.Unit;
 import fr.insee.rmes.search.model.DDIItemType;

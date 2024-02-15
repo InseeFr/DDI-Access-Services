@@ -8,7 +8,7 @@ public class Options {
 	private Object versionRationale = new Object();
 
 	@JsonProperty("SetName")
-	private String SetName = "";
+	private String setName = "";
 
 	public Object getVersionRationale() {
 		return versionRationale;
@@ -19,16 +19,16 @@ public class Options {
 	}
 
 	public String getSetName() {
-		return SetName;
+		return setName;
 	}
 
 	public void setSetName(String setName) {
-		SetName = setName;
+		this.setName = setName;
 	}
 
 	@Override
 	public String toString() {
-		return "Options [versionReversionRationale=" + versionRationale + ", SetName=" + SetName + "]";
+		return "Options [versionReversionRationale=" + versionRationale + ", SetName=" + setName + "]";
 	}
 
 }

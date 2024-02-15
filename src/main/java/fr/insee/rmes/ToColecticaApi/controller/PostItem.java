@@ -40,7 +40,7 @@ import java.util.List;
 })
 public class PostItem {
 
-    final static Logger log = LogManager.getLogger(PostItem.class);
+    static final Logger log = LogManager.getLogger(PostItem.class);
     private final ResourceLoader resourceLoader;
 
     private final ColecticaService colecticaService;
@@ -111,7 +111,7 @@ public class PostItem {
     @Hidden
     @PostMapping("{type}/json")
     @Operation(summary = "Get JSON for a type of DDI item", description = "Get a JSON list of item for a type of DDI items .")
-    public ResponseEntity<?> ByType (
+    public ResponseEntity<?> byType(
             @PathVariable("type") DDIItemType type)
             throws IOException, ExceptionColecticaUnreachable {
 

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/Item")
 @Tag(name= "DEMO-Colectica",description = "Services for upgrade Colectica-API")
 public class GetItem {
-    final static Logger logger = LogManager.getLogger(GetItem.class);
+    static final Logger logger = LogManager.getLogger(GetItem.class);
 
     private final ColecticaService colecticaService;
 
@@ -32,7 +32,7 @@ public class GetItem {
     @GetMapping("ddiInstance/uuid")
     @Operation(summary = "Get ddiInstance by uuid", description = "Get an XML document for a ddi:Instance from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public ResponseEntity<String> FindInstanceByUuidColectica (
+    public ResponseEntity<String> findInstanceByUuidColectica(
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
@@ -45,7 +45,7 @@ public class GetItem {
     @GetMapping("ddiFragment/uuid")
     @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public ResponseEntity<String> FindFragmentByUuidColectica (
+    public ResponseEntity<String> findFragmentByUuidColectica(
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
@@ -98,7 +98,7 @@ public class GetItem {
 
     @GetMapping("/filtered-search/type/")
     @Operation(summary = "Get list of match by type in elasticsearch database", description = "Get a JSON ")
-    public ResponseEntity<String> SearchByType(
+    public ResponseEntity<String> searchByType(
             @Parameter(
                     description = "nom par défaut de l'index colectica",
                     required = true,

@@ -45,16 +45,16 @@ import java.util.List;
 @RestController
 @Hidden
 public class ElasticsearchController {
-    private final static String HTTPS = "https://";
-    private final static String HTTP = "http://";
-    private final static String AUTHORIZATION = "Authorization";
-    private final static String BASIC = "Basic ";
-    private final static String KBN = "kbn-xsrf";
-    private final static String REPORTING = "reporting";
-    private final static String ERREUR_ES = "Une erreur s'est produite lors de la requête Elasticsearch.";
-    private final static String SEARCH = "/_search";
-    private final static String CONTENT_TYPE = "Content-Type";
-    private final static String APPLI_JSON = "application/json";
+    private static final String HTTPS = "https://";
+    private static final String HTTP = "http://";
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String BASIC = "Basic ";
+    private static final String KBN = "kbn-xsrf";
+    private static final String REPORTING = "reporting";
+    private static final String ERREUR_ES = "Une erreur s'est produite lors de la requête Elasticsearch.";
+    private static final String SEARCH = "/_search";
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String APPLI_JSON = "application/json";
 
     @Value("${fr.insee.rmes.elasticsearch.host}")
     private String  elasticHost;
@@ -71,7 +71,7 @@ public class ElasticsearchController {
     private final ElasticsearchClient elasticsearchClient;
 
 
-    final static Logger logger = LogManager.getLogger(ElasticsearchController.class);
+    static final Logger logger = LogManager.getLogger(ElasticsearchController.class);
 
 
     @Autowired
@@ -184,7 +184,7 @@ public class ElasticsearchController {
     }
 
     @PostMapping("/search/elastic/matchType/{type}")
-    public ResponseEntity<?> ByType(
+    public ResponseEntity<?> byType(
             @PathVariable ("type") DDIItemType type
     ) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {

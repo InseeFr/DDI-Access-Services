@@ -23,8 +23,8 @@ import java.util.Map;
 @Service
 @Slf4j
 public class MetadataServiceItemImpl implements MetadataServiceItem {
-	private final static String NAME_FRAGMENT = "//*[local-name()='Fragment']";
-	private final static String TEXT_ID = ".//*[local-name()='ID']/text()";
+	private static final String NAME_FRAGMENT = "//*[local-name()='Fragment']";
+	private static final String TEXT_ID = ".//*[local-name()='ID']/text()";
 	@Autowired
 	MetadataRepository metadataRepository;
 

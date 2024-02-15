@@ -50,7 +50,7 @@ import java.util.List;
         @ApiResponse(responseCode = "500", description = "Internal server error") })
 public class MetadataController {
 
-    final static Logger log = LogManager.getLogger(MetadataController.class);
+    static final Logger log = LogManager.getLogger(MetadataController.class);
 
     @Autowired
     private MetadataService metadataService;

@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -17,14 +16,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.swing.text.html.parser.Entity;
 
 @RestController
 @RequestMapping("/env")
 @Tag(name = "RMeS Environment")
 public class RMeSEnvironment {
 
-    private final static Logger log = LogManager.getLogger(fr.insee.rmes.webservice.rest.RMeSEnvironment.class);
+    private static final Logger log = LogManager.getLogger(fr.insee.rmes.webservice.rest.RMeSEnvironment.class);
 
     @Autowired
     Environment env;
