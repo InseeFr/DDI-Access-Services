@@ -206,12 +206,18 @@ public class DDIDocumentBuilder {
 		switch (node.getNodeName()) {
 			case "CodeList":
 				changeTagName(document, "CodeList", "l:CodeList", "");
+				break;
 			case "Code":
 				changeTagName(document, "Code", "l:Code", "");
+				break;
 			case "Category":
 				changeTagName(document, "Category", "l:Category", "");
+				break;
 			case "CategoryScheme":
 				changeTagName(document, "CategoryScheme", "l:CategoryScheme", "");
+				break;
+			default:
+				break;
 		}
 	}
 
