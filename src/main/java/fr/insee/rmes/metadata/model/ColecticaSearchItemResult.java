@@ -42,17 +42,17 @@ public class ColecticaSearchItemResult {
 	@JsonProperty("Notes")
 	private String notes = null;
 	@JsonProperty("VersionDate")
-	private String VersionDate;
+	private String versionDate;
 	@JsonProperty("VersionResponsibility")
 	private JSONObject versionResponsibility;
 	@JsonProperty("IsPublished")
-	private Boolean IsPublished = false;
+	private Boolean isPublished = false;
 	@JsonProperty("IsDeprecated")
-	private Boolean IsDeprecated = false;
+	private Boolean isDeprecated = false;
 	@JsonProperty("IsProvisional")
-	private Boolean IsProvisional = false;
+	private Boolean isProvisional = false;
 	@JsonProperty("ItemFormat")
-	private String ItemFormat;
+	private String itemFormat;
 	public JSONObject getSummary() {
 		return summary;
 	}
@@ -144,10 +144,10 @@ public class ColecticaSearchItemResult {
 		this.notes = notes;
 	}
 	public String getVersionDate() {
-		return VersionDate;
+		return versionDate;
 	}
 	public void setVersionDate(String versionDate) {
-		VersionDate = versionDate;
+		this.versionDate = versionDate;
 	}
 	public JSONObject getVersionResponsibility() {
 		return versionResponsibility;
@@ -156,28 +156,28 @@ public class ColecticaSearchItemResult {
 		this.versionResponsibility = versionResponsibility;
 	}
 	public Boolean getIsPublished() {
-		return IsPublished;
+		return isPublished;
 	}
 	public void setIsPublished(Boolean isPublished) {
-		IsPublished = isPublished;
+		this.isPublished = isPublished;
 	}
 	public Boolean getIsDeprecated() {
-		return IsDeprecated;
+		return isDeprecated;
 	}
 	public void setIsDeprecated(Boolean isDeprecated) {
-		IsDeprecated = isDeprecated;
+		this.isDeprecated = isDeprecated;
 	}
 	public Boolean getIsProvisional() {
-		return IsProvisional;
+		return isProvisional;
 	}
 	public void setIsProvisional(Boolean isProvisional) {
-		IsProvisional = isProvisional;
+		this.isProvisional = isProvisional;
 	}
 	public String getItemFormat() {
-		return ItemFormat;
+		return itemFormat;
 	}
 	public void setItemFormat(String itemFormat) {
-		ItemFormat = itemFormat;
+		this.itemFormat = itemFormat;
 	}
 	@Override
 	public String toString() {
@@ -185,9 +185,9 @@ public class ColecticaSearchItemResult {
 				+ ", description=" + description + ", versionRationale=" + versionRationale + ", metadataRank="
 				+ metadataRank + ", repositoryName=" + repositoryName + ", isAuthoritative=" + isAuthoritative
 				+ ", tags=" + tags + ", itemType=" + itemType + ", agencyId=" + agencyId + ", version=" + version
-				+ ", identifier=" + identifier + ", item=" + item + ", notes=" + notes + ", VersionDate=" + VersionDate
-				+ ", versionResponsibility=" + versionResponsibility + ", IsPublished=" + IsPublished
-				+ ", IsDeprecated=" + IsDeprecated + ", IsProvisional=" + IsProvisional + ", ItemFormat=" + ItemFormat
+				+ ", identifier=" + identifier + ", item=" + item + ", notes=" + notes + ", VersionDate=" + versionDate
+				+ ", versionResponsibility=" + versionResponsibility + ", IsPublished=" + isPublished
+				+ ", IsDeprecated=" + isDeprecated + ", IsProvisional=" + isProvisional + ", ItemFormat=" + itemFormat
 				+ "]";
 	}
 
