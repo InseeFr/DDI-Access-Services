@@ -18,8 +18,8 @@ public interface ColecticaService {
 
     ResponseEntity<String> filteredSearchText(String index, String texte);
 
-    ResponseEntity<String> SearchTexteByType(String index, String texte, DDIItemType type);
-    ResponseEntity<String> SearchByType(String index, DDIItemType type);
+    ResponseEntity<String> searchTexteByType(String index, String texte, DDIItemType type);
+    ResponseEntity<String> searchByType(String index, DDIItemType type);
     ResponseEntity<List<Map<String,String>>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception;
 
     String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException;
@@ -27,7 +27,7 @@ public interface ColecticaService {
 
     ResponseEntity<?> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable;
 
-    ResponseEntity<String> sendUpdateColectica(String DdiUpdatingInJson, TransactionType transactionType) throws IOException;
+    ResponseEntity<String> sendUpdateColectica(String ddiUpdatingInJson, TransactionType transactionType) throws IOException;
 
     ResponseEntity<?> transformFile(
             MultipartFile file,

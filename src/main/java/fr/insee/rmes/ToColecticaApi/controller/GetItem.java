@@ -93,7 +93,7 @@ public class GetItem {
                     description = "type à selectionner",
                     required = true)  @RequestParam DDIItemType ddiItemType
             ) {
-        return colecticaService.SearchTexteByType(index, texte, ddiItemType );
+        return colecticaService.searchTexteByType(index, texte, ddiItemType );
     }
 
     @GetMapping("/filtered-search/type/")
@@ -108,7 +108,7 @@ public class GetItem {
             @Parameter(
                     description = "type à selectionner",
                     required = true)  @RequestParam DDIItemType ddiItemType) {
-        return colecticaService.SearchByType(index, ddiItemType);
+        return colecticaService.searchByType(index, ddiItemType);
     }
 
 

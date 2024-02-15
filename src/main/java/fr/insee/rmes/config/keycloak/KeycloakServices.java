@@ -82,8 +82,7 @@ public class KeycloakServices {
         } else {
 
             String token = getAuthToken();
-            String accessToken = extractAccessToken(token);
-            return accessToken;
+            return extractAccessToken(token);
         }
 
     }

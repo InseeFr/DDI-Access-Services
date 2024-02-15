@@ -306,12 +306,12 @@ public class DDIDocumentBuilder {
 	}
 
 	public NodeList getElementByTagName(String name) {
-		NodeList nodeList = packagedDocument.getElementsByTagName(name);
-		return nodeList;
+		return packagedDocument.getElementsByTagName(name);
 	}
 
 	public void importChild(Node childNode) {
-		Node node, clonedNode;
+		Node node;
+		Node clonedNode ;
 		node = packagedDocument.getLastChild();
 		clonedNode = childNode.cloneNode(true);
 		node.appendChild(packagedDocument.adoptNode(clonedNode));

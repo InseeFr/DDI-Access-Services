@@ -89,10 +89,10 @@ public class PostItem {
     @Operation(summary = "Send an update to Colectica Repository via Colectica API ",
             description = "Send a json make with /replace-xml-parameters/{Type}/{Label}/{Version}/{Name}/{VersionResponsibility} COPYCOMMIT is for Upload a new object not for update")
     public ResponseEntity<String> sendUpdateColectica(
-            @RequestBody String DdiUpdatingInJson,
+            @RequestBody String ddiUpdatingInJson,
             @RequestParam("transactionType") TransactionType transactionType
     ) throws IOException {
-        return colecticaService.sendUpdateColectica(DdiUpdatingInJson, transactionType);
+        return colecticaService.sendUpdateColectica(ddiUpdatingInJson, transactionType);
 
     }
 
