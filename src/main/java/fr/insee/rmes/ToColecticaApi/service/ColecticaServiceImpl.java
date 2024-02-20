@@ -273,7 +273,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
 
-    private ResponseEntity<?> searchColecticaInstanceByUuid(String uuid) {
+    private ResponseEntity<String> searchColecticaInstanceByUuid(String uuid) {
         // Configuration pour ignorer les cookies invalides
         RequestConfig globalConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
