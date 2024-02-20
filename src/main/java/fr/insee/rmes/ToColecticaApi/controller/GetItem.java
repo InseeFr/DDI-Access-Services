@@ -55,7 +55,18 @@ public class GetItem {
 
     }
 
+    @GetMapping("ddiFragment/uuid/withChildren")
+    @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
+    @Produces(MediaType.APPLICATION_XML)
+    public String FindFragmentByUuidWithChildrenColectica (
+            @Parameter(
+                    description = "id de l'objet colectica",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws Exception {
+        return colecticaService.findFragmentByUuidWithChildren(uuid);
 
+    }
 
         @GetMapping("/filtered-search/texte")
         @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")

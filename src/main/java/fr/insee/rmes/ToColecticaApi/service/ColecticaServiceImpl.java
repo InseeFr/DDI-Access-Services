@@ -18,6 +18,8 @@ import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -36,8 +38,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -105,7 +105,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Value("${fr.insee.rmes.api.remote.metadata.agency}")
     private String agency;
 
-   @Value("${fr.insee.rmes.elasticsearch.host}")
+    @Value("${fr.insee.rmes.elasticsearch.host}")
     private String  elasticHost;
 
     @Value("${fr.insee.rmes.elasticsearch.port}")
@@ -271,8 +271,18 @@ public class ColecticaServiceImpl implements ColecticaService {
             return new JSONObject();
         }
     }
-    private ResponseEntity<String> searchColecticaInstanceByUuid(String uuid) {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+
+    private ResponseEntity<?> searchColecticaInstanceByUuid(String uuid) {
+        // Configuration pour ignorer les cookies invalides
+        RequestConfig globalConfig = RequestConfig.custom()
+                .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
+                .build();
+
+        try (CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(globalConfig)
+                .build()) {
+
             HttpGet httpGet;
             String authentToken;
             String url = String.format("%s/api/v1/ddiset/%s/%s", serviceUrl, agency, uuid);
@@ -286,6 +296,7 @@ public class ColecticaServiceImpl implements ColecticaService {
                 authentToken = extractAccessToken(token2);
                 httpGet.setHeader(AUTHORIZATION, BEARER + authentToken);
             }
+
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 String preresponseBody = EntityUtils.toString(response.getEntity());
                 String responseBody = preresponseBody.replace("ï»¿","");
@@ -550,12 +561,9 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
         @Override
-    public String replaceXmlParameters(@RequestBody String inputXml,
-                                       @RequestParam("Type") DDIItemType type,
-                                       @RequestParam ("Label") String label,
-                                       @RequestParam (VERSION) int version,
-                                       @RequestParam ("Name") String name,
-                                       @RequestParam ("VersionResponsibility") String idepUtilisateur) {
+
+    public String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version,String name,
+                                       String idepUtilisateur) {
         try {
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

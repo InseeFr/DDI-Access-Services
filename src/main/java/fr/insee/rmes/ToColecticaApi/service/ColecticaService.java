@@ -14,9 +14,11 @@ import java.util.Map;
 public interface ColecticaService {
     ResponseEntity<String> findFragmentByUuid(String uuid);
 
+
     ResponseEntity<String> findInstanceByUuid(String uuid);
     String findFragmentByUuidWithChildren(String uuid) throws Exception;
     ResponseEntity<String> filteredSearchText(String index, String texte);
+
 
     ResponseEntity<String> searchTexteByType(String index, String texte, DDIItemType type);
     ResponseEntity<String> searchByType(String index, DDIItemType type);
