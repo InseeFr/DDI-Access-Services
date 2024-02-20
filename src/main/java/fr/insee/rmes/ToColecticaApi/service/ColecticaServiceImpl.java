@@ -7,10 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import fr.insee.rmes.ToColecticaApi.models.AuthRequest;
-import fr.insee.rmes.ToColecticaApi.models.CustomMultipartFile;
-import fr.insee.rmes.ToColecticaApi.models.RessourcePackage;
-import fr.insee.rmes.ToColecticaApi.models.TransactionType;
+import fr.insee.rmes.ToColecticaApi.models.*;
 import fr.insee.rmes.ToColecticaApi.randomUUID;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
@@ -29,6 +26,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +56,9 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -186,6 +187,90 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
+    @Override
+    public String findFragmentByUuidWithChildren(String uuid) throws Exception {
+        ResponseEntity<?> responseEntity = searchColecticaInstanceByUuid(uuid);
+
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            String responseBody = (String) responseEntity.getBody();
+            Set<String> resultIntermediaire = extractUniqueIdentifiers(responseBody);
+            JSONArray resultArray = processUuidsAndFetchData(resultIntermediaire);
+            return resultArray.toString(4);
+        } else {
+            return "L'objet n'existe pas";
+        }
+    }
+
+    public Set<String> extractUniqueIdentifiers(String xmlResponse) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes()));
+        XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPath xpath = xpathFactory.newXPath();
+
+        xpath.setNamespaceContext(new NamespaceContextMap(
+                "r", "ddi:reusable:3_3",
+                "ddi", "ddi:instance:3_3"
+        ));
+
+        Set<String> identifiers = new HashSet<>();
+
+        // Extraire tous les UUIDs
+        NodeList idNodes = (NodeList) xpath.evaluate("//r:ID", document, XPathConstants.NODESET);
+        for (int i = 0; i < idNodes.getLength(); i++) {
+            identifiers.add(idNodes.item(i).getTextContent());
+        }
+
+        return identifiers;
+    }
+
+    public JSONArray processUuidsAndFetchData(Set<String> uuids) {
+        JSONArray dataArray = new JSONArray();
+
+        for (String uuid : uuids) {
+            ResponseEntity<?> responseEntity = searchColecticaFragmentByUuid(uuid);
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                String fragmentXml = (String) responseEntity.getBody();
+                JSONObject fragmentData = extractDataFromFragment(fragmentXml);
+                dataArray.put(fragmentData);
+            } else {
+                System.out.println("Erreur ou élément non trouvé pour UUID: " + uuid);
+            }
+        }
+
+        return dataArray;
+    }
+
+    private JSONObject extractDataFromFragment(String fragmentXml) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new ByteArrayInputStream(fragmentXml.getBytes(StandardCharsets.UTF_8)));
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            XPath xpath = xpathFactory.newXPath();
+
+            xpath.setNamespaceContext(new NamespaceContextMap("r", "ddi:reusable:3_3", "ddi", "ddi:instance:3_3"));
+
+            Node firstElement = (Node) xpath.evaluate("/*/*[1]", document, XPathConstants.NODE);
+            String itemType = firstElement.getLocalName();
+            String id = xpath.evaluate("//r:ID", firstElement);
+            String agency = xpath.evaluate("//r:Agency", firstElement);
+            String version = xpath.evaluate("//r:Version", firstElement);
+
+            JSONObject fragmentData = new JSONObject();
+            fragmentData.put("Identifier", id);
+            fragmentData.put("AgencyId", agency);
+            fragmentData.put("Version", version);
+            fragmentData.put("ItemType", itemType);
+
+            return fragmentData;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JSONObject();
+        }
+    }
     private ResponseEntity<String> searchColecticaInstanceByUuid(String uuid) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet httpGet;
