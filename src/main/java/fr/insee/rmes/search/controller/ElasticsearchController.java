@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.websocket.server.PathParam;
-
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -37,9 +36,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -48,13 +45,14 @@ public class ElasticsearchController {
     private static final String HTTPS = "https://";
     private static final String HTTP = "http://";
     private static final String AUTHORIZATION = "Authorization";
-    private static final String BASIC = "Basic ";
     private static final String KBN = "kbn-xsrf";
     private static final String REPORTING = "reporting";
     private static final String ERREUR_ES = "Une erreur s'est produite lors de la requête Elasticsearch.";
     private static final String SEARCH = "/_search";
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String APPLI_JSON = "application/json";
+    private static final String APIKEYHEADER = "apiKey ";
+    static final Logger logger = LogManager.getLogger(ElasticsearchController.class);
 
     @Value("${fr.insee.rmes.elasticsearch.host}")
     private String  elasticHost;
@@ -71,16 +69,13 @@ public class ElasticsearchController {
     private final ElasticsearchClient elasticsearchClient;
 
 
-    static final Logger logger = LogManager.getLogger(ElasticsearchController.class);
-
-
     @Autowired
     public ElasticsearchController(ElasticsearchClient elasticsearchClient) {
         this.elasticsearchClient = elasticsearchClient;
     }
 
     @GetMapping("/search/elastic/{index}/field")
-    public ResponseEntity<?> searchField(@PathVariable("index") String index) {
+    public ResponseEntity<String> searchField(@PathVariable("index") String index) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String apiUrl;
 
@@ -95,8 +90,7 @@ public class ElasticsearchController {
 
             if (!elasticHost.contains("kube")) {
                 // Add Basic Authentication header if not using Kubernetes
-                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-                httpGet.addHeader(AUTHORIZATION, BASIC + token);
+                httpGet.addHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
             }
 
             httpGet.addHeader(KBN, REPORTING);
@@ -118,7 +112,7 @@ public class ElasticsearchController {
     }
 
     @GetMapping("/search/elastic/_search/{index}/{texte}")
-    public  ResponseEntity<?> searchText(
+    public  ResponseEntity<String> searchText(
             @Parameter(
                     description = "nom de l'index (portal ou colectica)",
                     required = true,
@@ -138,8 +132,7 @@ public class ElasticsearchController {
             }
             else {
                 httpGet = new HttpGet(HTTP + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + texte);
-                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-                httpGet.addHeader(AUTHORIZATION, BASIC + token);
+                httpGet.addHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
             }
 
             
@@ -155,7 +148,7 @@ public class ElasticsearchController {
     }
 
     @PostMapping("/search/elastic/matchAll")
-    public ResponseEntity<?> searchElastic() {
+    public ResponseEntity<String> searchElastic() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost();
 
@@ -164,8 +157,7 @@ public class ElasticsearchController {
             }
             else {
                 httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + SEARCH);
-                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-                httpPost.addHeader(AUTHORIZATION,BASIC + token);
+                httpPost.setHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
             }
             httpPost.addHeader(KBN, REPORTING);
             httpPost.addHeader(CONTENT_TYPE, APPLI_JSON);
@@ -184,7 +176,7 @@ public class ElasticsearchController {
     }
 
     @PostMapping("/search/elastic/matchType/{type}")
-    public ResponseEntity<?> byType(
+    public ResponseEntity<String> byType(
             @PathVariable ("type") DDIItemType type
     ) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -195,8 +187,7 @@ public class ElasticsearchController {
             }
             else {
                 httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + SEARCH);
-                String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-                httpPost.addHeader(AUTHORIZATION,BASIC + token);
+                httpPost.setHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
             }
 
             httpPost.addHeader(KBN, REPORTING);
@@ -217,7 +208,7 @@ public class ElasticsearchController {
 
 
 @PostMapping("/search/elastic/{field}/{texte}/search")
-    public ResponseEntity<?> searchElastic(
+    public ResponseEntity<String> searchElastic(
             @PathVariable String texte,
             @PathVariable String field
             ) {
@@ -230,8 +221,7 @@ public class ElasticsearchController {
            }
            else {
                httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + SEARCH);
-               String token = Base64.getEncoder().encodeToString((apiId + ":" + apiKey).getBytes(StandardCharsets.UTF_8));
-               httpPost.addHeader(AUTHORIZATION,BASIC + token);
+               httpPost.setHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
            }
 
 
@@ -282,9 +272,11 @@ public class ElasticsearchController {
             boolean isExactResult = total.relation() == TotalHitsRelation.Eq;
 
             if (isExactResult) {
-                logger.info("There are " + total.value() + " results");
+                String resultTot = "There are " + total.value() + " results";
+                logger.info(resultTot);
             } else {
-                logger.info("There are more than " + total.value() + " results");
+                String resultTotPlus ="There are more than " + total.value() + " results";
+                logger.info(resultTotPlus);
             }
 
             List<Hit<ObjectNode>> hits = search.hits().hits();
@@ -292,7 +284,8 @@ public class ElasticsearchController {
             for (Hit<ObjectNode> hit : search.hits().hits()) {
                 ObjectNode result = hit.source();
                 sortie.add(result.toString());
-                logger.info("Found product " + result.toString() + ", score " + hit.score());
+                String resultScore="Found product " + result + ", score " + hit.score();
+                logger.info(resultScore);
 
             }
 
