@@ -1,4 +1,4 @@
-package fr.insee.rmes.ToColecticaApi.service;
+package fr.insee.rmes.tocolecticaapi.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -7,11 +7,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import fr.insee.rmes.ToColecticaApi.models.*;
-import fr.insee.rmes.ToColecticaApi.randomUUID;
+import fr.insee.rmes.tocolecticaapi.models.*;
+import fr.insee.rmes.tocolecticaapi.randomUUID;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.webservice.rest.RMeSException;
 import lombok.NonNull;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
@@ -130,8 +131,23 @@ public class ColecticaServiceImpl implements ColecticaService {
         this.restTemplate = restTemplate;
     }
 
+    public ColecticaServiceImpl(CloseableHttpClient mockHttpClient, ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
+        this.elasticsearchClient = elasticsearchClient;
+
+        this.restTemplate = restTemplate;
+    }
+
+    public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient) {
+        this.elasticsearchClient = elasticsearchClient;
+        restTemplate = null;
+    }
+
+    public ColecticaServiceImpl() {
+        this.elasticsearchClient = null;
+        restTemplate = null;
+    }
     @Override
-    public ResponseEntity<String> findFragmentByUuid(String uuid) {
+    public ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException {
         ResponseEntity<String> responseEntity = searchColecticaFragmentByUuid(uuid);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = responseEntity.getBody();
@@ -141,24 +157,23 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
-    private ResponseEntity<String> searchColecticaFragmentByUuid(String uuid) {
+    private ResponseEntity<String> searchColecticaFragmentByUuid(String uuid) throws
+            ExceptionColecticaUnreachable, IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = getGet(uuid);
+            HttpGet httpGet = getGetSearchColecticaFragmentByUuid(uuid);
 
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-                return getResponseEntity(response);
+                return getResponseEntitySearchColecticaFragmentByUuid(response);
             } catch (IOException e) {
-                // Log the exception
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(ERREUR_COLECTICA);
+
+                throw new IOException("Erreur IO lors de la récupération des données pour UUID: " + uuid, e);
             }
-        } catch (IOException|ExceptionColecticaUnreachable e) {
-            throw new RuntimeException(e);
+        } catch (ExceptionColecticaUnreachable e) {
+            throw new ExceptionColecticaUnreachable("Le service Colectica est injoignable pour UUID: " + uuid, e);
         }
     }
 
-    private HttpGet getGet(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
+    private HttpGet getGetSearchColecticaFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException {
         String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, uuid);
         HttpGet httpGet = new HttpGet(url);
         httpGet.addHeader(CONTENT_TYPE, APPLICATION_XML);
@@ -175,7 +190,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         return httpGet;
     }
 
-    private static ResponseEntity<String> getResponseEntity(CloseableHttpResponse response) throws IOException {
+    protected static ResponseEntity<String> getResponseEntitySearchColecticaFragmentByUuid(CloseableHttpResponse response) throws IOException {
         if (response.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
             return ResponseEntity.status(response.getStatusLine().getStatusCode())
                     .body("Erreur lors de la requête vers Colectica.");
@@ -190,7 +205,7 @@ public class ColecticaServiceImpl implements ColecticaService {
 
 
     @Override
-    public ResponseEntity<String> findInstanceByUuid(String uuid) {
+    public ResponseEntity<String> findInstanceByUuid(String uuid) throws RMeSException {
         ResponseEntity<String> responseEntity = searchColecticaInstanceByUuid(uuid);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody =  responseEntity.getBody();
@@ -238,7 +253,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         return identifiers;
     }
 
-    public JSONArray processUuidsAndFetchData(Set<String> uuids) {
+    public JSONArray processUuidsAndFetchData(Set<String> uuids) throws ExceptionColecticaUnreachable, IOException {
         JSONArray dataArray = new JSONArray();
 
         for (String uuid : uuids) {
@@ -272,12 +287,12 @@ public class ColecticaServiceImpl implements ColecticaService {
             Node firstElement = (Node) xpath.evaluate("/*/*[1]", document, XPathConstants.NODE);
             String itemType = firstElement.getLocalName();
             String id = xpath.evaluate("//r:ID", firstElement);
-            String agency = xpath.evaluate("//r:Agency", firstElement);
+            String agencyFragment = xpath.evaluate("//r:Agency", firstElement);
             String version = xpath.evaluate("//r:Version", firstElement);
 
             JSONObject fragmentData = new JSONObject();
             fragmentData.put("Identifier", id);
-            fragmentData.put("AgencyId", agency);
+            fragmentData.put("AgencyId", agencyFragment);
             fragmentData.put("Version", version);
             fragmentData.put("ItemType", itemType);
 
@@ -289,7 +304,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
 
-    private ResponseEntity<String> searchColecticaInstanceByUuid(String uuid) {
+    private ResponseEntity<String> searchColecticaInstanceByUuid(String uuid) throws RMeSException {
         // Configuration pour ignorer les cookies invalides
         RequestConfig globalConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
@@ -300,12 +315,14 @@ public class ColecticaServiceImpl implements ColecticaService {
                 .build()) {
 
             return getStringResponseEntity(uuid, httpClient);
-        } catch (IOException|ExceptionColecticaUnreachable e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RMeSException(400, "Erreur lors de la communication avec le service : " + e.getMessage(), "");
+        } catch (ExceptionColecticaUnreachable e) {
+            throw new RMeSException(400, "Le service Colectica est injoignable : " + e.getMessage(), "");
         }
     }
 
-    private ResponseEntity<String> getStringResponseEntity(String uuid, CloseableHttpClient httpClient) throws ExceptionColecticaUnreachable, JsonProcessingException {
+    protected ResponseEntity<String> getStringResponseEntity(String uuid, CloseableHttpClient httpClient) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException {
         if (!uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$")) {
             throw new IllegalArgumentException("UUID invalide");
         }
@@ -316,11 +333,11 @@ public class ColecticaServiceImpl implements ColecticaService {
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ERREUR_COLECTICA);
+                    .body("Une erreur s'est produite lors de la requête vers Colectica.");
         }
     }
 
-    private HttpGet getHttpGet(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
+    private HttpGet getHttpGet(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException {
         HttpGet httpGet;
         String authentToken;
         String url = String.format("%s/api/v1/ddiset/%s/%s", serviceUrl, agency, uuid);
@@ -552,7 +569,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
+    public String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException {
 
         String apiUrl = serviceUrl + "/api/v1/jsonset/fr.insee/" + uuid;
 
@@ -591,63 +608,66 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         @Override
 
-    public String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version,String name,
-                                       String idepUtilisateur) {
-        try {
+        public String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur) {
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document document = builder.parse(new InputSource(new StringReader(inputXml)));
 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new InputSource(new StringReader(inputXml)));
-
-            String typeName= type.getName();
-            NodeList typeNodes = document.getElementsByTagNameNS("ddi:logicalproduct:3_3", typeName);
-            Element typeNameDocument = (Element) typeNodes.item(0);
-            if (!typeName.equals(typeNameDocument.getNodeName().toString())) {
-                return "Erreur : Attention ce n'est pas le bon type. L'item chargé n'est pas du type que vous avez sélectionné.";
-            }
-
-            Document document2 = (Document) document.cloneNode(true);
-            NodeList versionNodes = document2.getElementsByTagName("r:Version");
-            for (int i = 0; i < versionNodes.getLength(); i++) {
-                Node versionNode = versionNodes.item(i);
-                if (versionNode instanceof Element) {
-                    Element versionElement = (Element) versionNode;
-                    versionElement.setTextContent(String.valueOf(version));
+                String typeName = type.getName();
+                NodeList typeNodes = document.getElementsByTagNameNS("ddi:logicalproduct:3_3", typeName);
+                if (typeNodes.getLength() == 0) {
+                    return "Erreur : Aucun élément correspondant trouvé pour le type " + typeName;
                 }
-            }
 
-            Node nameNode= document2.getElementsByTagName("r:String").item(0);
-            nameNode.setTextContent(name);
-
-            Node labelNode = document2.getElementsByTagName("r:Content").item(0);
-            labelNode.setTextContent(label);
-
-            NodeList urnNodes = document2.getElementsByTagName("r:URN");
-
-            for (int i = 0; i < urnNodes.getLength(); i++) {
-                Node urnNode = urnNodes.item(i);
-                if (urnNode instanceof Element) {
-                    Element urnElement = (Element) urnNode;
-                    String urnCode = urnElement.getTextContent();
-                    urnElement.setTextContent(urnCode.substring(0,urnCode.lastIndexOf(":"))+":"+version); // Remplacez par le contenu souhaité
+                Element typeNameDocument = (Element) typeNodes.item(0);
+                if (!typeName.equals(typeNameDocument.getNodeName().toString())) {
+                    return "Erreur : Attention ce n'est pas le bon type. L'item chargé n'est pas du type que vous avez sélectionné.";
                 }
+
+                Document document2 = (Document) document.cloneNode(true);
+                NodeList versionNodes = document2.getElementsByTagName("r:Version");
+                for (int i = 0; i < versionNodes.getLength(); i++) {
+                    Node versionNode = versionNodes.item(i);
+                    if (versionNode instanceof Element) {
+                        Element versionElement = (Element) versionNode;
+                        versionElement.setTextContent(String.valueOf(version));
+                    }
+                }
+
+                Node nameNode = document2.getElementsByTagName("r:String").item(0);
+                nameNode.setTextContent(name);
+
+                Node labelNode = document2.getElementsByTagName("r:Content").item(0);
+                labelNode.setTextContent(label);
+
+                NodeList urnNodes = document2.getElementsByTagName("r:URN");
+                for (int i = 0; i < urnNodes.getLength(); i++) {
+                    Node urnNode = urnNodes.item(i);
+                    if (urnNode instanceof Element) {
+                        Element urnElement = (Element) urnNode;
+                        String urnCode = urnElement.getTextContent();
+                        urnElement.setTextContent(urnCode.substring(0, urnCode.lastIndexOf(":")) + ":" + version);
+                    }
+                }
+
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                StringWriter writer = new StringWriter();
+                transformer.transform(new DOMSource(document2), new StreamResult(writer));
+
+                // Ajout de la transformation XML vers JSON avec XSLT
+                InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojsonForOneObject.xsl");
+                String jsonResult = transformToJson(new ByteArrayResource(writer.toString().getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur, version);
+
+                return jsonResult;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Error processing XML";
             }
-
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            StringWriter writer = new StringWriter();
-            transformer.transform(new DOMSource(document2), new StreamResult(writer));
-            InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojsonForOneObject.xsl");
-            return transformToJson(new ByteArrayResource(writer.toString().getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur,version);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error processing XML";
         }
-    }
 
     private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur, int version) throws IOException, TransformerException {
 
@@ -667,7 +687,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<?> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable {
+    public ResponseEntity<String> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable {
 
         if (!serviceUrl.contains("kube")){
             token = getFreshToken();
@@ -819,7 +839,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     @Override
-    public ResponseEntity<?> transformFile(
+    public ResponseEntity<String> transformFile(
             MultipartFile file,
             String idValue,
             String nomenclatureName,
@@ -892,7 +912,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
-    public static MultipartFile processFile(MultipartFile inputFile) throws Exception {
+    public static MultipartFile processFile(MultipartFile inputFile) throws IOException {
         byte[] modifiedContent;
         try (InputStream inputStream = inputFile.getInputStream();
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -1054,7 +1074,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     private boolean sendFileToApi(String fileContent, String token, String url) {
-        RestTemplate restTemplate = new RestTemplate();
+
 
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(100000); // Temps de connexion en millisecondes
@@ -1073,9 +1093,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         return response.getStatusCode() == HttpStatus.OK;
     }
 
-    private String getAuthToken() throws JsonProcessingException {
-        RestTemplate restTemplate = new RestTemplate();
-
+    private String getAuthToken() throws JsonProcessingException, RMeSException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
 
@@ -1092,8 +1110,8 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         if (response.getStatusCode() == HttpStatus.OK) {
             return response.getBody();
-        } else {
-            throw new RuntimeException("Impossible d'obtenir le token d'authentification.");
+        }  else {
+            throw new RMeSException(401, "Impossible d'obtenir le token d'authentification.", "toto");
         }
     }
     public static String extractAccessToken(String token) {

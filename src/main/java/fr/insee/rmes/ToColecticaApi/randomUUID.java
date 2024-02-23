@@ -1,4 +1,4 @@
-package fr.insee.rmes.ToColecticaApi;
+package fr.insee.rmes.tocolecticaapi;
 
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.ItemType;
@@ -11,7 +11,7 @@ import net.sf.saxon.s9api.XdmValue;
 
 import java.util.UUID;
 
-//import location.to.test.java.file.Test;
+
 public class randomUUID implements ExtensionFunction{
 
     @Override

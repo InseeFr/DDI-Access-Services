@@ -1,9 +1,10 @@
-package fr.insee.rmes.ToColecticaApi.service;
+package fr.insee.rmes.tocolecticaapi.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.rmes.ToColecticaApi.models.TransactionType;
+import fr.insee.rmes.tocolecticaapi.models.TransactionType;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.webservice.rest.RMeSException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface ColecticaService {
-    ResponseEntity<String> findFragmentByUuid(String uuid);
+    ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException;
 
 
-    ResponseEntity<String> findInstanceByUuid(String uuid);
+    ResponseEntity<String> findInstanceByUuid(String uuid) throws RMeSException;
     String findFragmentByUuidWithChildren(String uuid) throws Exception;
     ResponseEntity<String> filteredSearchText(String index, String texte);
 
@@ -24,14 +25,14 @@ public interface ColecticaService {
     ResponseEntity<String> searchByType(String index, DDIItemType type);
     ResponseEntity<List<Map<String,String>>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception;
 
-    String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException;
+    String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException;
     String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur);
 
-    ResponseEntity<?> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable;
+    ResponseEntity<String> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable;
 
     ResponseEntity<String> sendUpdateColectica(String ddiUpdatingInJson, TransactionType transactionType) throws IOException;
 
-    ResponseEntity<?> transformFile(
+    ResponseEntity<String> transformFile(
             MultipartFile file,
             String idValue,
             String nomenclatureName,
@@ -40,7 +41,7 @@ public interface ColecticaService {
             String idepUtilisateur,
             String timbre
     );
-    ResponseEntity<?> transformFileForComplexList(
+    ResponseEntity<String> transformFileForComplexList(
             MultipartFile file,
             String idValue,
             String nomenclatureName,

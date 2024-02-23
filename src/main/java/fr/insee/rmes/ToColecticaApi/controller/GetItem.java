@@ -1,9 +1,10 @@
-package fr.insee.rmes.ToColecticaApi.controller;
+package fr.insee.rmes.tocolecticaapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.rmes.ToColecticaApi.service.ColecticaService;
+import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.webservice.rest.RMeSException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 
 @RestController
@@ -37,7 +40,7 @@ public class GetItem {
                     description = "id de l'objet colectica",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RMeSException {
         return colecticaService.findInstanceByUuid(uuid);
 
     }
@@ -50,7 +53,7 @@ public class GetItem {
                     description = "id de l'objet colectica",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws ExceptionColecticaUnreachable, IOException {
         return colecticaService.findFragmentByUuid(uuid);
 
     }
@@ -58,7 +61,7 @@ public class GetItem {
     @GetMapping("ddiFragment/uuid/withChildren")
     @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public String FindFragmentByUuidWithChildrenColectica (
+    public String findFragmentByUuidWithChildrenColectica(
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
@@ -140,7 +143,7 @@ public class GetItem {
 
     @GetMapping("/RessourcePackageToJson")
     public String convertXmlToJson(
-            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
+            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException {
         return colecticaService.convertXmlToJson(uuid);
     }
 

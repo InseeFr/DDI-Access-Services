@@ -1,4 +1,4 @@
-package fr.insee.rmes.ToColecticaApi.models;
+package fr.insee.rmes.tocolecticaapi.models;
 
 import javax.xml.namespace.NamespaceContext;
 import java.util.HashMap;

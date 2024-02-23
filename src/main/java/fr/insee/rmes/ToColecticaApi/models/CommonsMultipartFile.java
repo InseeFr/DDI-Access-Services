@@ -1,20 +1,5 @@
-package fr.insee.rmes.ToColecticaApi.models;
+package fr.insee.rmes.tocolecticaapi.models;
 
-/*
- * Copyright 2002-2016 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -25,6 +10,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * {@link MultipartFile} implementation for Apache Commons FileUpload.
@@ -32,7 +19,6 @@ import java.io.*;
  * @author Trevor D. Cook
  * @author Juergen Hoeller
  * @since 29.09.2003
- * @see CommonsMultipartResolver
  */
 @SuppressWarnings("serial")
 public class CommonsMultipartFile implements MultipartFile {
@@ -48,6 +34,7 @@ public class CommonsMultipartFile implements MultipartFile {
 
     /**
      * Create an instance wrapping the given FileItem.
+     *
      * @param fileItem the FileItem to wrap
      */
     public CommonsMultipartFile(FileItem fileItem) {
@@ -67,14 +54,15 @@ public class CommonsMultipartFile implements MultipartFile {
     /**
      * Set whether to preserve the filename as sent by the client, not stripping off
      * path information in {@link CommonsMultipartFile#getOriginalFilename()}.
-     *
-
-     Default is "false", stripping off path information that may prefix the
+     * <p>
+     * <p>
+     * Default is "false", stripping off path information that may prefix the
      * actual filename e.g. from Opera. Switch this to "true" for preserving the
      * client-specified filename as-is, including potential path separators.
-     * @since 4.3.5
+     *
      * @see #getOriginalFilename()
      * @see
+     * @since 4.3.5
      */
     public void setPreserveFilename(boolean preserveFilename) {
         this.preserveFilename = preserveFilename;
@@ -100,10 +88,9 @@ public class CommonsMultipartFile implements MultipartFile {
         int unixSep = filename.lastIndexOf("/");
         int winSep = filename.lastIndexOf("\\");
         int pos = Math.max(winSep, unixSep);
-        if (pos != -1)  {
+        if (pos != -1) {
             return filename.substring(pos + 1);
-        }
-        else {
+        } else {
             return filename;
         }
     }
@@ -144,14 +131,18 @@ public class CommonsMultipartFile implements MultipartFile {
     }
 
     @Override
-    public void transferTo( @NonNull File dest) throws IOException, IllegalStateException {
+    public void transferTo(@NonNull File dest) throws IOException, IllegalStateException {
         if (!isAvailable()) {
             throw new IllegalStateException("File has already been moved - cannot be transferred again");
         }
 
-        if (dest.exists() && !dest.delete()) {
-            throw new IOException(
-                    "Destination file [" + dest.getAbsolutePath() + "] already exists and could not be deleted");
+        Path destPath = dest.toPath(); // Convertir le fichier de destination en Path
+        if (Files.exists(destPath)) {
+            try {
+                Files.delete(destPath); // Utilise Files.delete pour supprimer le fichier
+            } catch (IOException e) {
+                throw new IOException("Destination file [" + dest.getAbsolutePath() + "] already exists and could not be deleted", e);
+            }
         }
 
         try {
@@ -162,17 +153,14 @@ public class CommonsMultipartFile implements MultipartFile {
                     action = isAvailable() ? "copied" : "moved";
                 }
                 logger.debug("Multipart file '" + getName() + "' with original filename [" +
-                             getOriginalFilename() + "], stored " + getStorageDescription() + ": " +
-                             action + " to [" + dest.getAbsolutePath() + "]");
+                        getOriginalFilename() + "], stored " + getStorageDescription() + ": " +
+                        action + " to [" + dest.getAbsolutePath() + "]");
             }
-        }
-        catch (FileUploadException ex) {
+        } catch (FileUploadException ex) {
             throw new IllegalStateException(ex.getMessage());
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             throw ex;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             logger.error("Could not transfer to file", ex);
             throw new IOException("Could not transfer to file: " + ex.getMessage());
         }
@@ -188,8 +176,8 @@ public class CommonsMultipartFile implements MultipartFile {
             return true;
         }
         // Check actual existence of temporary file.
-        if (this.fileItem instanceof DiskFileItem) {
-            return ((DiskFileItem) this.fileItem).getStoreLocation().exists();
+        if (this.fileItem instanceof DiskFileItem diskFileItem) {
+            return diskFileItem.getStoreLocation().exists();
         }
         // Check whether current file size is different than original one.
         return (this.fileItem.getSize() == this.size);
@@ -203,11 +191,9 @@ public class CommonsMultipartFile implements MultipartFile {
     public String getStorageDescription() {
         if (this.fileItem.isInMemory()) {
             return "in memory";
-        }
-        else if (this.fileItem instanceof DiskFileItem) {
-            return "at [" + ((DiskFileItem) this.fileItem).getStoreLocation().getAbsolutePath() + "]";
-        }
-        else {
+        } else if (this.fileItem instanceof DiskFileItem diskFileItem) {
+            return "at [" + diskFileItem.getStoreLocation().getAbsolutePath() + "]";
+        } else {
             return "on disk";
         }
     }

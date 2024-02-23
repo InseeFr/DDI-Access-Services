@@ -1,4 +1,4 @@
-package fr.insee.rmes.ToColecticaApi.models;
+package fr.insee.rmes.tocolecticaapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.rmes.metadata.model.Category;
@@ -18,10 +18,6 @@ public class Items{
     public void setItems(ArrayList<Item> items) {
         this.items = items; }
     ArrayList<Item> items;
-
-    public Items() {
-        this.items = items;
-    }
 
     public List<Item> getItemsList() {
         return items;

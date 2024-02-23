@@ -1,4 +1,4 @@
-package fr.insee.rmes.ToColecticaApi.models;
+package fr.insee.rmes.tocolecticaapi.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
