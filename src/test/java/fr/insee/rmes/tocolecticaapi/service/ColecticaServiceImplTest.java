@@ -10,6 +10,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -109,7 +110,7 @@ class ColecticaServiceImplTest {
     }
 
     @Test
-    public void testGetByType() throws ExceptionColecticaUnreachable, IOException {
+    public void testGetByType() throws ExceptionColecticaUnreachable, IOException, ParseException {
 
         DDIItemType type =  DDIItemType.CODE_LIST;
         when(colecticaService.getByType(type)).thenReturn(ResponseEntity.ok("test"));
