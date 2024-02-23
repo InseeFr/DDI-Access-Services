@@ -10,6 +10,8 @@ import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,7 @@ public class KeycloakServices {
 
     @Value("${auth.password}")
     private String password;
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakServices.class);
     /**
      * Permet de récuperer un jeton keycloak
      * @return jeton
@@ -141,7 +144,7 @@ public class KeycloakServices {
             JSONObject json = (JSONObject) parser.parse(token);
             return (String) json.get("access_token");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erreur lors de l'extraction de l'access token : {}", e.getMessage(), e);
         }
         return null;
     }

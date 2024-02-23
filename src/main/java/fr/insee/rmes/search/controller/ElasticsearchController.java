@@ -106,7 +106,6 @@ public class ElasticsearchController {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
             return ResponseEntity.status(500).body("An error occurred while making the Elasticsearch request.");
         }
     }
@@ -142,7 +141,6 @@ public class ElasticsearchController {
                 return ResponseEntity.ok(responseBody);
             }
         } catch (IOException e) {
-            e.printStackTrace();
             return ResponseEntity.status(500).body(ERREUR_ES);
         }
     }
@@ -170,7 +168,6 @@ public class ElasticsearchController {
                 return ResponseEntity.ok(responseBody);
             }
         } catch (IOException e) {
-            e.printStackTrace();
             return ResponseEntity.status(500).body(ERREUR_ES);
         }
     }
@@ -201,7 +198,6 @@ public class ElasticsearchController {
                 return ResponseEntity.ok(responseBody);
             }
         } catch (IOException e) {
-            e.printStackTrace();
             return ResponseEntity.status(500).body(ERREUR_ES);
         }
     }
@@ -236,7 +232,6 @@ public class ElasticsearchController {
                     return ResponseEntity.ok(responseBody);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
                 return ResponseEntity.status(500).body(ERREUR_ES);
             }
 
