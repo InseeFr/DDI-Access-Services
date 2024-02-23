@@ -101,7 +101,7 @@ class ColecticaServiceImplTest {
         int version = 2;
         String name = "New Name";
         String idepUtilisateur = "user";
-        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticsearchClient);
+        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticsearchClient,restTemplate);
         String result = colecticaService.replaceXmlParameters(inputXml, type, label, version, name, idepUtilisateur);
         assertNotNull(result);
         assertFalse(result.isEmpty());

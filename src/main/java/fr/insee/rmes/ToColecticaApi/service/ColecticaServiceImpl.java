@@ -133,20 +133,16 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     public ColecticaServiceImpl(CloseableHttpClient mockHttpClient, ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
-        this.elasticsearchClient = elasticsearchClient;
 
+        this.elasticsearchClient = elasticsearchClient;
         this.restTemplate = restTemplate;
-    }
-
-    public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient) {
-        this.elasticsearchClient = elasticsearchClient;
-        restTemplate = null;
     }
 
     public ColecticaServiceImpl() {
         this.elasticsearchClient = null;
         restTemplate = null;
     }
+
     @Override
     public ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException {
         ResponseEntity<String> responseEntity = searchColecticaFragmentByUuid(uuid);
@@ -726,7 +722,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Override
     public ResponseEntity<String> sendUpdateColectica(String ddiUpdatingInJson, TransactionType transactionType) {
         try {
-            // Étape 1: Initialiser la transaction
+            RestTemplate restTemplate=new RestTemplate();
             String initTransactionUrl = serviceUrl + "/api/v1/transaction";
             String authentToken;
             if (serviceUrl.contains("kube")) {
