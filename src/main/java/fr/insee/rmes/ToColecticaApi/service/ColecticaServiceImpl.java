@@ -54,6 +54,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
@@ -606,68 +607,72 @@ public class ColecticaServiceImpl implements ColecticaService {
         return result;
     }
 
-        @Override
+    @Override
+    public String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
 
-        public String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur) {
-            try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setNamespaceAware(true);
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document document = builder.parse(new InputSource(new StringReader(inputXml)));
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(inputXml)));
 
-                String typeName = type.getName();
-                NodeList typeNodes = document.getElementsByTagNameNS("ddi:logicalproduct:3_3", typeName);
-                if (typeNodes.getLength() == 0) {
-                    return "Erreur : Aucun élément correspondant trouvé pour le type " + typeName;
-                }
-
-                Element typeNameDocument = (Element) typeNodes.item(0);
-                if (!typeName.equals(typeNameDocument.getNodeName().toString())) {
-                    return "Erreur : Attention ce n'est pas le bon type. L'item chargé n'est pas du type que vous avez sélectionné.";
-                }
-
-                Document document2 = (Document) document.cloneNode(true);
-                NodeList versionNodes = document2.getElementsByTagName("r:Version");
-                for (int i = 0; i < versionNodes.getLength(); i++) {
-                    Node versionNode = versionNodes.item(i);
-                    if (versionNode instanceof Element) {
-                        Element versionElement = (Element) versionNode;
-                        versionElement.setTextContent(String.valueOf(version));
-                    }
-                }
-
-                Node nameNode = document2.getElementsByTagName("r:String").item(0);
-                nameNode.setTextContent(name);
-
-                Node labelNode = document2.getElementsByTagName("r:Content").item(0);
-                labelNode.setTextContent(label);
-
-                NodeList urnNodes = document2.getElementsByTagName("r:URN");
-                for (int i = 0; i < urnNodes.getLength(); i++) {
-                    Node urnNode = urnNodes.item(i);
-                    if (urnNode instanceof Element) {
-                        Element urnElement = (Element) urnNode;
-                        String urnCode = urnElement.getTextContent();
-                        urnElement.setTextContent(urnCode.substring(0, urnCode.lastIndexOf(":")) + ":" + version);
-                    }
-                }
-
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                StringWriter writer = new StringWriter();
-                transformer.transform(new DOMSource(document2), new StreamResult(writer));
-
-                // Ajout de la transformation XML vers JSON avec XSLT
-                InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojsonForOneObject.xsl");
-                String jsonResult = transformToJson(new ByteArrayResource(writer.toString().getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur, version);
-
-                return jsonResult;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "Error processing XML";
+            String typeName = type.getName();
+            NodeList typeNodes = document.getElementsByTagNameNS("ddi:logicalproduct:3_3", typeName);
+            if (typeNodes.getLength() == 0) {
+                return "Erreur : Aucun élément correspondant trouvé pour le type " + typeName;
             }
+
+            Element typeNameDocument = (Element) typeNodes.item(0);
+            if (!typeName.equals(typeNameDocument.getNodeName().toString())) {
+                return "Erreur : Attention ce n'est pas le bon type. L'item chargé n'est pas du type que vous avez sélectionné.";
+            }
+
+            Document document2 = (Document) document.cloneNode(true);
+            NodeList versionNodes = document2.getElementsByTagName("r:Version");
+            for (int i = 0; i < versionNodes.getLength(); i++) {
+                Node versionNode = versionNodes.item(i);
+                if (versionNode instanceof Element) {
+                    Element versionElement = (Element) versionNode;
+                    versionElement.setTextContent(String.valueOf(version));
+                }
+            }
+
+            Node nameNode = document2.getElementsByTagName("r:String").item(0);
+            nameNode.setTextContent(name);
+
+            Node labelNode = document2.getElementsByTagName("r:Content").item(0);
+            labelNode.setTextContent(label);
+
+            NodeList urnNodes = document2.getElementsByTagName("r:URN");
+            for (int i = 0; i < urnNodes.getLength(); i++) {
+                Node urnNode = urnNodes.item(i);
+                if (urnNode instanceof Element) {
+                    Element urnElement = (Element) urnNode;
+                    String urnCode = urnElement.getTextContent();
+                    urnElement.setTextContent(urnCode.substring(0, urnCode.lastIndexOf(":")) + ":" + version);
+                }
+            }
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document2), new StreamResult(writer));
+
+            // Ajout de la transformation XML vers JSON avec XSLT
+            InputStream xsltStream2 = getClass().getResourceAsStream("/DDIxmltojsonForOneObject.xsl");
+            String jsonResult = transformToJson(new ByteArrayResource(writer.toString().getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur, version);
+
+            return jsonResult;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error processing XML";
         }
+    }
 
     private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur, int version) throws IOException, TransformerException {
 
