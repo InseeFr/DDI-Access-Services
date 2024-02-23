@@ -13,6 +13,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class GetItem {
                     description = "id de l'objet colectica",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RMeSException {
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RMeSException, ParseException {
         return colecticaService.findInstanceByUuid(uuid);
 
     }
@@ -143,7 +144,7 @@ public class GetItem {
 
     @GetMapping("/RessourcePackageToJson")
     public String convertXmlToJson(
-            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException {
+            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException, ParseException {
         return colecticaService.convertXmlToJson(uuid);
     }
 

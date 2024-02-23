@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
@@ -123,7 +124,7 @@ public class PostItem {
     public ResponseEntity<String> byType(
             @PathVariable("type") DDIItemType type, @AuthenticationPrincipal
     OidcUser principal)
-            throws IOException, ExceptionColecticaUnreachable {
+            throws IOException, ExceptionColecticaUnreachable, ParseException {
 
         return colecticaService.getByType(type);
     }
