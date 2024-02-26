@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.http.entity.ContentType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -52,7 +51,7 @@ public class MetadataClientImpl implements MetadataClient {
 	@Autowired
 	private KeycloakServices kc;
 
-	private static String token;
+	private String token;
 
 	@Value("${fr.insee.rmes.api.remote.metadata.url}")
 	String serviceUrl;
@@ -140,8 +139,8 @@ public class MetadataClientImpl implements MetadataClient {
 		String url = String.format("%s/api/v1/_query/set", serviceUrl);
 		RestTemplate restTemplate = new RestTemplate();
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
-		headers.add("Content-type", ContentType.APPLICATION_JSON.getMimeType());
-		headers.add("Authorization", "Bearer " + token);
+		headers.add(CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+		headers.add(AUTHORIZATION, AUTHORIZATION_TYPE + token);
 		HttpEntity<ColecticaSearchSetRequest> request = new HttpEntity<>(setRequest, headers);
 		ResponseEntity<Relationship[]> response = restTemplate.exchange(url, HttpMethod.POST, request,
 				Relationship[].class);

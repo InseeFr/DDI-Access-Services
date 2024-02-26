@@ -27,6 +27,7 @@ import java.util.TreeMap;
 @Slf4j
 public class DDIDocumentBuilder {
 
+	private final static String RESOURCE_PACKAGE = "g:ResourcePackage";
 	private Boolean envelope;
 	private String nameEnvelope = Envelope.DEFAULT.toString();
 	private Node itemNode;
@@ -70,7 +71,7 @@ public class DDIDocumentBuilder {
 				if (this.nameEnvelope.equals(Envelope.DEFAULT.toString())) {
 					packagedDocument.getDocumentElement().appendChild(itemNode);
 				} else {
-					appendChildByParent("g:ResourcePackage", itemNode);
+					appendChildByParent(RESOURCE_PACKAGE, itemNode);
 					refactor(itemNode, packagedDocument);
 				}
 			}
@@ -101,7 +102,7 @@ public class DDIDocumentBuilder {
 		if (envelope) {
 			if (null != itemNode) {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
-				appendChildByParent("g:ResourcePackage", itemNode);
+				appendChildByParent(RESOURCE_PACKAGE, itemNode);
 				importChildByParent(nameParent, node);
 				refactor(itemNode, packagedDocument);
 			}
@@ -131,7 +132,7 @@ public class DDIDocumentBuilder {
 		if (envelope) {
 			if (null != itemNode) {
 				// packagedDocument.getDocumentElement().appendChild(itemNode);
-				appendChildByParent("g:ResourcePackage", itemNode);
+				appendChildByParent(RESOURCE_PACKAGE, itemNode);
 				refactor(itemNode, packagedDocument);
 			}
 			for (Integer key : nodesWithParentNames.keySet()) {
@@ -205,12 +206,18 @@ public class DDIDocumentBuilder {
 		switch (node.getNodeName()) {
 			case "CodeList":
 				changeTagName(document, "CodeList", "l:CodeList", "");
+				break;
 			case "Code":
 				changeTagName(document, "Code", "l:Code", "");
+				break;
 			case "Category":
 				changeTagName(document, "Category", "l:Category", "");
+				break;
 			case "CategoryScheme":
 				changeTagName(document, "CategoryScheme", "l:CategoryScheme", "");
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -299,12 +306,12 @@ public class DDIDocumentBuilder {
 	}
 
 	public NodeList getElementByTagName(String name) {
-		NodeList nodeList = packagedDocument.getElementsByTagName(name);
-		return nodeList;
+		return packagedDocument.getElementsByTagName(name);
 	}
 
 	public void importChild(Node childNode) {
-		Node node, clonedNode;
+		Node node;
+		Node clonedNode ;
 		node = packagedDocument.getLastChild();
 		clonedNode = childNode.cloneNode(true);
 		node.appendChild(packagedDocument.adoptNode(clonedNode));

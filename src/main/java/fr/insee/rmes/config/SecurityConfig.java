@@ -23,12 +23,6 @@ public class SecurityConfig {
     @Value("${fr.insee.rmes.metadata.cors.allowedOrigin}")
     private Optional<String> allowedOrigin;
 
-    private static final String[] SWAGGER_WHITELIST = {
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-    };
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()

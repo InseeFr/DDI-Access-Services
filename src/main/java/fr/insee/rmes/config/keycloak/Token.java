@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Token {
     @JsonProperty("access_token")
-    String access_token;
+    String accessToken;
 
-    private String token_type;
+    private String tokentype;
 
     public String getAccessToken() {
-        return access_token;
+        return accessToken;
     }
 
-    public String getToken_type() {
-        return token_type;
+    public String getTokenType() {
+        return tokentype;
     }
 }

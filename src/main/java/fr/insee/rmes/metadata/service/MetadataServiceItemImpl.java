@@ -23,7 +23,8 @@ import java.util.Map;
 @Service
 @Slf4j
 public class MetadataServiceItemImpl implements MetadataServiceItem {
-
+	private static final String NAME_FRAGMENT = "//*[local-name()='Fragment']";
+	private static final String TEXT_ID = ".//*[local-name()='ID']/text()";
 	@Autowired
 	MetadataRepository metadataRepository;
 
@@ -115,13 +116,13 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	@Override
 	public List<ResponseItem> getDDICodeListSchemeFromResourcePackage(String idRP) throws Exception {
 		String fragment = getItem(idRP).item;
-		String rootExp = "//*[local-name()='Fragment']";
+		String rootExp = NAME_FRAGMENT;
 		Node rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		List<ResponseItem> clsList = new ArrayList<>();
 		String childExp = ".//*[local-name()='CodeListSchemeReference']";
 		NodeList children = xpathProcessor.queryList(rootNode, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String id = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem cls = new ResponseItem();
@@ -142,7 +143,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		List<ResponseItem> clsList = new ArrayList<>();
 		log.debug("GroupRoot id : " + idGroupRoot);
 		String fragment = getItem(idGroupRoot).item;
-		String rootExp = "//*[local-name()='Fragment']";
+		String rootExp = NAME_FRAGMENT;
 		Node rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 		String childGroupExp = ".//*[local-name()='GroupReference']/*[local-name()='ID']/text()";
 		String idGroup = xpathProcessor.queryString(rootNode, childGroupExp);
@@ -155,14 +156,14 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		String childExp = ".//*[local-name()='ResourcePackageReference']";
 		NodeList children = xpathProcessor.queryList(rootNode, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String idRP = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String idRP = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			fragment = getItem(idRP).item;
-			rootExp = "//*[local-name()='Fragment']";
+			rootExp = NAME_FRAGMENT;
 			rootNode = xpathProcessor.queryList(fragment, rootExp).item(0);
 			childExp = ".//*[local-name()='CodeListSchemeReference']";
 			children = xpathProcessor.queryList(rootNode, childExp);
 			for (int j = 0; j < children.getLength(); j++) {
-				String id = xpathProcessor.queryString(children.item(j), ".//*[local-name()='ID']/text()");
+				String id = xpathProcessor.queryString(children.item(j), TEXT_ID);
 				fragment = getItem(id).item;
 				Node child = xpathProcessor.toDocument(fragment);
 				ResponseItem cls = new ResponseItem();
@@ -184,7 +185,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		String childExp = ".//*[local-name()='CodeListReference']";
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String id = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem cl = new ResponseItem();
@@ -201,7 +202,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 	public String getResourcePackageId(Node rootNode) throws Exception {
 		String childExp = ".//*[local-name()='ResourcePackageReference']";
 		Node rpNode = xpathProcessor.queryList(rootNode, childExp).item(0);
-		return xpathProcessor.queryText(rpNode, ".//*[local-name()='ID']/text()");
+		return xpathProcessor.queryText(rpNode, TEXT_ID);
 	}
 
 	public List<ResponseItem> getGroups(Node node, ResponseItem ddiRoot) throws Exception {
@@ -209,7 +210,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		String childExp = ".//*[local-name()='GroupReference']";
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String id = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem group = new ResponseItem();
@@ -230,7 +231,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		String childExp = ".//*[local-name()='SubGroupReference']";
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String id = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem subGroup = new ResponseItem();
@@ -252,7 +253,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		String childExp = ".//*[local-name()='StudyUnitReference']";
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String id = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem studyUnit = new ResponseItem();
@@ -275,7 +276,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		String childExp = ".//*[local-name()='DataCollectionReference']";
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String id = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem dataCollection = new ResponseItem();
@@ -299,7 +300,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		String childExp = ".//*[local-name()='InstrumentSchemeReference']";
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String id = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem instrumentScheme = new ResponseItem();
@@ -321,7 +322,7 @@ public class MetadataServiceItemImpl implements MetadataServiceItem {
 		String childExp = ".//*[local-name()='InstrumentReference']";
 		NodeList children = xpathProcessor.queryList(node, childExp);
 		for (int i = 0; i < children.getLength(); i++) {
-			String id = xpathProcessor.queryText(children.item(i), ".//*[local-name()='ID']/text()");
+			String id = xpathProcessor.queryText(children.item(i), TEXT_ID);
 			String fragment = getItem(id).item;
 			Node child = xpathProcessor.toDocument(fragment);
 			ResponseItem instrument = new ResponseItem();

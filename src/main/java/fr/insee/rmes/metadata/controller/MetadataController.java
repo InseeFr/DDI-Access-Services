@@ -11,6 +11,7 @@ import fr.insee.rmes.metadata.service.ddiinstance.DDIInstanceService;
 import fr.insee.rmes.metadata.service.fragmentInstance.FragmentInstanceService;
 import fr.insee.rmes.search.model.DDIItemType;
 import fr.insee.rmes.webservice.rest.RMeSException;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -49,7 +50,7 @@ import java.util.List;
         @ApiResponse(responseCode = "500", description = "Internal server error") })
 public class MetadataController {
 
-    final static Logger log = LogManager.getLogger(MetadataController.class);
+    static final Logger log = LogManager.getLogger(MetadataController.class);
 
     @Autowired
     private MetadataService metadataService;
@@ -62,6 +63,7 @@ public class MetadataController {
     @Autowired
     private MetadataServiceItem metadataServiceItem;
 
+    @Hidden
     @GetMapping("/question/{uuid}/ddi")
     @Produces(MediaType.APPLICATION_JSON)
     public String  getQuestion(@PathVariable String uuid) throws Exception{
@@ -81,7 +83,7 @@ public class MetadataController {
             log.error(e.getMessage(), e);
             throw e;        }
     }
-
+    @Hidden
     @GetMapping("/ddi-instance/{uuid}/ddi")
     @Produces(MediaType.APPLICATION_JSON)
     public  String getDDIInstance(@PathVariable String uuid) throws Exception{
@@ -92,7 +94,7 @@ public class MetadataController {
             throw e;        }
     }
 
-
+    @Hidden
     @GetMapping("/colectica-item/{uuid}")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get the item with uuid {uuid}", description = "Get an item from Colectica Repository, given it's {id}")
@@ -117,7 +119,7 @@ public class MetadataController {
             log.error(e.getMessage(), e);
             throw e;        }
     }
-
+    @Hidden
     @GetMapping("colectica-items/{itemType}")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get all referenced items of a certain type", description = "Retrieve a list of ColecticaItem of the type defined")
@@ -130,7 +132,7 @@ public class MetadataController {
             throw e;
         }
     }
-
+    @Hidden
     @GetMapping("colectica-item/{uuid}/toplevel-refs/")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get the colectica item toplevel parents refs with item uuid {uuid}", description = "This will give a list of object containing a triple identifier (reference id, version and agency) and the itemtype. Note that you will"
@@ -145,7 +147,7 @@ public class MetadataController {
             throw e;
         }
     }
-
+    @Hidden
     @GetMapping("fragmentInstance/{uuid}/ddi")
     @Produces(MediaType.APPLICATION_XML)
     @Operation(summary = "Get DDI document", description = "Get a DDI document from Colectica repository including an item thanks to its {uuid} and its children as fragments.")

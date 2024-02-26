@@ -41,7 +41,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
         @ApiResponse(responseCode = "500", description = "Internal server error") })
 public class DDISearch {
 
-    final static Logger log = LogManager.getLogger(DDISearch.class);
+     static final Logger log = LogManager.getLogger(DDISearch.class);
 
     @Autowired
     SearchService searchService;

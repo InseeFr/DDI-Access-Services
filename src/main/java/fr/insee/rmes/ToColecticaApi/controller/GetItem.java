@@ -1,9 +1,10 @@
-package fr.insee.rmes.ToColecticaApi.controller;
+package fr.insee.rmes.tocolecticaapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.rmes.ToColecticaApi.service.ColecticaService;
+import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.webservice.rest.RMeSException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,37 +13,35 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
 
 
 @RestController
 @RequestMapping("/Item")
 @Tag(name= "DEMO-Colectica",description = "Services for upgrade Colectica-API")
 public class GetItem {
-    final static Logger logger = LogManager.getLogger(GetItem.class);
+    static final Logger logger = LogManager.getLogger(GetItem.class);
 
     private final ColecticaService colecticaService;
 
-    private final RestTemplate restTemplate;
-    @Autowired
-    public GetItem(ColecticaService colecticaService, RestTemplate restTemplate) {
+    public GetItem(ColecticaService colecticaService) {
         this.colecticaService = colecticaService;
-        this.restTemplate = restTemplate;
     }
 
 
     @GetMapping("ddiInstance/uuid")
     @Operation(summary = "Get ddiInstance by uuid", description = "Get an XML document for a ddi:Instance from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public ResponseEntity<?> FindInstanceByUuidColectica (
+    public ResponseEntity<String> findInstanceByUuidColectica(
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RMeSException, ParseException {
         return colecticaService.findInstanceByUuid(uuid);
 
     }
@@ -50,12 +49,12 @@ public class GetItem {
     @GetMapping("ddiFragment/uuid")
     @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public ResponseEntity<?> FindFragmentByUuidColectica (
+    public ResponseEntity<String> findFragmentByUuidColectica(
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws ExceptionColecticaUnreachable, IOException {
         return colecticaService.findFragmentByUuid(uuid);
 
     }
@@ -63,7 +62,7 @@ public class GetItem {
     @GetMapping("ddiFragment/uuid/withChildren")
     @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
-    public String FindFragmentByUuidWithChildrenColectica (
+    public String findFragmentByUuidWithChildrenColectica(
             @Parameter(
                     description = "id de l'objet colectica",
                     required = true,
@@ -75,7 +74,7 @@ public class GetItem {
 
         @GetMapping("/filtered-search/texte")
         @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
-        public ResponseEntity<?> filteredSearchText(
+        public ResponseEntity<String> filteredSearchText(
                 @Parameter(
                         description = "nom par défaut de l'index colectica",
                         required = true,
@@ -92,7 +91,7 @@ public class GetItem {
 
     @GetMapping("/filtered-search/texteByType")
     @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
-    public ResponseEntity<?> filteredSearchTextByType(
+    public ResponseEntity<String> filteredSearchTextByType(
             @Parameter(
                     description = "nom par défaut de l'index colectica",
                     required = true,
@@ -109,12 +108,12 @@ public class GetItem {
                     description = "type à selectionner",
                     required = true)  @RequestParam DDIItemType ddiItemType
             ) {
-        return colecticaService.SearchTexteByType(index, texte, ddiItemType );
+        return colecticaService.searchTexteByType(index, texte, ddiItemType );
     }
 
     @GetMapping("/filtered-search/type/")
     @Operation(summary = "Get list of match by type in elasticsearch database", description = "Get a JSON ")
-    public ResponseEntity<?> SearchByType(
+    public ResponseEntity<String> searchByType(
             @Parameter(
                     description = "nom par défaut de l'index colectica",
                     required = true,
@@ -124,7 +123,7 @@ public class GetItem {
             @Parameter(
                     description = "type à selectionner",
                     required = true)  @RequestParam DDIItemType ddiItemType) {
-        return colecticaService.SearchByType(index, ddiItemType);
+        return colecticaService.searchByType(index, ddiItemType);
     }
 
 
@@ -145,7 +144,7 @@ public class GetItem {
 
     @GetMapping("/RessourcePackageToJson")
     public String convertXmlToJson(
-            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
+            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RMeSException, ParseException {
         return colecticaService.convertXmlToJson(uuid);
     }
 

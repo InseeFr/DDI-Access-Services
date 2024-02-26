@@ -15,23 +15,23 @@ public class ObjectColecticaPost {
 	 */
 
 	@JsonProperty("ItemTypes")
-	private List<String> ItemTypes;
+	private List<String> itemTypes;
 
 	@JsonProperty("TargetItem")
 	private TargetItem targetItem;
 
 	@JsonProperty("UseDistinctResultItem")
-	private Boolean UseDistinctResultItem;
+	private Boolean useDistinctResultItem;
 
 	@JsonProperty("UseDistinctTargetItem")
-	private Boolean UseDistinctTargetItem;
+	private Boolean useDistinctTargetItem;
 
 	public List<String> getItemTypes() {
-		return ItemTypes;
+		return itemTypes;
 	}
 
 	public void setItemTypes(List<String> itemTypes) {
-		ItemTypes = itemTypes;
+		this.itemTypes = itemTypes;
 	}
 
 	public TargetItem getTargetItem() {
@@ -43,25 +43,25 @@ public class ObjectColecticaPost {
 	}
 
 	public Boolean getUseDistinctResultItem() {
-		return UseDistinctResultItem;
+		return useDistinctResultItem;
 	}
 
 	public void setUseDistinctResultItem(Boolean useDistinctResultItem) {
-		UseDistinctResultItem = useDistinctResultItem;
+		this.useDistinctResultItem = useDistinctResultItem;
 	}
 
 	public Boolean getUseDistinctTargetItem() {
-		return UseDistinctTargetItem;
+		return useDistinctTargetItem;
 	}
 
 	public void setUseDistinctTargetItem(Boolean useDistinctTargetItem) {
-		UseDistinctTargetItem = useDistinctTargetItem;
+		this.useDistinctTargetItem = useDistinctTargetItem;
 	}
 
 	@Override
 	public String toString() {
-		return "RelationshipPost [ItemTypes=" + ItemTypes + ", targetItem=" + targetItem + ", UseDistinctResultItem="
-				+ UseDistinctResultItem + ", UseDistinctTargetItem=" + UseDistinctTargetItem + "]";
+		return "RelationshipPost [ItemTypes=" + itemTypes + ", targetItem=" + targetItem + ", UseDistinctResultItem="
+				+ useDistinctResultItem + ", UseDistinctTargetItem=" + useDistinctTargetItem + "]";
 	}
 
 	public String toJson() throws JsonProcessingException {

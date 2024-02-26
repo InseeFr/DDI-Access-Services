@@ -1,4 +1,4 @@
-package fr.insee.rmes.ToColecticaApi.models;
+package fr.insee.rmes.tocolecticaapi.models;
 
 import org.apache.commons.fileupload.FileItem;
 public class CustomMultipartFile extends CommonsMultipartFile {

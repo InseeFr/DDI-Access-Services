@@ -1,4 +1,4 @@
-package fr.insee.rmes.ToColecticaApi.models;
+package fr.insee.rmes.tocolecticaapi.models;
 
 public class IdLabelPair {
     private String id;

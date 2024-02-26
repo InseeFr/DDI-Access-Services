@@ -33,13 +33,7 @@ public class DDIFunctions {
 		try {
 			controlConstructReferenceList = getElementListFromFragmentByXpath(fragment, expression);
 			log.debug("Occurence of ControlConstructReference : " + controlConstructReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(controlConstructReferenceList);
@@ -55,17 +49,10 @@ public class DDIFunctions {
 		try {
 			controlConstructReferenceList = getElementListFromFragmentByXpath(fragment, expression);
 			log.debug("Occurence of ControlConstructReference : " + controlConstructReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(controlConstructReferenceList);
-
 	}
 
 	public static Map<String, String> getDDIQuestionReferenceIDFromFragment(String fragment) throws RuntimeException {
@@ -75,13 +62,7 @@ public class DDIFunctions {
 		try {
 			questionReferenceList = getElementListFromFragmentByXpath(fragment, expression);
 			log.debug("Occurence of QuestionReference : " + questionReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(questionReferenceList);
@@ -95,17 +76,10 @@ public class DDIFunctions {
 		try {
 			sourceParameterReferenceList = getElementListFromFragmentByXpath(fragment, expression);
 			log.debug("Occurence of SourceParameterReference : " + sourceParameterReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(sourceParameterReferenceList);
-
 	}
 
 	public static Map<String, String> getDDITargetParameterReferenceIDFromFragment(String fragment)
@@ -115,17 +89,10 @@ public class DDIFunctions {
 		try {
 			targetParameterReferenceList = getElementListFromFragmentByXpath(fragment, expression);
 			log.debug("Occurence of TargetParameterReference : " + targetParameterReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(targetParameterReferenceList);
-
 	}
 
 	public static NodeList getElementListFromFragmentByXpath(String fragment, String xpathExpression)

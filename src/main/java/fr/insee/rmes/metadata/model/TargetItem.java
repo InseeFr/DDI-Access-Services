@@ -11,41 +11,41 @@ public class TargetItem {
 	 */
 
 	@JsonProperty("AgencyId")
-	private String AgencyId;
+	private String agencyId;
 
 	@JsonProperty("Identifier")
-	private String Identifier;
+	private String identifier;
 
 	@JsonProperty("Version")
-	private Integer Version;
+	private Integer version;
 
 	public String getAgencyId() {
-		return AgencyId;
+		return agencyId;
 	}
 
 	public void setAgencyId(String agencyId) {
-		AgencyId = agencyId;
+		this.agencyId = agencyId;
 	}
 
 	public String getIdentifier() {
-		return Identifier;
+		return identifier;
 	}
 
 	public void setIdentifier(String identifier) {
-		Identifier = identifier;
+		this.identifier = identifier;
 	}
 
 	public Integer getVersion() {
-		return Version;
+		return version;
 	}
 
 	public void setVersion(Integer version) {
-		Version = version;
+		this.version = version;
 	}
 
 	@Override
 	public String toString() {
-		return "TargetItem [AgencyId=" + AgencyId + ", Identifier=" + Identifier + ", Version=" + Version + "]";
+		return "TargetItem [AgencyId=" + agencyId + ", Identifier=" + identifier + ", Version=" + version + "]";
 	}
 
 }
