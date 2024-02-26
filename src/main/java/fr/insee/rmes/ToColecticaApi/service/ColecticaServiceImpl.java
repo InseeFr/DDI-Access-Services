@@ -360,8 +360,8 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     private static ResponseEntity<String> getStringResponseEntity(CloseableHttpResponse response) throws IOException {
-        String preresponseBody = EntityUtils.toString(response.getEntity());
-        String responseBody = preresponseBody.replace("ï»¿","");
+        byte[] bytes = EntityUtils.toByteArray(response.getEntity());
+        String responseBody = new String(bytes, StandardCharsets.UTF_8);
         return ResponseEntity.ok(responseBody);
     }
 
