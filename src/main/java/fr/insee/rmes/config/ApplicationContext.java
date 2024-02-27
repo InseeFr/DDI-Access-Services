@@ -78,12 +78,13 @@ public class ApplicationContext {
 
 	@Bean
 	public OpenAPI customOpenAPI() {
+		String serverUrl = "http://";
 		if (isProductionProfileActive()) {
-			return new OpenAPI().servers(List.of(
-					new Server().url("https://" + serverHost ).description("HTTPS Server")));
-		} else {
-			return new OpenAPI();
+			serverUrl = "https://";
 		}
+
+		return new OpenAPI().servers(List.of(
+				new Server().url(serverUrl + serverHost).description("Server")));
 	}
 
 	private boolean isProductionProfileActive() {
