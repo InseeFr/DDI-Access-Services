@@ -1,17 +1,7 @@
 package fr.insee.rmes.config;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import javax.net.ssl.SSLContext;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.servers.Server;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
@@ -26,9 +16,19 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
+
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 @Configuration
 public class ApplicationContext {
@@ -78,9 +78,9 @@ public class ApplicationContext {
 
 	@Bean
 	public OpenAPI customOpenAPI() {
-		String serverUrl = "http://";
+		String serverUrl = "http://"; // Par défaut, utilise HTTP
 		if (isProductionProfileActive()) {
-			serverUrl = "https://";
+			serverUrl = "https://"; // Si le profil de production est actif, utilise HTTPS
 		}
 
 		return new OpenAPI().servers(List.of(

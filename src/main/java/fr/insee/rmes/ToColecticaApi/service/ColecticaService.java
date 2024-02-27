@@ -1,9 +1,9 @@
 package fr.insee.rmes.tocolecticaapi.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.rmes.tocolecticaapi.models.TransactionType;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.tocolecticaapi.models.TransactionType;
 import fr.insee.rmes.webservice.rest.RMeSException;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;

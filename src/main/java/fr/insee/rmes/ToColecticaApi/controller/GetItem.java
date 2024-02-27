@@ -1,9 +1,9 @@
 package fr.insee.rmes.tocolecticaapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.webservice.rest.RMeSException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +14,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,13 +26,12 @@ import java.io.IOException;
 @Tag(name= "DEMO-Colectica",description = "Services for upgrade Colectica-API")
 public class GetItem {
     static final Logger logger = LogManager.getLogger(GetItem.class);
-
+    @Autowired
     private final ColecticaService colecticaService;
 
     public GetItem(ColecticaService colecticaService) {
         this.colecticaService = colecticaService;
     }
-
 
     @GetMapping("ddiInstance/uuid")
     @Operation(summary = "Get ddiInstance by uuid", description = "Get an XML document for a ddi:Instance from Colectica repository.")
@@ -158,5 +158,6 @@ public class GetItem {
                                        @RequestParam ("VersionResponsibility") String idepUtilisateur) {
         return colecticaService.replaceXmlParameters(inputXml, type, label, version, name, idepUtilisateur);
     }
+
 
 }

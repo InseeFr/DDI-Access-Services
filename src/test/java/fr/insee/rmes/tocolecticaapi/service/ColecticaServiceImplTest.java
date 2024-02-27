@@ -5,11 +5,11 @@ import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
 import org.apache.http.ProtocolVersion;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicStatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.message.BasicStatusLine;
 import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,14 +25,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -121,7 +119,7 @@ class ColecticaServiceImplTest {
 
     @Test
     public void testTransformFile() {
-        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl();
+        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticsearchClient,restTemplate);
         MockMultipartFile file = new MockMultipartFile("file", "test.json", "application/json", "[{\"id\": \"value\",\"label\": \"value\" }]".getBytes());
         ResponseEntity<String> result = colecticaService.transformFile(file, "idValue", "nomenclatureName", "suggesterDescription", "version", "idepUtilisateur", "timbre");
         assertNotNull(result);

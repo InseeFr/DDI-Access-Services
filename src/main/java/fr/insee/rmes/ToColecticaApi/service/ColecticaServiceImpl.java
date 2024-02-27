@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import fr.insee.rmes.tocolecticaapi.models.*;
-import fr.insee.rmes.tocolecticaapi.randomUUID;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.tocolecticaapi.models.*;
+import fr.insee.rmes.tocolecticaapi.randomUUID;
 import fr.insee.rmes.webservice.rest.RMeSException;
 import lombok.NonNull;
 import net.sf.saxon.TransformerFactoryImpl;
@@ -129,25 +129,25 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Value("${fr.insee.rmes.elasticsearch.apikey}")
     private String apiKey;
 
-    private final ElasticsearchClient elasticsearchClient;
-    private final RestTemplate restTemplate;
+    @Autowired
+    public ElasticsearchClient elasticsearchClient;
+    @Autowired
+    public  RestTemplate restTemplate;
 
-    public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient,RestTemplate restTemplate) {
-        this.elasticsearchClient = elasticsearchClient;
-        this.restTemplate = restTemplate;
+    public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
+    this.elasticsearchClient=elasticsearchClient;
+    this.restTemplate=restTemplate;
+    }
+    private CloseableHttpClient mockHttpClient;
+    public ColecticaServiceImpl(CloseableHttpClient mockHttpClient,ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
+        this.elasticsearchClient=elasticsearchClient;
+        this.restTemplate=restTemplate;
+        this.mockHttpClient=mockHttpClient;
     }
 
-    public ColecticaServiceImpl(CloseableHttpClient mockHttpClient, ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
+    public ColecticaServiceImpl(){
 
-        this.elasticsearchClient = elasticsearchClient;
-        this.restTemplate = restTemplate;
     }
-
-    public ColecticaServiceImpl() {
-        this.elasticsearchClient = null;
-        restTemplate = null;
-    }
-
     @Override
     public ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException {
         ResponseEntity<String> responseEntity = searchColecticaFragmentByUuid(uuid);

@@ -1,10 +1,10 @@
 package fr.insee.rmes.tocolecticaapi.controller;
 
 
-import fr.insee.rmes.tocolecticaapi.models.TransactionType;
-import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
+import fr.insee.rmes.tocolecticaapi.models.TransactionType;
+import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
