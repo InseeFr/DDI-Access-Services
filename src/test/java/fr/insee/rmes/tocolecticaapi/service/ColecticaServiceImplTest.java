@@ -68,7 +68,6 @@ class ColecticaServiceImplTest {
         when(mockHttpClient.execute(Mockito.any(HttpGet.class))).thenReturn(mockResponse);
 
         colecticaServiceImpl = new ColecticaServiceImpl(mockHttpClient, elasticsearchClient, restTemplate);
-        //ReflectionTestUtils.setField(colecticaServiceImpl, "serviceUrl", "http://dvrmesgopslm003.ad.insee.intra:8080");
         when(keycloakServices.getKeycloakAccessToken()).thenReturn("un_token_valide");
     }
 
