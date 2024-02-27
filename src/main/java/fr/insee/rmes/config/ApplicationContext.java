@@ -4,10 +4,14 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
 import javax.net.ssl.SSLContext;
-import javax.sql.DataSource;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
@@ -22,15 +26,15 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class ApplicationContext {
 
+	@Value("${fr.insee.rmes.api.host}")
+	private String serverHost;
 
 	@Value("${fr.insee.ntlm.user}")
 	private String ntlmUser;
@@ -47,6 +51,12 @@ public class ApplicationContext {
 	@Value("#{'${fr.insee.rmes.search.root.resource-package.ids}'.split(',')}")
 	private List<String> ressourcePackageIds;
 
+	@Autowired
+	private final Environment environment;
+
+	public ApplicationContext(Environment environment) {
+		this.environment = environment;
+	}
 	@Bean
 	public HttpClientBuilder httpClientBuilder()
 			throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
@@ -66,8 +76,24 @@ public class ApplicationContext {
 		return builder.build();
 	}
 
+	@Bean
+	public OpenAPI customOpenAPI() {
+		if (isProductionProfileActive()) {
+			return new OpenAPI().servers(List.of(
+					new Server().url("https://" + serverHost ).description("HTTPS Server")));
+		} else {
+			return new OpenAPI();
+		}
+	}
 
-
-
+	private boolean isProductionProfileActive() {
+		String[] activeProfiles = environment.getActiveProfiles();
+		for (String profile : activeProfiles) {
+			if (profile.equalsIgnoreCase("prod") || profile.equalsIgnoreCase("production")) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }
