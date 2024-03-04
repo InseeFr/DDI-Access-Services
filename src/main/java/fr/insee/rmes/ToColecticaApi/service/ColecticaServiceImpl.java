@@ -85,6 +85,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER = "Bearer ";
     private static final String HTTP = "http://";
+    private static final String HTTPS = "https://";
     private static final String VERSION = "version";
     private static final String SEARCH = "/_search";
     private static final String APIKEYHEADER = "apiKey ";
@@ -429,7 +430,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             httpPost.setEntity(entity);
         }
         else {
-            httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + "/" + index + SEARCH);
+            httpPost = new HttpPost(HTTPS + elasticHost + ":" + elasticHostPort + "/" + index + SEARCH);
             httpPost.setHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
             httpPost.setHeader(CONTENT_TYPE, APPLICATION_JSON);
             httpPost.setEntity(entity);
@@ -459,7 +460,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         if (elasticHost.contains("kube")) {
             httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + encodedTexte);
         } else {
-            httpGet = new HttpGet(HTTP + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=*" + encodedTexte + "*");
+            httpGet = new HttpGet(HTTPS + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=*" + encodedTexte + "*");
             httpGet.addHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
         }
         return httpGet;
