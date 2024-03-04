@@ -11,8 +11,10 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.auth.NTLMSchemeFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
@@ -28,6 +30,7 @@ import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 @Configuration
@@ -97,4 +100,20 @@ public class ApplicationContext {
 		return false;
 	}
 
+	@Bean
+	public CloseableHttpClient httpClient() throws Exception {
+		return createAcceptSelfSignedCertificateClient();
+	}
+	public CloseableHttpClient createAcceptSelfSignedCertificateClient()
+			throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
+		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+		SSLContext sslContext = SSLContexts.custom()
+				.loadTrustMaterial(null, acceptingTrustStrategy)
+				.build();
+		SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+		return HttpClients.custom()
+				.setSSLSocketFactory(csf)
+				.build();
+	}
 }

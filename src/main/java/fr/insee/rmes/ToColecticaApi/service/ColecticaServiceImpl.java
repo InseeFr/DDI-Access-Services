@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fr.insee.rmes.config.ApplicationContext;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
@@ -72,6 +73,9 @@ import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ERROR;
@@ -123,6 +127,8 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     @Value("${fr.insee.rmes.elasticsearch.port}")
     private int  elasticHostPort;
+    @Value("${fr.insee.rmes.elasticsearch.url}")
+    private String  elasticUrl;
 
     @Value("${fr.insee.rmes.elasticsearch.apiId}")
     private String apiId;
@@ -134,6 +140,8 @@ public class ColecticaServiceImpl implements ColecticaService {
     public ElasticsearchClient elasticsearchClient;
     @Autowired
     public  RestTemplate restTemplate;
+
+    public CloseableHttpClient httpClient;
 
     public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
     this.elasticsearchClient=elasticsearchClient;
@@ -149,6 +157,11 @@ public class ColecticaServiceImpl implements ColecticaService {
     public ColecticaServiceImpl(){
 
     }
+    @Autowired
+    public ColecticaServiceImpl(CloseableHttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
     @Override
     public ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException {
         ResponseEntity<String> responseEntity = searchColecticaFragmentByUuid(uuid);
@@ -405,7 +418,7 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     private ResponseEntity<String> searchType(String index,String type) {
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try  {
             HttpPost httpPost;
             String jsonBody = "{\"query\": {\"match\": {\"itemType\":\""+ type + "\"}}, \"_source\": true, \"size\": 10000, \"from\": 0}";
             StringEntity entity = new StringEntity(jsonBody, ContentType.APPLICATION_JSON);
@@ -430,7 +443,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             httpPost.setEntity(entity);
         }
         else {
-            httpPost = new HttpPost(HTTPS + elasticHost + ":" + elasticHostPort + "/" + index + SEARCH);
+            httpPost = new HttpPost(elasticUrl + "/" + index + SEARCH);
             httpPost.setHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
             httpPost.setHeader(CONTENT_TYPE, APPLICATION_JSON);
             httpPost.setEntity(entity);
@@ -438,20 +451,18 @@ public class ColecticaServiceImpl implements ColecticaService {
         return httpPost;
     }
 
-
     private ResponseEntity<String> searchText(String index, String texte) {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try {
             String encodedTexte = URLEncoder.encode(texte, StandardCharsets.UTF_8.toString());
-            HttpGet httpGet;
-
-            httpGet = getHttpGetToElastic(index, encodedTexte);
+            HttpGet httpGet = getHttpGetToElastic(index,encodedTexte);
 
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 return ResponseEntity.ok(responseBody);
             }
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(ERREUR_ELASTICSEARCH);
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la connexion au service.");
         }
     }
 
@@ -460,7 +471,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         if (elasticHost.contains("kube")) {
             httpGet = new HttpGet("https://" + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + encodedTexte);
         } else {
-            httpGet = new HttpGet(HTTPS + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=*" + encodedTexte + "*");
+            httpGet = new HttpGet(elasticUrl + "/" + index + "/_search?q=*" + encodedTexte + "*");
             httpGet.addHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
         }
         return httpGet;
