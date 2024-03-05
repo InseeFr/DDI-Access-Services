@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import fr.insee.rmes.config.ApplicationContext;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.metadata.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.search.model.DDIItemType;
@@ -57,7 +56,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -73,9 +71,6 @@ import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ERROR;
@@ -385,6 +380,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody =  responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
+            logger.info("Réponse filtrée avec succès pour searchTexte");
             return ResponseEntity.ok(filteredResponse);
         } else {
             return responseEntity;
@@ -397,6 +393,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody =  responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
+            logger.info("Réponse filtrée avec succès pour searchByType");
             return ResponseEntity.ok(filteredResponse);
         } else {
             return responseEntity;
@@ -409,6 +406,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
              String responseBody = responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
+            logger.info("Réponse filtrée avec succès pour searchTexteByType");
             return ResponseEntity.ok(filteredResponse);
         } else {
             return responseEntity;
@@ -417,7 +415,6 @@ public class ColecticaServiceImpl implements ColecticaService {
 
 
     private ResponseEntity<String> searchType(String index,String type) {
-
         try  {
             HttpPost httpPost;
             String jsonBody = "{\"query\": {\"match\": {\"itemType\":\""+ type + "\"}}, \"_source\": true, \"size\": 10000, \"from\": 0}";
@@ -478,10 +475,9 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     private ResponseEntity<String> searchTextByType(String index, String texte, String type) {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + "/" + index + SEARCH);
+        try  {
+            HttpPost httpPost = new HttpPost(elasticUrl + "/" + index + SEARCH);
 
-            // Ajouter l'en-tête pour l'authentification et le type de contenu si nécessaire
             if (!elasticHost.contains("kube")) {
                 httpPost.setHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
                 httpPost.setHeader(CONTENT_TYPE, APPLICATION_JSON);
