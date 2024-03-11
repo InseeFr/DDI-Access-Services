@@ -16,7 +16,7 @@ import java.util.Map;
 public interface ColecticaService {
     ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException;
 
-
+    String sendDeleteColectica(String uuid, TransactionType transactionType) throws JsonProcessingException, ExceptionColecticaUnreachable, RMeSException, ParseException;
     ResponseEntity<String> findInstanceByUuid(String uuid) throws RMeSException, ParseException;
     String findFragmentByUuidWithChildren(String uuid) throws Exception;
     ResponseEntity<String> filteredSearchText(String index, String texte);

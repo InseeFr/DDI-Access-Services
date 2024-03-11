@@ -113,7 +113,7 @@ class ColecticaServiceImplTest {
         when(colecticaService.getByType(type)).thenReturn(ResponseEntity.ok("test"));
         ResponseEntity<String> result = colecticaService.getByType(type);
         assertNotNull(result);
-        assertEquals(200, result.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         assertNotNull(result.getBody());
     }
 
@@ -123,7 +123,7 @@ class ColecticaServiceImplTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.json", "application/json", "[{\"id\": \"value\",\"label\": \"value\" }]".getBytes());
         ResponseEntity<String> result = colecticaService.transformFile(file, "idValue", "nomenclatureName", "suggesterDescription", "version", "idepUtilisateur", "timbre");
         assertNotNull(result);
-        assertEquals(200, result.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         assertNotNull(result.getBody());
     }
 
@@ -151,7 +151,7 @@ class ColecticaServiceImplTest {
         when(colecticaService.uploadItem(file)).thenReturn(mockedResponse);
         ResponseEntity<String> result = colecticaService.uploadItem(file);
         assertNotNull(result);
-        assertEquals(200, result.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("Le fichier a été envoyé avec succès à l'API.", result.getBody());
     }
 }

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/meta-data")
 @Tag(name = "DDI MetaData API" )
@@ -74,6 +75,7 @@ public class MetadataController {
             throw e;        }
     }
 
+    @Hidden
     @GetMapping("/units")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Unit> getUnits() throws Exception{
@@ -132,6 +134,7 @@ public class MetadataController {
             throw e;
         }
     }
+
     @Hidden
     @GetMapping("colectica-item/{uuid}/toplevel-refs/")
     @Produces(MediaType.APPLICATION_JSON)

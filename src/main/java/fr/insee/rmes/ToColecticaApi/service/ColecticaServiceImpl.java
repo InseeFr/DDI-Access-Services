@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
@@ -1155,6 +1156,114 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
+    @Override
+    public String sendDeleteColectica(String uuid, TransactionType transactionType) throws JsonProcessingException, ExceptionColecticaUnreachable, RMeSException, ParseException {
+        RestTemplate restTemplate = new RestTemplate();
+        String initTransactionUrl = serviceUrl + "/api/v1/transaction";
+        String authentToken;
+
+        if (serviceUrl.contains("kube")) {
+            String token2 = getAuthToken();
+            authentToken = extractAccessToken(token2);
+        } else {
+            authentToken = getFreshToken();
+        }
+
+        HttpHeaders initTransactionHeaders = new HttpHeaders();
+        initTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+        if (authentToken != null && !authentToken.isEmpty()) {
+            initTransactionHeaders.setBearerAuth(authentToken);
+        }
+        HttpEntity<String> initTransactionRequest = new HttpEntity<>(initTransactionHeaders);
+        ResponseEntity<String> initTransactionResponse = restTemplate.exchange(
+                initTransactionUrl,
+                HttpMethod.POST,
+                initTransactionRequest,
+                String.class
+        );
+
+        if (initTransactionResponse.getStatusCode() == HttpStatus.OK) {
+            String responseBodyInit = initTransactionResponse.getBody();
+            int transactionId = extractTransactionId(responseBodyInit);
+
+            //appel au service DDI instance par uuuid
+            ResponseEntity<?> test = searchColecticaInstanceByUuid(uuid);
+            // transformation de la reponse à la requete précédente grâce à une transformation xslt: on obtient une String
+            // Transformation de la réponse en JSON
+            String responseBody = (String) test.getBody();
+            JSONArray result = extractIdentifiersFromDiiInstance(responseBody);
+            // Créer l'objet JSON pour la requête
+            JSONObject deleteTransactionBody = new JSONObject();
+            deleteTransactionBody.put("identifiers", result); // Ajouter les identifiants extraits
+            deleteTransactionBody.put("setIdentifiers", new JSONArray()); // Tableau vide si nécessaire
+            deleteTransactionBody.put("transactionIds", new JSONArray(Arrays.asList(transactionId))); // Ajouter l'ID de transaction
+            deleteTransactionBody.put("deleteType", 0); // Ajouter le type de suppression
+
+            // Convertir en chaîne JSON pour la requête
+            JsonMapper resultFinal = new JsonMapper();
+            String deleteTransactionRequestBody = deleteTransactionBody.toString();
+            System.out.println("deleteTransactionRequestBody: " + deleteTransactionRequestBody);
+            // lancement de la requete à destination de l'api colectica
+            String deleteTransactionUrl = serviceUrl + "/api/v1/item/_delete";
+            // Configuration des en-têtes de la requête
+            HttpHeaders deleteTransactionHeaders = new HttpHeaders();
+            deleteTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
+            deleteTransactionHeaders.setBearerAuth(authentToken);
+
+            // Création et envoi de la requête
+            HttpEntity<String> deleteTransactionRequest = new HttpEntity<>(deleteTransactionRequestBody, deleteTransactionHeaders);
+            ResponseEntity<String> deleteTransactionResponse = restTemplate.exchange(
+                    deleteTransactionUrl,
+                    HttpMethod.POST,
+                    deleteTransactionRequest,
+                    String.class
+            );
+            return deleteTransactionResponse.getStatusCode().toString();
+        }
+        return ("error no TransactionId");
+    }
+    private JSONArray extractIdentifiersFromDiiInstance(String fragmentXml) {
+        Set<FragmentData> uniqueData = new HashSet<>();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new ByteArrayInputStream(fragmentXml.getBytes(StandardCharsets.UTF_8)));
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            XPath xpath = xpathFactory.newXPath();
+
+            xpath.setNamespaceContext(new NamespaceContextMap("r", "ddi:reusable:3_3", "ddi", "ddi:instance:3_3"));
+
+            // Sélectionner tous les nœuds ayant un ID, Agency ou Version
+            NodeList nodes = (NodeList) xpath.evaluate("//*[local-name()='ID' or local-name()='Agency' or local-name()='Version']", document, XPathConstants.NODESET);
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node currentNode = nodes.item(i).getParentNode();
+
+                String id = xpath.evaluate("r:ID", currentNode);
+                String agency = xpath.evaluate("r:Agency", currentNode);
+                String version = xpath.evaluate("r:Version", currentNode);
+
+                FragmentData fragmentData = new FragmentData(id, agency, version);
+                uniqueData.add(fragmentData);
+            }
+
+            // Convertir Set en JSONArray
+            JSONArray allFragmentsData = new JSONArray();
+            for (FragmentData data : uniqueData) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Identifier", data.getIdentifier());
+                jsonObject.put("AgencyId", data.getAgencyId());
+                jsonObject.put("Version", data.getVersion());
+                allFragmentsData.put(jsonObject);
+            }
+
+            return allFragmentsData;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JSONArray();
+        }
+    }
     public String getFreshToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
         if ( ! kc.isTokenValid(token)) {
             token = getToken();
