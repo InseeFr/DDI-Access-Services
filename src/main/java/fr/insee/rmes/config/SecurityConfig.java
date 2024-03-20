@@ -38,14 +38,17 @@ public class SecurityConfig {
         if (isProdProfileActive()) {
             // Configuration spécifique au profil prod
             http
-                    .requiresChannel()
-                    .anyRequest()
-                    .requiresSecure()
-                    .and()
-                    .httpBasic()
-                    .and()
-                    .authorizeRequests()
-                    .anyRequest().authenticated();
+                    .securityMatcher("/**")
+                    .authorizeRequests(authorizeRequests ->
+                            authorizeRequests
+                                    .requestMatchers(HttpMethod.GET).permitAll()
+                                    .anyRequest().authenticated()
+                    )
+                    .httpBasic(withDefaults())
+                    .requiresChannel(requiresChannel ->
+                            requiresChannel
+                                    .anyRequest().requiresSecure()
+                    );
         } else {
             http.csrf().disable()
                     .httpBasic(withDefaults())
