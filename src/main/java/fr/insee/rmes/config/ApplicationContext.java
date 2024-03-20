@@ -1,6 +1,7 @@
 package fr.insee.rmes.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
@@ -25,7 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
-
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -39,40 +40,13 @@ public class ApplicationContext {
 	@Value("${fr.insee.rmes.api.host}")
 	private String serverHost;
 
-	@Value("${fr.insee.ntlm.user}")
-	private String ntlmUser;
-
-	@Value("${fr.insee.ntlm.password}")
-	private String ntlmPassword;
-
-	@Value("${fr.insee.ntlm.domain}")
-	private String ntlmDomain;
-	
-	@Value("#{'${fr.insee.rmes.search.root.sub-group.ids}'.split(',')}")
-	private List<String> subGroupIds;
-	
-	@Value("#{'${fr.insee.rmes.search.root.resource-package.ids}'.split(',')}")
-	private List<String> ressourcePackageIds;
-
 	@Autowired
 	private final Environment environment;
 
 	public ApplicationContext(Environment environment) {
 		this.environment = environment;
 	}
-	@Bean
-	public HttpClientBuilder httpClientBuilder()
-			throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-		SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-		Registry<AuthSchemeProvider> authSchemeRegistry = RegistryBuilder.<AuthSchemeProvider> create()
-				.register(AuthSchemes.NTLM, new NTLMSchemeFactory()).build();
-		BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(AuthScope.ANY, new NTCredentials(ntlmUser, ntlmPassword, null, ntlmDomain));
-		return HttpClients.custom().setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).setSSLSocketFactory(sslsf)
-				.useSystemProperties().setDefaultAuthSchemeRegistry(authSchemeRegistry)
-				.setDefaultCredentialsProvider(credsProvider);
-	}
+
 	@Bean
 	public RestTemplate restTemplate(RestTemplateBuilder builder) {
 
@@ -87,7 +61,14 @@ public class ApplicationContext {
 		}
 
 		return new OpenAPI().servers(List.of(
-				new Server().url(serverUrl + serverHost).description("Server")));
+				new Server().url(serverUrl + serverHost).description("Server")))
+				.components(new io.swagger.v3.oas.models.Components()
+						.addSecuritySchemes("bearerAuth",
+								new SecurityScheme()
+										.type(SecurityScheme.Type.HTTP)
+										.scheme("bearer")
+										.bearerFormat("JWT")))
+				.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
 	}
 
 	private boolean isProductionProfileActive() {

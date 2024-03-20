@@ -1,6 +1,5 @@
 package fr.insee.rmes.config;
 
-import fr.insee.rmes.tocolecticaapi.controller.DeleteItem;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
