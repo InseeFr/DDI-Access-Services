@@ -1,10 +1,10 @@
-FROM maven:3.8.3-openjdk-21 as mvn
+FROM maven:3.9.6-eclipse-temurin-21-alpine as mvn
 WORKDIR /DDI-Access-Services
 COPY ./ /DDI-Access-Services/
 RUN mvn -B -f /DDI-Access-Services/pom.xml package
 
 MAINTAINER hugobouttes
 
-FROM openjdk:21-alpine
+FROM eclipse-temurin:21-alpine
 COPY --from=mvn DDI-Access-Services/target/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
