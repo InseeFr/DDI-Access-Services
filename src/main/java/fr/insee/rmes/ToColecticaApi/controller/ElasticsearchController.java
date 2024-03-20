@@ -1,4 +1,4 @@
-package fr.insee.rmes.search.controller;
+package fr.insee.rmes.tocolecticaapi.controller;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
