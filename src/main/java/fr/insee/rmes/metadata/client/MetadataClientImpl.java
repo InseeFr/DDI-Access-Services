@@ -1,6 +1,8 @@
 package fr.insee.rmes.metadata.client;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -180,13 +182,12 @@ public class MetadataClientImpl implements MetadataClient {
 
 	@Override
 	public List<Unit> getUnits() throws Exception {
-		//Units are not retrieved from a repository but from a file in resources folder
-		//Change this method when units are available in repository
-		final ObjectMapper objectMapper = new ObjectMapper();
-        URL resource = getClass().getClassLoader().getResource("measure-units.json");
-		return objectMapper.readValue(
-				new File(resource.toURI()), 
-		        new TypeReference<List<Unit>>(){});
+		ObjectMapper objectMapper = new ObjectMapper();
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("measure-units.json");
+		if (inputStream == null) {
+			throw new FileNotFoundException("Resource 'measure-units.json' is not found");
+		}
+		return objectMapper.readValue(inputStream, new TypeReference<List<Unit>>() {});
 	}
 
 	@Override
