@@ -75,7 +75,6 @@ public class MetadataController {
             throw e;        }
     }
 
-    @Hidden
     @GetMapping("/units")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Unit> getUnits() throws Exception{

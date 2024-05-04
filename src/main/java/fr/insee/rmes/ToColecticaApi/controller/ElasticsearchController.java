@@ -14,6 +14,7 @@ import fr.insee.rmes.search.model.DDIItemType;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.websocket.server.PathParam;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@SecurityRequirement(name = "bearerAuth")
 @Hidden
 public class ElasticsearchController {
     private static final String HTTPS = "https://";

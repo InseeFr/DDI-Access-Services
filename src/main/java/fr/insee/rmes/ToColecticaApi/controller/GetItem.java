@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -149,6 +150,7 @@ public class GetItem {
     }
 
     @PutMapping ("/replace-xml-parameters")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     @Operation(summary = "Modify a fragment DDI", description = "Modify a fragment DDI. All field need to be filled with the same data if there are no changes, except for the version number, which takes a plus 1.")
     public String replaceXmlParameters(@RequestBody String inputXml,
                                        @RequestParam ("Type") DDIItemType type,

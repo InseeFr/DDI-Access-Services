@@ -54,7 +54,7 @@ public class PostItem {
     @PostMapping(value = "/transformJsonToJsonForAPi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "transform an JSON Codelist (Id,Label) to an another json for Colectica API ",
             description = "tranform a codeList in json to another json with DDI item inside")
-    @PreAuthorize("hasRole('ADMIN_WDAI')")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     public ResponseEntity<String> transformFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam("nom metier") String idValue,
                                            @RequestParam("label") String nomenclatureName,
@@ -71,7 +71,7 @@ public class PostItem {
     @PostMapping(value = "/transformJsonToJsonForApiForComplexCodeList", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "transform an JSON Codelist with multiple field for one id to an another json for Colectica API ",
             description = "tranform a codeList in json to another json with DDI item inside")
-    @PreAuthorize("hasRole('ADMIN_WDAI')")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     public ResponseEntity<String> transformFileForComplexCodeList(@RequestParam("file") MultipartFile file,
                                            @RequestParam("nom metier") String idValue,
                                            @RequestParam("label") String nomenclatureName,
@@ -92,7 +92,7 @@ public class PostItem {
     @PostMapping("/UpdateToColecticaRepository/{transactionType}")
     @Operation(summary = "Send an update to Colectica Repository via Colectica API ",
             description = "Send a json make with /replace-xml-parameters/{Type}/{Label}/{Version}/{Name}/{VersionResponsibility} COPYCOMMIT is for Upload a new object not for update")
-    @PreAuthorize("hasRole('ADMIN_WDAI')")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     public ResponseEntity<String> sendUpdateColectica(
             @RequestBody String ddiUpdatingInJson,
             @RequestParam("transactionType") TransactionType transactionType
@@ -107,7 +107,7 @@ public class PostItem {
     @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "Send suggester JSON to Colectica Repository via Colectica API",
             description = "Send a suggester JSON to /api/v1/item. This suggester must be simple, a list of Id,Label transform with transformJsonToJsonForAPi")
-    @PreAuthorize("hasRole('ADMIN_WDAI')")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     public ResponseEntity<String> uploadItem(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal
     OidcUser principal)
             throws IOException, ExceptionColecticaUnreachable {
@@ -119,7 +119,7 @@ public class PostItem {
     @Hidden
     @PostMapping("{type}/json")
     @Operation(summary = "Get JSON for a type of DDI item", description = "Get a JSON list of item for a type of DDI items .")
-    @PreAuthorize("hasRole('ADMIN_WDAI')")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     public ResponseEntity<String> byType(
             @PathVariable("type") DDIItemType type, @AuthenticationPrincipal
     OidcUser principal)
