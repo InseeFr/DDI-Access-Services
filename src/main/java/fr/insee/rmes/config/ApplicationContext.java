@@ -1,121 +1,90 @@
 package fr.insee.rmes.config;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.web.client.RestTemplate;
+
+import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.net.ssl.SSLContext;
-import javax.sql.DataSource;
-
-import org.apache.http.auth.AuthSchemeProvider;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.auth.NTLMSchemeFactory;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.web.client.RestTemplate;
-
 @Configuration
-@PropertySource(value = { "classpath:env/${fr.insee.rmes.env:dev}/ddi-access-services.properties",
-		"file:${catalina.base}/webapps/ddi-access-services.properties" ,"file:${catalina.base}/webapps/rmspogbo.properties","file:${catalina.base}/webapps/rmespogbo.properties" }, ignoreResourceNotFound = true)
 public class ApplicationContext {
 
-	@Value("${fr.insee.rmes.search.db.host}")
-	String dbHost;
+	@Value("${fr.insee.rmes.api.host}")
+	private String serverHost;
 
-	@Value("${fr.insee.rmes.search.db.port}")
-	String dbPort;
+	@Autowired
+	private final Environment environment;
 
-	@Value("${fr.insee.rmes.search.db.schema}")
-	String dbSchema;
-
-	@Value("${fr.insee.rmes.search.db.user}")
-	private String dbUser;
-
-	@Value("${fr.insee.rmes.search.db.password}")
-	private String dbPassword;
-
-	@Value("${fr.insee.rmes.search.db.driver}")
-	private String dbDriver;
-
-	@Value("${fr.insee.ntlm.user}")
-	private String ntlmUser;
-
-	@Value("${fr.insee.ntlm.password}")
-	private String ntlmPassword;
-
-	@Value("${fr.insee.ntlm.domain}")
-	private String ntlmDomain;
-	
-	@Value("#{'${fr.insee.rmes.search.root.sub-group.ids}'.split(',')}")
-	private List<String> subGroupIds;
-	
-	@Value("#{'${fr.insee.rmes.search.root.resource-package.ids}'.split(',')}")
-	private List<String> ressourcePackageIds;
-
-	@Bean
-	public HttpClientBuilder httpClientBuilder()
-			throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-		SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-		Registry<AuthSchemeProvider> authSchemeRegistry = RegistryBuilder.<AuthSchemeProvider> create()
-				.register(AuthSchemes.NTLM, new NTLMSchemeFactory()).build();
-		BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(AuthScope.ANY, new NTCredentials(ntlmUser, ntlmPassword, null, ntlmDomain));
-		return HttpClients.custom().setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).setSSLSocketFactory(sslsf)
-				.useSystemProperties().setDefaultAuthSchemeRegistry(authSchemeRegistry)
-				.setDefaultCredentialsProvider(credsProvider);
+	public ApplicationContext(Environment environment) {
+		this.environment = environment;
 	}
 
 	@Bean
-	public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-		CloseableHttpClient httpClient = httpClientBuilder().build();
-		ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-		RestTemplate restTemplate = new RestTemplate(requestFactory);
-		return restTemplate;
+	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+
+		return builder.build();
 	}
 
 	@Bean
-	public DataSource dataSource() {
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(dbDriver);
-		dataSource.setUrl(String.format("jdbc:postgresql://%s:%s/%s", dbHost, dbPort, dbSchema));
-		dataSource.setUsername(dbUser);
-		dataSource.setPassword(dbPassword);
-		return dataSource;
+	public OpenAPI customOpenAPI() {
+		String serverUrl = "http://"; // Par défaut, utilise HTTP
+		if (isProductionProfileActive()) {
+			serverUrl = "https://"; // Si le profil de production est actif, utilise HTTPS
+		}
+
+		return new OpenAPI().servers(List.of(
+				new Server().url(serverUrl + serverHost).description("Server")))
+				.components(new io.swagger.v3.oas.models.Components()
+						.addSecuritySchemes("bearerAuth",
+								new SecurityScheme()
+										.type(SecurityScheme.Type.HTTP)
+										.scheme("bearer")
+										.bearerFormat("JWT")))
+				.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+	}
+
+	private boolean isProductionProfileActive() {
+		String[] activeProfiles = environment.getActiveProfiles();
+		for (String profile : activeProfiles) {
+			if (profile.equalsIgnoreCase("prod") || profile.equalsIgnoreCase("production")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Bean
-	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.setResultsMapCaseInsensitive(true);
-		return jdbcTemplate;
+	public CloseableHttpClient httpClient() throws Exception {
+		return createAcceptSelfSignedCertificateClient();
 	}
-	
-	@Bean 
-	public MetaDataRootContext getMetaDataContext(){
-		MetaDataRootContext metaDataContext = new MetaDataRootContext();
-		metaDataContext.setRessourcePackageIds(ressourcePackageIds);
-		metaDataContext.setSubGroupIds(subGroupIds);
-		return metaDataContext;
+	public CloseableHttpClient createAcceptSelfSignedCertificateClient()
+			throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
+		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+		SSLContext sslContext = SSLContexts.custom()
+				.loadTrustMaterial(null, acceptingTrustStrategy)
+				.build();
+		SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+		return HttpClients.custom()
+				.setSSLSocketFactory(csf)
+				.build();
 	}
-	
 }
