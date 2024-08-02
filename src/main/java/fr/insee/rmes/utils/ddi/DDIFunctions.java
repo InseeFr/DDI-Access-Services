@@ -1,9 +1,12 @@
 package fr.insee.rmes.utils.ddi;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -12,19 +15,14 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
+@Slf4j
 public class DDIFunctions {
 
-	final static Logger logger = LogManager.getLogger(DDIFunctions.class);
 
 	public static Map<String, String> getDDIControlConstructReferenceListFromFragment(String fragment)
 			throws RuntimeException {
@@ -34,14 +32,8 @@ public class DDIFunctions {
 		String expression = "/Fragment/Instrument[1]/ControlConstructReference";
 		try {
 			controlConstructReferenceList = getElementListFromFragmentByXpath(fragment, expression);
-			logger.debug("Occurence of ControlConstructReference : " + controlConstructReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+			log.debug("Occurence of ControlConstructReference : " + controlConstructReferenceList.getLength());
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(controlConstructReferenceList);
@@ -56,18 +48,11 @@ public class DDIFunctions {
 		String expression = "/Fragment/Sequence[1]/ControlConstructReference";
 		try {
 			controlConstructReferenceList = getElementListFromFragmentByXpath(fragment, expression);
-			logger.debug("Occurence of ControlConstructReference : " + controlConstructReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+			log.debug("Occurence of ControlConstructReference : " + controlConstructReferenceList.getLength());
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(controlConstructReferenceList);
-
 	}
 
 	public static Map<String, String> getDDIQuestionReferenceIDFromFragment(String fragment) throws RuntimeException {
@@ -76,14 +61,8 @@ public class DDIFunctions {
 		String expression = "/Fragment/QuestionConstruct/r:QuestionReference";
 		try {
 			questionReferenceList = getElementListFromFragmentByXpath(fragment, expression);
-			logger.debug("Occurence of QuestionReference : " + questionReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+			log.debug("Occurence of QuestionReference : " + questionReferenceList.getLength());
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(questionReferenceList);
@@ -96,18 +75,11 @@ public class DDIFunctions {
 		String expression = "/Fragment/QuestionItem[1]/r:Binding[1]/r:SourceParameterReference[1]";
 		try {
 			sourceParameterReferenceList = getElementListFromFragmentByXpath(fragment, expression);
-			logger.debug("Occurence of SourceParameterReference : " + sourceParameterReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+			log.debug("Occurence of SourceParameterReference : " + sourceParameterReferenceList.getLength());
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(sourceParameterReferenceList);
-
 	}
 
 	public static Map<String, String> getDDITargetParameterReferenceIDFromFragment(String fragment)
@@ -116,18 +88,11 @@ public class DDIFunctions {
 		String expression = "/Fragment/QuestionItem[1]/r:Binding[1]/r:TargetParameterReference[1]";
 		try {
 			targetParameterReferenceList = getElementListFromFragmentByXpath(fragment, expression);
-			logger.debug("Occurence of TargetParameterReference : " + targetParameterReferenceList.getLength());
-		} catch (XPathExpressionException ex) {
-			throw new RuntimeException(ex);
-		} catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} catch (ParserConfigurationException ex) {
+			log.debug("Occurence of TargetParameterReference : " + targetParameterReferenceList.getLength());
+		} catch (XPathExpressionException|SAXException|IOException|ParserConfigurationException ex) {
 			throw new RuntimeException(ex);
 		}
 		return getMapIdTypeOfObjectFromElementList(targetParameterReferenceList);
-
 	}
 
 	public static NodeList getElementListFromFragmentByXpath(String fragment, String xpathExpression)
