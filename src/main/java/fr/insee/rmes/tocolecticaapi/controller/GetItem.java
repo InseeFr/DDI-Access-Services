@@ -15,11 +15,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 
 @RestController
@@ -98,19 +102,32 @@ public class GetItem {
                     required = true,
                     schema = @Schema(
                             type = "string", example="portal*"))
-            String index ,
+            @RequestParam String index,
             @Parameter(
                     description = "texte à rechercher. le * sert de wildcard",
                     required = true,
                     schema = @Schema(
                             type = "string", example="sugg*"))
-            String texte,
+            @RequestParam String texte,
             @Parameter(
                     description = "type à selectionner",
-                    required = true)  @RequestParam DDIItemType ddiItemType
-            ) {
-        return colecticaService.searchTexteByType(index, texte, ddiItemType );
+                    required = true)
+            @RequestParam DDIItemType ddiItemType
+    ) throws UnsupportedEncodingException {
+
+        // Validation des entrées
+        if (!index.matches("^[a-zA-Z0-9_*]+$") || !texte.matches("^[a-zA-Z0-9_*]+$")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid input");
+        }
+
+        // Encodage des entrées
+        String encodedIndex = URLEncoder.encode(index, StandardCharsets.UTF_8.toString());
+        String encodedText = URLEncoder.encode(texte, StandardCharsets.UTF_8.toString());
+
+        // Appel au service avec les valeurs encodées
+        return colecticaService.searchTexteByType(encodedIndex, encodedText, ddiItemType);
     }
+
 
     @GetMapping("/filtered-search/type/")
     @Operation(summary = "Get list of match by type in elasticsearch database", description = "Get a JSON ")

@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +115,7 @@ public class ElasticsearchController {
     }
 
     @GetMapping("/search/elastic/_search/{index}/{texte}")
-    public  ResponseEntity<String> searchText(
+    public ResponseEntity<String> searchText(
             @Parameter(
                     description = "nom de l'index (portal ou colectica)",
                     required = true,
@@ -125,21 +127,18 @@ public class ElasticsearchController {
                     schema = @Schema(
                             type = "string", example = "voyage")) @PathParam("texte") String texte) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            String encodedText = URLEncoder.encode(texte, StandardCharsets.UTF_8.toString());
             HttpGet httpGet;
 
             if (elasticHost.contains("kube")) {
-                httpGet = new HttpGet(HTTPS + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q="+ texte);
-            
-            }
-            else {
-                httpGet = new HttpGet(HTTP + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + texte);
+                httpGet = new HttpGet(HTTPS + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + encodedText);
+            } else {
+                httpGet = new HttpGet(HTTP + elasticHost + ":" + elasticHostPort + "/" + index + "/_search?q=" + encodedText);
                 httpGet.addHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
             }
 
-            
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 String responseBody = EntityUtils.toString(response.getEntity());
-
                 return ResponseEntity.ok(responseBody);
             }
         } catch (IOException e) {
@@ -205,41 +204,46 @@ public class ElasticsearchController {
     }
 
 
-@PostMapping("/search/elastic/{field}/{texte}/search")
+    @PostMapping("/search/elastic/{field}/{texte}/search")
     public ResponseEntity<String> searchElastic(
             @PathVariable String texte,
             @PathVariable String field
-            ) {
-       try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    ) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-           HttpPost httpPost = new HttpPost();
-
-           if (elasticHost.contains("kube")) {
-               httpPost = new HttpPost(HTTPS + elasticHost + ":" + elasticHostPort + SEARCH);
-           }
-           else {
-               httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + SEARCH);
-               httpPost.setHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
-           }
-
-
-                httpPost.addHeader(KBN, REPORTING);
-                httpPost.setHeader(CONTENT_TYPE, APPLI_JSON);
-                String requestBody = "{ \"query\": { \"match\": {\""+field+"\":\"" + texte + "\"} }, \"size\":10000 }";
-                httpPost.setEntity(new StringEntity(requestBody));
-
-                try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                    String responseBody = EntityUtils.toString(response.getEntity());
-
-                    return ResponseEntity.ok(responseBody);
-                }
-            } catch (IOException e) {
-                return ResponseEntity.status(500).body(ERREUR_ES);
+            // Validation des entrées
+            if (!field.matches("^[a-zA-Z0-9_]+$") || !texte.matches("^[a-zA-Z0-9_ ]+$")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid input");
             }
 
+            HttpPost httpPost;
 
+            if (elasticHost.contains("kube")) {
+                httpPost = new HttpPost(HTTPS + elasticHost + ":" + elasticHostPort + SEARCH);
+            } else {
+                httpPost = new HttpPost(HTTP + elasticHost + ":" + elasticHostPort + SEARCH);
+                httpPost.setHeader(AUTHORIZATION, APIKEYHEADER + apiKey);
+            }
 
+            httpPost.addHeader(KBN, REPORTING);
+            httpPost.setHeader(CONTENT_TYPE, APPLI_JSON);
+
+            // Encodage des entrées pour éviter les injections
+            String encodedField = URLEncoder.encode(field, StandardCharsets.UTF_8.toString());
+            String encodedText = URLEncoder.encode(texte, StandardCharsets.UTF_8.toString());
+
+            String requestBody = "{ \"query\": { \"match\": {\"" + encodedField + "\":\"" + encodedText + "\"} }, \"size\":10000 }";
+            httpPost.setEntity(new StringEntity(requestBody));
+
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                String responseBody = EntityUtils.toString(response.getEntity());
+                return ResponseEntity.ok(responseBody);
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(ERREUR_ES);
+        }
     }
+
 
     @PostMapping("/search/elastic/{date}")
     public ResponseEntity<?> searchElasticDate(
