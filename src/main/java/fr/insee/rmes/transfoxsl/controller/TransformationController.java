@@ -33,23 +33,6 @@ public class TransformationController {
         this.fileService = fileService;
     }
 
-/*    @Operation(summary = "Lancer la transformation de déréréférencement")
-    @PostMapping(value="/dereference", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<InputStreamResource> dereference(@RequestParam("file") MultipartFile file) throws Exception {
-        File outputFile = xsltTransformationService.transform(file, "dereference.xsl");
-        TemporaryFileCleanupFilter.addTempFile(outputFile);
-
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(outputFile));
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=dereferenced.xml");
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(outputFile.length())
-                .contentType(MediaType.APPLICATION_XML)
-                .body(resource);
-    }*/
-
     @Operation(summary = "Générer un fichier texte contenant les règles VTL à partir d'une physicalInstance")
     @PostMapping(value = "/ddi2vtl", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<InputStreamResource> ddi2vtl(@RequestParam("file") MultipartFile file) throws Exception {
