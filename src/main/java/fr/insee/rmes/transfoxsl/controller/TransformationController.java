@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -37,8 +38,9 @@ public class TransformationController {
     @Operation(summary = "Générer un fichier texte contenant les règles VTL à partir d'une physicalInstance")
     @PostMapping(value = "/ddi2vtl", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<InputStreamResource> ddi2vtl(@RequestParam("file") MultipartFile file) throws Exception {
+        try {
         // Conversion du MultipartFile en InputStream
-        InputStream inputStream = MultipartFileUtils.convertToInputStream(file);
+        InputStream inputStream = multipartFileUtils.convertToInputStream(file);
 
         // Première transformation - XML en sortie (on récupère la sortie en tant que chaîne)
         List<String> intermediateOutput = xsltTransformationService.transform(inputStream, "dereference.xsl", false);
@@ -62,13 +64,18 @@ public class TransformationController {
                 .headers(headers)
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(resource);
+
+    } catch (Exception e) {
+        // Capture l'exception et renvoie un statut 500
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
     }
 
     @Operation(summary = "Générer les règles VTL à partir d'une physicalInstance et renvoyer sous forme de JSON")
     @PostMapping(value = "/ddi2vtlJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<String>> ddi2vtlJson(@RequestParam("file") MultipartFile file) throws Exception {
         // Conversion du MultipartFile en InputStream
-        InputStream inputStream = MultipartFileUtils.convertToInputStream(file);
+        InputStream inputStream = multipartFileUtils.convertToInputStream(file);
 
         // Première transformation - XML en sortie
         List<String> intermediateOutput = xsltTransformationService.transform(inputStream, "dereference.xsl", false);
@@ -87,7 +94,7 @@ public class TransformationController {
     @PostMapping(value = "/ddi2vtlBrut", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> ddi2vtlBrut(@RequestParam("file") MultipartFile file) throws Exception {
         // Conversion du MultipartFile en InputStream
-        InputStream inputStream = MultipartFileUtils.convertToInputStream(file);
+        InputStream inputStream = multipartFileUtils.convertToInputStream(file);
 
         // Première transformation - XML en sortie
         List<String> intermediateOutput = xsltTransformationService.transform(inputStream, "dereference.xsl", false);

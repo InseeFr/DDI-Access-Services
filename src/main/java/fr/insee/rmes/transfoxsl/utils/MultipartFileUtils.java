@@ -8,7 +8,10 @@ import java.io.InputStream;
 @Service
 public class MultipartFileUtils {
 
-    public static InputStream convertToInputStream(MultipartFile file) throws IOException {
+    public InputStream convertToInputStream(MultipartFile file) throws IOException {
+        if (file == null) {
+            throw new IllegalArgumentException("MultipartFile cannot be null");
+        }
         return file.getInputStream();
     }
 }
