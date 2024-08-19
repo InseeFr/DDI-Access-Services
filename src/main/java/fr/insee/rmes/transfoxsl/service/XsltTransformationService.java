@@ -1,5 +1,6 @@
 package fr.insee.rmes.transfoxsl.service;
 
+import fr.insee.rmes.exceptions.XsltTransformationException;
 import net.sf.saxon.s9api.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -25,37 +26,41 @@ public class XsltTransformationService {
     }
 
     public List<String> transform(InputStream inputStream, String xslFileName, boolean isTextOutput) throws Exception {
-        logger.log(Level.INFO, "Starting transformation with XSLT file: {0}", xslFileName);
+        try {
+            logger.log(Level.INFO, "Starting transformation with XSLT file: {0}", xslFileName);
 
-        XsltCompiler compiler = processor.newXsltCompiler();
-        File xslFile = new ClassPathResource(xslFileName).getFile();
-        XsltExecutable executable = compiler.compile(new StreamSource(xslFile));
-        XsltTransformer transformer = executable.load();
+            XsltCompiler compiler = processor.newXsltCompiler();
+            File xslFile = new ClassPathResource(xslFileName).getFile();
+            XsltExecutable executable = compiler.compile(new StreamSource(xslFile));
+            XsltTransformer transformer = executable.load();
 
-        transformer.setSource(new StreamSource(inputStream));
+            transformer.setSource(new StreamSource(inputStream));
 
-        // Utilisation d'un OutputStream pour capturer la sortie en mémoire
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            // Utilisation d'un OutputStream pour capturer la sortie en mémoire
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        Serializer out = processor.newSerializer(outputStream);
-        if (isTextOutput) {
-            out.setOutputProperty(Serializer.Property.METHOD, "text");  // Configurer pour un texte simple
-            out.setOutputProperty(Serializer.Property.OMIT_XML_DECLARATION, "yes");  // Pas de déclaration XML pour le texte
-        } else {
-            out.setOutputProperty(Serializer.Property.METHOD, "xml");  // Configurer pour un XML si nécessaire
-        }
-        transformer.setDestination(out);
-        transformer.transform();
+            Serializer out = processor.newSerializer(outputStream);
+            if (isTextOutput) {
+                out.setOutputProperty(Serializer.Property.METHOD, "text");  // Configurer pour un texte simple
+                out.setOutputProperty(Serializer.Property.OMIT_XML_DECLARATION, "yes");  // Pas de déclaration XML pour le texte
+            } else {
+                out.setOutputProperty(Serializer.Property.METHOD, "xml");  // Configurer pour un XML si nécessaire
+            }
+            transformer.setDestination(out);
+            transformer.transform();
 
-        // Capture de la sortie sous forme de chaîne
-        String result = outputStream.toString();
+            // Capture de la sortie sous forme de chaîne
+            String result = outputStream.toString();
 
-        // Si sortie texte, on peut découper par ligne et retourner une liste de String
-        if (isTextOutput) {
-            return Arrays.asList(result.split("\n"));
-        } else {
-            // Pour XML, on retourne une seule chaîne sous forme de liste (vous pouvez adapter selon vos besoins)
-            return Collections.singletonList(result);
+            // Si sortie texte, on peut découper par ligne et retourner une liste de String
+            if (isTextOutput) {
+                return Arrays.asList(result.split("\n"));
+            } else {
+                // Pour XML, on retourne une seule chaîne sous forme de liste (vous pouvez adapter selon vos besoins)
+                return Collections.singletonList(result);
+            }
+        } catch (Exception e) {
+            throw new XsltTransformationException("Error during XSLT transformation", e);
         }
     }
 }

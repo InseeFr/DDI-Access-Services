@@ -1,5 +1,7 @@
 package fr.insee.rmes.transfoxsl.controller;
 
+import fr.insee.rmes.exceptions.VtlTransformationException;
+import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.transfoxsl.utils.MultipartFileUtils;
 import org.junit.jupiter.api.Test;
@@ -17,15 +19,16 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 @WebMvcTest(TransformationController.class)
 @ActiveProfiles("dev")
-public class TransformationControllerTest {
+class TransformationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,7 +41,7 @@ public class TransformationControllerTest {
 
     @Test
     @WithMockUser // Simule un utilisateur authentifié
-    public void ddi2vtl_ShouldReturnPlainText_WhenTransformationIsSuccessful() throws Exception {
+    void ddi2vtl_ShouldReturnPlainText_WhenTransformationIsSuccessful() throws Exception {
         // Mocking MultipartFile and transformation service
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.xml", "application/xml", "<xml></xml>".getBytes());
 
@@ -63,16 +66,17 @@ public class TransformationControllerTest {
 
     @Test
     @WithMockUser
-    public void ddi2vtl_ShouldReturnServerError_WhenTransformationFails() throws Exception {
+    void ddi2vtl_ShouldReturnServerError_WhenTransformationFails() throws Exception {
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.xml", "application/xml", "<xml></xml>".getBytes());
 
         // Simulate MultipartFile conversion to InputStream
         when(multipartFileUtils.convertToInputStream(any())).thenReturn(new ByteArrayInputStream("<xml></xml>".getBytes()));
 
-        // Simulate transformation failure
-        when(xsltTransformationService.transform(any(), anyString(), anyBoolean())).thenThrow(new RuntimeException("Transformation failed"));
+        // Simulate transformation failure with the correct exception
+        when(xsltTransformationService.transform(any(), anyString(), anyBoolean()))
+                .thenThrow(new VtlTransformationException("Transformation failed during the XSLT processing."));
 
-        // Perform the request and verify the error
+        // Perform the request and expect the server error
         mockMvc.perform(MockMvcRequestBuilders.multipart("/xsl/ddi2vtl")
                         .file(mockFile)
                         .with(csrf())) // Ajoute un jeton CSRF fictif
@@ -81,7 +85,7 @@ public class TransformationControllerTest {
 
     @Test
     @WithMockUser  // Simule un utilisateur authentifié
-    public void ddi2vtlJson_ShouldReturnJson_WhenTransformationIsSuccessful() throws Exception {
+    void ddi2vtlJson_ShouldReturnJson_WhenTransformationIsSuccessful() throws Exception {
         // Mocking MultipartFile and transformation service
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.xml", "application/xml", "<xml></xml>".getBytes());
 
@@ -108,7 +112,7 @@ public class TransformationControllerTest {
 
     @Test
     @WithMockUser
-    public void ddi2vtlBrut_ShouldReturnPlainText_WhenTransformationIsSuccessful() throws Exception {
+    void ddi2vtlBrut_ShouldReturnPlainText_WhenTransformationIsSuccessful() throws Exception {
         // Mocking MultipartFile and transformation service
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.xml", "application/xml", "<xml></xml>".getBytes());
 

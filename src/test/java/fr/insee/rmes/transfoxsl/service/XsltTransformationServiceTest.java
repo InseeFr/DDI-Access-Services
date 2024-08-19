@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
