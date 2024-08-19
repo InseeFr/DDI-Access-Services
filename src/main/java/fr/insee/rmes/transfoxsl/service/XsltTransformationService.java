@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +26,7 @@ public class XsltTransformationService {
         this.processor = new Processor(false);
     }
 
-    public List<String> transform(InputStream inputStream, String xslFileName, boolean isTextOutput) throws Exception {
+    public List<String> transform(InputStream inputStream, String xslFileName, boolean isTextOutput)  throws XsltTransformationException, IOException {
         try {
             logger.log(Level.INFO, "Starting transformation with XSLT file: {0}", xslFileName);
 
@@ -59,8 +60,10 @@ public class XsltTransformationService {
                 // Pour XML, on retourne une seule chaîne sous forme de liste (vous pouvez adapter selon vos besoins)
                 return Collections.singletonList(result);
             }
-        } catch (Exception e) {
+        } catch (SaxonApiException e) {
             throw new XsltTransformationException("Error during XSLT transformation", e);
+        } catch (IOException e) {
+            throw new IOException("I/O error during XSLT transformation", e);
         }
     }
 }
