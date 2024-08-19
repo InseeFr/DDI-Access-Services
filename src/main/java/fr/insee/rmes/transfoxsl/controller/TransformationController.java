@@ -31,6 +31,8 @@ public class TransformationController {
 
     public static final String DDI_2_VTL_XSL = "ddi2vtl.xsl";
     public static final String DEREFERENCE_XSL = "dereference.xsl";
+    public static final String FAILED_TO_PROCESS_THE_INPUT_FILE = "Failed to process the input file";
+    public static final String TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING = "Transformation failed during the XSLT processing";
     private final XsltTransformationService xsltTransformationService;
     private final MultipartFileUtils multipartFileUtils;
 
@@ -42,7 +44,7 @@ public class TransformationController {
 
     @Operation(summary = "Générer un fichier texte contenant les règles VTL à partir d'une physicalInstance")
     @PostMapping(value = "/ddi2vtl", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<InputStreamResource> ddi2vtl(@RequestParam("file") MultipartFile file) throws Exception {
+    public ResponseEntity<InputStreamResource> ddi2vtl(@RequestParam("file") MultipartFile file)  {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
@@ -71,9 +73,9 @@ public class TransformationController {
                     .body(resource);
 
         } catch (IOException e) {
-            throw new VtlTransformationException("Failed to process the input file.", e);
+            throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
         } catch (XsltTransformationException e) {
-            throw new VtlTransformationException("Transformation failed during the XSLT processing.", e);
+            throw new VtlTransformationException(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + ".", e);
         } catch (VtlTransformationException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -81,7 +83,7 @@ public class TransformationController {
 
     @Operation(summary = "Générer les règles VTL à partir d'une physicalInstance et renvoyer sous forme de JSON")
     @PostMapping(value = "/ddi2vtlJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<String>> ddi2vtlJson(@RequestParam("file") MultipartFile file) throws Exception {
+    public ResponseEntity<List<String>> ddi2vtlJson(@RequestParam("file") MultipartFile file)  {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
@@ -98,9 +100,9 @@ public class TransformationController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(outputText);
         } catch (IOException e) {
-            throw new VtlTransformationException("Failed to process the input file.", e);
+            throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
         } catch (XsltTransformationException e) {
-            throw new VtlTransformationException("Transformation failed during the XSLT processing.", e);
+            throw new VtlTransformationException(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + ".", e);
         } catch (VtlTransformationException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -108,7 +110,7 @@ public class TransformationController {
 
     @Operation(summary = "Générer les règles VTL à partir d'une physicalInstance et renvoyer sous forme de texte brut")
     @PostMapping(value = "/ddi2vtlBrut", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> ddi2vtlBrut(@RequestParam("file") MultipartFile file) throws Exception {
+    public ResponseEntity<String> ddi2vtlBrut(@RequestParam("file") MultipartFile file)  {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
@@ -127,9 +129,9 @@ public class TransformationController {
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(finalOutput);
         } catch (IOException e) {
-            throw new VtlTransformationException("Failed to process the input file.", e);
+            throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
         } catch (XsltTransformationException e) {
-            throw new VtlTransformationException("Transformation failed during the XSLT processing.", e);
+            throw new VtlTransformationException(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + ".", e);
         } catch (VtlTransformationException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }

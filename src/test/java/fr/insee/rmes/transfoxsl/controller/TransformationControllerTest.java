@@ -1,7 +1,6 @@
 package fr.insee.rmes.transfoxsl.controller;
 
 import fr.insee.rmes.exceptions.VtlTransformationException;
-import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.transfoxsl.utils.MultipartFileUtils;
 import org.junit.jupiter.api.Test;
@@ -19,13 +18,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 @WebMvcTest(TransformationController.class)
 @ActiveProfiles("dev")
 class TransformationControllerTest {
