@@ -9,8 +9,9 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
-import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
+import fr.insee.rmes.exceptions.RmesException;
+import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.models.*;
 import fr.insee.rmes.tocolecticaapi.randomUUID;
@@ -18,13 +19,10 @@ import fr.insee.rmes.utils.ExportUtils;
 import fr.insee.rmes.utils.FilesUtils;
 import fr.insee.rmes.utils.XMLUtils;
 import fr.insee.rmes.utils.export.XDocReport;
-import fr.insee.rmes.exceptions.RmesExceptionIO;
 import lombok.NonNull;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -953,6 +951,8 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     public static MultipartFile processFile(MultipartFile inputFile) throws IOException {
         byte[] modifiedContent;
+
+        // Modifie le contenu en ajoutant des balises <data>
         try (InputStream inputStream = inputFile.getInputStream();
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
@@ -973,27 +973,14 @@ public class ColecticaServiceImpl implements ColecticaService {
             modifiedContent = outputStream.toByteArray();
         }
 
-        // Création d'un objet FileItem à partir du contenu modifié
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        FileItem fileItem = factory.createItem(
-                inputFile.getName(),
-                inputFile.getContentType(),
-                false,
-                inputFile.getOriginalFilename()
-        );
-        try (InputStream modifiedInputStream = new ByteArrayInputStream(modifiedContent)) {
-            try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = modifiedInputStream.read(buffer)) != -1) {
-                    output.write(buffer, 0, bytesRead);
-                }
-                fileItem.getOutputStream().write(output.toByteArray());
-            }
+        // Création d'un fichier temporaire pour stocker le contenu modifié
+        File tempFile = File.createTempFile("upload_", ".tmp");
+        try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+            fos.write(modifiedContent);
         }
 
-        // Création d'un nouvel objet MultipartFile à partir du FileItem modifié
-        return new CustomMultipartFile(fileItem);
+        // Créer un MultipartFile personnalisé à partir du fichier temporaire
+        return new CustomMultipartFile(tempFile, inputFile.getOriginalFilename(), inputFile.getContentType());
     }
 
     private String transformToXml(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,

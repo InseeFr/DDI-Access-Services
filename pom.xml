@@ -135,11 +135,6 @@
             <version>3.3.2</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-fileupload2-javax</artifactId>
-            <version>2.0.0-M2</version>
-        </dependency>
-        <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
@@ -170,7 +165,18 @@
         <dependency>
             <groupId>org.httpobjects.multipart</groupId>
             <artifactId>httpobjects-multipart</artifactId>
-            <version>0.27.0</version>
+            <version>0.53.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-fileupload</groupId>
+                    <artifactId>commons-fileupload</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-fileupload2-jakarta-servlet6</artifactId>
+            <version>2.0.0-M2</version>
         </dependency>
         <dependency>
             <groupId>co.elastic.clients</groupId>
