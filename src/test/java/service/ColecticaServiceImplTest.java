@@ -2,19 +2,15 @@ package service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
-import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
-import fr.insee.rmes.model.DDIItem;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaServiceImpl;
 import fr.insee.rmes.utils.DocumentBuilderUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicStatusLine;
-import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -22,9 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -35,13 +29,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -129,7 +120,7 @@ class ColecticaServiceImplTest {
 
 
     @Test
-    public void testTransformFile() {
+    void testTransformFile() {
         ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticsearchClient, restTemplate);
         MockMultipartFile file = new MockMultipartFile("file", "test.json", "application/json", "[{\"id\": \"value\",\"label\": \"value\" }]".getBytes());
         ResponseEntity<String> result = colecticaService.transformFile(file, "idValue", "nomenclatureName", "suggesterDescription", "version", "idepUtilisateur", "timbre");
@@ -139,7 +130,7 @@ class ColecticaServiceImplTest {
     }
 
     @Test
-    public void testTransformToJson() throws Exception {
+    void testTransformToJson() throws Exception {
         ColecticaServiceImpl colecticaService = new ColecticaServiceImpl();
 
         // Mock the Resource to simulate the XML input
@@ -163,13 +154,13 @@ class ColecticaServiceImplTest {
 
         // Assertions
         assertNotNull(result);
-        assertTrue(result.length() > 0);
+        assertTrue(!result.isEmpty());
         assertTrue(result.contains("<transformed>"));
         assertTrue(result.contains("<element>Test</element>"));
     }
 
     @Test
-    public void testUploadItem() {
+    void testUploadItem() {
         ColecticaServiceImpl colecticaService = mock(ColecticaServiceImpl.class);
         String jsonContent = "{\n" +
                 "   \"Items\":\n" +
@@ -197,7 +188,7 @@ class ColecticaServiceImplTest {
     }
 
     @Test
-    public void testGetDocument() throws Exception {
+    void testGetDocument() throws Exception {
         String xml = "<root><element>value</element></root>";
         Document doc = DocumentBuilderUtils.getDocument(xml);
 

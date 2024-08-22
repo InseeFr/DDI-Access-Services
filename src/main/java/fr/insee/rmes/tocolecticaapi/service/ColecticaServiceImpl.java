@@ -101,7 +101,10 @@ public class ColecticaServiceImpl implements ColecticaService {
     private static final String ATTACHMENT = "attachment";
 
     static final Logger logger = LogManager.getLogger(ColecticaServiceImpl.class);
-
+    public static final String DISALLOW_DOCTYPE_DECL = "http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl";
+    public static final String DISALLOW_DOCTYPE_DECL1 = "http://apache.org/xml/features/disallow-doctype-decl";
+    public static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
+    public static final String EXTERNAL_PARAMETER_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
 
 
     @NonNull
@@ -260,9 +263,9 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         // Désactivation de l'accès aux entités externes pour la sécurité (prévention des attaques XXE)
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+        factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+        factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
 
         factory.setNamespaceAware(true);
 
@@ -315,9 +318,9 @@ public class ColecticaServiceImpl implements ColecticaService {
 
             // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+            factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
 
             factory.setNamespaceAware(true);
 
@@ -672,9 +675,9 @@ public class ColecticaServiceImpl implements ColecticaService {
             // Désactivation des entités externes pour des raisons de sécurité (prévention des attaques XXE)
             factory.setNamespaceAware(true);
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+            factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
 
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(inputXml)));
@@ -722,7 +725,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             // Désactivation des entités externes dans TransformerFactory pour éviter les attaques XXE
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            transformerFactory.setFeature("http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl", true);
+            transformerFactory.setFeature(DISALLOW_DOCTYPE_DECL, true);
 
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -747,7 +750,7 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        factory.setFeature("http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl", true);
+        factory.setFeature(DISALLOW_DOCTYPE_DECL, true);
 
         Source xslt = new StreamSource(xsltFileJson);
 
@@ -1063,7 +1066,7 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        factory.setFeature("http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl", true);
+        factory.setFeature(DISALLOW_DOCTYPE_DECL, true);
 
         // Utiliser TransformerFactoryImpl pour permettre des personnalisations supplémentaires via Saxon
         TransformerFactoryImpl tFactoryImpl = (TransformerFactoryImpl) factory;
@@ -1278,9 +1281,9 @@ public class ColecticaServiceImpl implements ColecticaService {
 
             // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+            factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
 
             factory.setNamespaceAware(true);
 
@@ -1370,9 +1373,9 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
         dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        dbf.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+        dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+        dbf.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
 
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(control);
