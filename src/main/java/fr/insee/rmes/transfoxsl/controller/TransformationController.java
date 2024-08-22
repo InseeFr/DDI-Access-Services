@@ -42,6 +42,30 @@ public class TransformationController {
         this.multipartFileUtils = multipartFileUtils;
     }
 
+    @Operation(summary = "Déréférencer un objet DDI")
+    @PostMapping(value = "/Derefddi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> Derefddi(@RequestParam("file") MultipartFile file)  {
+        try {
+            // Conversion du MultipartFile en InputStream
+            InputStream inputStream = multipartFileUtils.convertToInputStream(file);
+
+            // Première transformation - XML en sortie
+            List<String> outputText = xsltTransformationService.transform(inputStream, DEREFERENCE_XSL, false);
+            String finalOutput = String.join("\n", outputText);
+            // Retourner la liste sous forme de JSON
+            return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(finalOutput);
+        } catch (IOException e) {
+            throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
+        } catch (XsltTransformationException e) {
+            throw new VtlTransformationException(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + ".", e);
+        } catch (VtlTransformationException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
     @Operation(summary = "Générer un fichier texte contenant les règles VTL à partir d'une physicalInstance")
     @PostMapping(value = "/ddi2vtl", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<InputStreamResource> ddi2vtl(@RequestParam("file") MultipartFile file)  {
