@@ -1023,41 +1023,27 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     private String transformToXml(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,
-                                  String suggesterDescription, String timbre, String version)
-            throws IOException, TransformerException {
+                                  String suggesterDescription, String timbre, String version) throws IOException, TransformerException {
 
-        // Créer un transformateur XSLT sécurisé
-        TransformerFactory factory = TransformerFactory.newInstance();
+        TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
 
-        // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
-        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        factory.setFeature("http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl", true);
+        // Saxon ne supporte pas certaines fonctionnalités comme disallow-doctype-decl, il n'est pas nécessaire de définir cette propriété
 
-        // Utiliser TransformerFactoryImpl pour pouvoir utiliser Saxon et effectuer des modifications spécifiques
         TransformerFactoryImpl tFactoryImpl = (TransformerFactoryImpl) factory;
-
-        // Obtenir la configuration actuelle du processeur Saxon
         net.sf.saxon.Configuration saxonConfig = tFactoryImpl.getConfiguration();
-
-        // Obtenir le processeur Saxon
         Processor processor = (Processor) saxonConfig.getProcessor();
 
-        // Enregistrer la fonction d'extension
         ExtensionFunction randomUUID = new randomUUID();
         processor.registerExtensionFunction(randomUUID);
 
-        // Préparer la transformation XSLT
         Source xslt = new StreamSource(xsltFile);
         Transformer transformer = factory.newTransformer(xslt);
-
-        // Passer les paramètres à la transformation
         transformer.setParameter("idValue", idValue);
         transformer.setParameter("suggesterName", nomenclatureName);
         transformer.setParameter("suggesterDescription", suggesterDescription);
         transformer.setParameter("timbre", timbre);
         transformer.setParameter(VERSION, version);
 
-        // Exécuter la transformation
         StreamSource text = new StreamSource(file.getInputStream());
         StringWriter xmlWriter = new StringWriter();
         StreamResult xmlResult = new StreamResult(xmlWriter);
@@ -1116,21 +1102,14 @@ public class ColecticaServiceImpl implements ColecticaService {
         return xmlWriter.toString();
     }
 
-    private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur) throws IOException, TransformerException {
 
-        // Créer un transformateur XSLT sécurisé
-        TransformerFactory factory = TransformerFactory.newInstance();
-
-        // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
-        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        factory.setFeature("http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl", true);
-
+    public String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur) throws IOException, TransformerException {
+        TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
         Source xslt = new StreamSource(xsltFileJson);
 
         Transformer transformer = factory.newTransformer(xslt);
         transformer.setParameter("idepUtilisateur", idepUtilisateur);
 
-        // Exécuter la transformation
         StreamSource text = new StreamSource(resultResource.getInputStream());
         StringWriter xmlWriter = new StringWriter();
         StreamResult xmlResult = new StreamResult(xmlWriter);
