@@ -9,8 +9,9 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
-import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
+import fr.insee.rmes.exceptions.RmesException;
+import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.models.*;
 import fr.insee.rmes.tocolecticaapi.randomUUID;
@@ -18,13 +19,10 @@ import fr.insee.rmes.utils.ExportUtils;
 import fr.insee.rmes.utils.FilesUtils;
 import fr.insee.rmes.utils.XMLUtils;
 import fr.insee.rmes.utils.export.XDocReport;
-import fr.insee.rmes.exceptions.RmesExceptionIO;
 import lombok.NonNull;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -103,7 +101,10 @@ public class ColecticaServiceImpl implements ColecticaService {
     private static final String ATTACHMENT = "attachment";
 
     static final Logger logger = LogManager.getLogger(ColecticaServiceImpl.class);
-
+    public static final String DISALLOW_DOCTYPE_DECL = "http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl";
+    public static final String DISALLOW_DOCTYPE_DECL1 = "http://apache.org/xml/features/disallow-doctype-decl";
+    public static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
+    public static final String EXTERNAL_PARAMETER_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
 
 
     @NonNull
@@ -259,9 +260,18 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     public Set<String> extractUniqueIdentifiers(String xmlResponse) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+        // Désactivation de l'accès aux entités externes pour la sécurité (prévention des attaques XXE)
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+        factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+        factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
+
         factory.setNamespaceAware(true);
+
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes()));
+
         XPathFactory xpathFactory = XPathFactory.newInstance();
         XPath xpath = xpathFactory.newXPath();
 
@@ -274,6 +284,7 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         // Extraire tous les UUIDs
         NodeList idNodes = (NodeList) xpath.evaluate("//r:ID", document, XPathConstants.NODESET);
+
         for (int i = 0; i < idNodes.getLength(); i++) {
             identifiers.add(idNodes.item(i).getTextContent());
         }
@@ -304,15 +315,25 @@ public class ColecticaServiceImpl implements ColecticaService {
     private JSONObject extractDataFromFragment(String fragmentXml) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+            factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
+
             factory.setNamespaceAware(true);
+
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new ByteArrayInputStream(fragmentXml.getBytes(StandardCharsets.UTF_8)));
+
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
 
             xpath.setNamespaceContext(new NamespaceContextMap("r", "ddi:reusable:3_3", "ddi", "ddi:instance:3_3"));
 
             Node firstElement = (Node) xpath.evaluate("/*/*[1]", document, XPathConstants.NODE);
+
             String itemType = firstElement.getLocalName();
             String id = xpath.evaluate("//r:ID", firstElement);
             String agencyFragment = xpath.evaluate("//r:Agency", firstElement);
@@ -325,9 +346,10 @@ public class ColecticaServiceImpl implements ColecticaService {
             fragmentData.put("ItemType", itemType);
 
             return fragmentData;
-        }  catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
             // Log the exception
             logger.error("Error extracting data from fragment XML: {}", e.getMessage());
+
             // Return an appropriate response to the client
             return new JSONObject();
         }
@@ -649,26 +671,32 @@ public class ColecticaServiceImpl implements ColecticaService {
     public String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            // Désactivation des entités externes pour des raisons de sécurité (prévention des attaques XXE)
             factory.setNamespaceAware(true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+            factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
 
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(inputXml)));
 
             String typeName = type.getName();
             NodeList typeNodes = document.getElementsByTagNameNS("ddi:logicalproduct:3_3", typeName);
+
             if (typeNodes.getLength() == 0) {
                 return "Erreur : Aucun élément correspondant trouvé pour le type " + typeName;
             }
 
             Element typeNameDocument = (Element) typeNodes.item(0);
-            if (!typeName.equals(typeNameDocument.getNodeName().toString())) {
+
+            if (!typeName.equals(typeNameDocument.getNodeName())) {
                 return "Erreur : Attention ce n'est pas le bon type. L'item chargé n'est pas du type que vous avez sélectionné.";
             }
 
             Document document2 = (Document) document.cloneNode(true);
+
             NodeList versionNodes = document2.getElementsByTagName("r:Version");
             for (int i = 0; i < versionNodes.getLength(); i++) {
                 Node versionNode = versionNodes.item(i);
@@ -694,10 +722,14 @@ public class ColecticaServiceImpl implements ColecticaService {
                 }
             }
 
+            // Désactivation des entités externes dans TransformerFactory pour éviter les attaques XXE
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            transformerFactory.setFeature(DISALLOW_DOCTYPE_DECL, true);
+
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
             StringWriter writer = new StringWriter();
             transformer.transform(new DOMSource(document2), new StreamResult(writer));
 
@@ -706,25 +738,33 @@ public class ColecticaServiceImpl implements ColecticaService {
             String jsonResult = transformToJson(new ByteArrayResource(writer.toString().getBytes(StandardCharsets.UTF_8)), xsltStream2, idepUtilisateur, version);
 
             return jsonResult;
+
         } catch (Exception e) {
             return "Error processing XML";
         }
     }
 
     private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur, int version) throws IOException, TransformerException {
-
-        // Créer un transformateur XSLT
+        // Créer un transformateur XSLT sécurisé
         TransformerFactory factory = TransformerFactory.newInstance();
 
+        // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setFeature(DISALLOW_DOCTYPE_DECL, true);
+
         Source xslt = new StreamSource(xsltFileJson);
+
         Transformer transformer = factory.newTransformer(xslt);
         transformer.setParameter("idepUtilisateur", idepUtilisateur);
         transformer.setParameter(VERSION, version);
-        // on lance la transfo
+
+        // Effectuer la transformation
         StreamSource text = new StreamSource(resultResource.getInputStream());
         StringWriter xmlWriter = new StringWriter();
         StreamResult xmlResult = new StreamResult(xmlWriter);
+
         transformer.transform(text, xmlResult);
+
         return xmlWriter.toString();
     }
 
@@ -953,6 +993,8 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     public static MultipartFile processFile(MultipartFile inputFile) throws IOException {
         byte[] modifiedContent;
+
+        // Modifie le contenu en ajoutant des balises <data>
         try (InputStream inputStream = inputFile.getInputStream();
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
@@ -973,86 +1015,77 @@ public class ColecticaServiceImpl implements ColecticaService {
             modifiedContent = outputStream.toByteArray();
         }
 
-        // Création d'un objet FileItem à partir du contenu modifié
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        FileItem fileItem = factory.createItem(
-                inputFile.getName(),
-                inputFile.getContentType(),
-                false,
-                inputFile.getOriginalFilename()
-        );
-        try (InputStream modifiedInputStream = new ByteArrayInputStream(modifiedContent)) {
-            try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = modifiedInputStream.read(buffer)) != -1) {
-                    output.write(buffer, 0, bytesRead);
-                }
-                fileItem.getOutputStream().write(output.toByteArray());
-            }
+        // Création d'un fichier temporaire pour stocker le contenu modifié
+        File tempFile = File.createTempFile("upload_", ".tmp");
+        try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+            fos.write(modifiedContent);
         }
 
-        // Création d'un nouvel objet MultipartFile à partir du FileItem modifié
-        return new CustomMultipartFile(fileItem);
+        // Créer un MultipartFile personnalisé à partir du fichier temporaire
+        return new CustomMultipartFile(tempFile, inputFile.getOriginalFilename(), inputFile.getContentType());
     }
 
     private String transformToXml(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,
-                                  String suggesterDescription,  String timbre, String version)
-            throws IOException, TransformerException {
+                                  String suggesterDescription, String timbre, String version) throws IOException, TransformerException {
 
-        // Créer un transformateur XSLT
-        TransformerFactory factory = TransformerFactory.newInstance();
+        TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
 
-        // on doit passer à TransformerFactoryImpl pour pouvoir faire des modifs
+        // Saxon ne supporte pas certaines fonctionnalités comme disallow-doctype-decl, il n'est pas nécessaire de définir cette propriété
+
         TransformerFactoryImpl tFactoryImpl = (TransformerFactoryImpl) factory;
-
-        // on appelle le "processor" actuel
         net.sf.saxon.Configuration saxonConfig = tFactoryImpl.getConfiguration();
         Processor processor = (Processor) saxonConfig.getProcessor();
 
-        // on injecte ici la class que l'on appelle dans le xslt
         ExtensionFunction randomUUID = new randomUUID();
         processor.registerExtensionFunction(randomUUID);
+
         Source xslt = new StreamSource(xsltFile);
         Transformer transformer = factory.newTransformer(xslt);
-
-        // param pour la transfo
-
         transformer.setParameter("idValue", idValue);
         transformer.setParameter("suggesterName", nomenclatureName);
         transformer.setParameter("suggesterDescription", suggesterDescription);
         transformer.setParameter("timbre", timbre);
         transformer.setParameter(VERSION, version);
-        // on lance la transfo
+
         StreamSource text = new StreamSource(file.getInputStream());
         StringWriter xmlWriter = new StringWriter();
         StreamResult xmlResult = new StreamResult(xmlWriter);
+
         transformer.transform(text, xmlResult);
+
         return xmlWriter.toString();
     }
 
     private String transformToXmlForComplexList(MultipartFile file, InputStream xsltFile, String idValue, String nomenclatureName,
-                                  String suggesterDescription,  String timbre, String version, String principale,List <String> secondaire, List  <String> labelSecondaire)
+                                                String suggesterDescription, String timbre, String version, String principale,
+                                                List<String> secondaire, List<String> labelSecondaire)
             throws IOException, TransformerException {
 
-        // Créer un transformateur XSLT
+        // Créer un transformateur XSLT sécurisé
         TransformerFactory factory = TransformerFactory.newInstance();
 
-        // on doit passer à TransformerFactoryImpl pour pouvoir faire des modifs
+        // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setFeature(DISALLOW_DOCTYPE_DECL, true);
+
+        // Utiliser TransformerFactoryImpl pour permettre des personnalisations supplémentaires via Saxon
         TransformerFactoryImpl tFactoryImpl = (TransformerFactoryImpl) factory;
 
-        // on appelle le "processor" actuel
+        // Obtenir la configuration Saxon
         net.sf.saxon.Configuration saxonConfig = tFactoryImpl.getConfiguration();
+
+        // Obtenir le processeur Saxon
         Processor processor = (Processor) saxonConfig.getProcessor();
 
-        // on injecte ici la class que l'on appelle dans le xslt
+        // Enregistrer une fonction d'extension personnalisée
         ExtensionFunction randomUUID = new randomUUID();
         processor.registerExtensionFunction(randomUUID);
+
+        // Préparer la transformation XSLT
         Source xslt = new StreamSource(xsltFile);
         Transformer transformer = factory.newTransformer(xslt);
 
-        // param pour la transfo
-
+        // Passer les paramètres à la transformation
         transformer.setParameter("idValue", idValue);
         transformer.setParameter("suggesterName", nomenclatureName);
         transformer.setParameter("suggesterDescription", suggesterDescription);
@@ -1061,28 +1094,32 @@ public class ColecticaServiceImpl implements ColecticaService {
         transformer.setParameter("principale", principale);
         transformer.setParameter("secondaire", secondaire);
         transformer.setParameter("labelSecondaire", labelSecondaire);
-        // on lance la transfo
+
+        // Exécuter la transformation
         StreamSource text = new StreamSource(file.getInputStream());
         StringWriter xmlWriter = new StringWriter();
         StreamResult xmlResult = new StreamResult(xmlWriter);
+
         transformer.transform(text, xmlResult);
+
         return xmlWriter.toString();
     }
 
-    private String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur) throws IOException, TransformerException {
 
-        // Créer un transformateur XSLT
-        TransformerFactory factory = TransformerFactory.newInstance();
-
+    public String transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur) throws IOException, TransformerException {
+        TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
         Source xslt = new StreamSource(xsltFileJson);
+
         Transformer transformer = factory.newTransformer(xslt);
         transformer.setParameter("idepUtilisateur", idepUtilisateur);
-        // on lance la transfo
+
         StreamSource text = new StreamSource(resultResource.getInputStream());
         StringWriter xmlWriter = new StringWriter();
         StreamResult xmlResult = new StreamResult(xmlWriter);
+
         transformer.transform(text, xmlResult);
-        return  xmlWriter.toString();
+
+        return xmlWriter.toString();
     }
 
     @Override
@@ -1238,11 +1275,21 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
     private JSONArray extractIdentifiersFromDiiInstance(String fragmentXml) {
         Set<FragmentData> uniqueData = new HashSet<>();
+
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+            factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
+
             factory.setNamespaceAware(true);
+
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new ByteArrayInputStream(fragmentXml.getBytes(StandardCharsets.UTF_8)));
+
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
 
@@ -1273,6 +1320,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             }
 
             return allFragmentsData;
+
         } catch (Exception e) {
             e.printStackTrace();
             return new JSONArray();
@@ -1314,24 +1362,35 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         File ddiRemoveNameSpaces = File.createTempFile("ddiRemoveNameSpaces", ".xml");
         ddiRemoveNameSpaces.deleteOnExit();
-        transformerStringWithXsl(ddi,xslRemoveNameSpaces,ddiRemoveNameSpaces);
+        transformerStringWithXsl(ddi, xslRemoveNameSpaces, ddiRemoveNameSpaces);
 
         File control = File.createTempFile("control", ".xml");
         control.deleteOnExit();
-        transformerFileWithXsl(ddiRemoveNameSpaces,xslCheckReference,control);
+        transformerFileWithXsl(ddiRemoveNameSpaces, xslCheckReference, control);
 
-        DocumentBuilderFactory dbf= DocumentBuilderFactory.newInstance();
-        DocumentBuilder db= dbf.newDocumentBuilder();
-        Document doc= db.parse(control);
+        // Créer un DocumentBuilderFactory sécurisé
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
+        dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        dbf.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+        dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+        dbf.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(control);
+
         String checkResult = doc.getDocumentElement().getNodeName();
 
-        if (checkResult !="OK") {
+        if (!"OK".equals(checkResult)) {
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + control.getName());
             headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
             headers.add("Pragma", "no-cache");
             headers.add("Expires", "0");
+
             ByteArrayResource resourceByte = new ByteArrayResource(Files.readAllBytes(control.toPath()));
+
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentLength(control.length())
@@ -1339,11 +1398,10 @@ public class ColecticaServiceImpl implements ColecticaService {
                     .body(resourceByte);
         }
 
-        HashMap<String,String> contentXML= new HashMap<>();
+        HashMap<String, String> contentXML = new HashMap<>();
         contentXML.put("ddi-file", Files.readString(ddiRemoveNameSpaces.toPath()));
 
-        return exportUtils.exportAsODT("export.odt", contentXML,dicoCode, xslPatternFile,zipRmes, "dicoVariable");
-
+        return exportUtils.exportAsODT("export.odt", contentXML, dicoCode, xslPatternFile, zipRmes, "dicoVariable");
     }
 
     public static void transformerStringWithXsl(String ddi,InputStream xslRemoveNameSpaces, File output) throws Exception{

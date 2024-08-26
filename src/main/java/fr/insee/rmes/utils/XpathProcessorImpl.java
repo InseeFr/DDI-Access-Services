@@ -6,6 +6,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -69,20 +70,38 @@ public class XpathProcessorImpl implements XpathProcessor {
 
 	@Override
 	public Document toDocument(String xml) throws Exception {
+
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+		// Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
+		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+		factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
 		DocumentBuilder builder = factory.newDocumentBuilder();
+
 		InputSource source = new InputSource(new StringReader(xml));
+
 		return builder.parse(source);
 	}
 
 	@Override
 	public String toString(Node node) throws TransformerException {
+
 		StringWriter buf = new StringWriter();
-		Transformer xForm = TransformerFactory.newInstance().newTransformer();
+
+		// Utiliser une implémentation spécifique de TransformerFactory
+		TransformerFactory transformerFactory = new net.sf.saxon.TransformerFactoryImpl();
+
+		Transformer xForm = transformerFactory.newTransformer();
+
 		xForm.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		xForm.setOutputProperty(OutputKeys.INDENT, "yes");
 		xForm.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
 		xForm.transform(new DOMSource(node), new StreamResult(buf));
-		return (buf.toString());
+
+		return buf.toString();
 	}
 }

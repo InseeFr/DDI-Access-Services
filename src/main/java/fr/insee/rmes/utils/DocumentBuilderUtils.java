@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
@@ -14,12 +15,23 @@ import java.io.StringReader;
 @Service
 public class DocumentBuilderUtils {
 
+
 	public static Document getDocument(String fragment) throws Exception {
+
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+		// Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
+		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+		factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
 		DocumentBuilder builder = factory.newDocumentBuilder();
+
 		if (null == fragment || fragment.isEmpty()) {
 			return builder.newDocument();
 		}
+
 		InputSource ddiSource = new InputSource(new StringReader(fragment));
 		return builder.parse(ddiSource);
 	}

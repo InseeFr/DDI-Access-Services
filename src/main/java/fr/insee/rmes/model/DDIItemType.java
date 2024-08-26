@@ -38,8 +38,8 @@ public enum DDIItemType {
 	INSTRUMENT_SCHEME("InstrumentScheme","instrument-scheme","F152EE61-08BA-4FCA-8A3A-DAF8F87F972E"),
 	CODELIST_SCHEME("CodeListScheme","code-list-scheme","4193D389-B5AE-4368-B399-CD5A7EE3653C"),
 	MANAGEDREPRESENTATION_SCHEME("ManagedRepresentationScheme","managed-representation-scheme","16D4D829-41E1-4677-AA17-81190B6A0E66"),
-	LOGICAL_PRODUCT("LogicalProduct","logical-product","965C8D28-7D48-4950-BEA7-04B27E52BB9B");
-	
+	LOGICAL_PRODUCT("LogicalProduct","logical-product","965C8D28-7D48-4950-BEA7-04B27E52BB9B"),
+	PHYSICALINSTANCE("PhysicalInstance","Physical-instance","a51e85bb-6259-4488-8df2-f08cb43485f8");
 	private String name = "" ;
 	private String type ="";
 	private String UUID ="";

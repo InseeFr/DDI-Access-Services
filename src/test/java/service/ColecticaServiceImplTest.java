@@ -2,27 +2,25 @@ package service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
-import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaServiceImpl;
+import fr.insee.rmes.utils.DocumentBuilderUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicStatusLine;
-import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
@@ -30,10 +28,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Document;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -119,8 +118,9 @@ class ColecticaServiceImplTest {
         assertFalse(result.isEmpty());
     }
 
+
     @Test
-    public void testTransformFile() {
+    void testTransformFile() {
         ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticsearchClient, restTemplate);
         MockMultipartFile file = new MockMultipartFile("file", "test.json", "application/json", "[{\"id\": \"value\",\"label\": \"value\" }]".getBytes());
         ResponseEntity<String> result = colecticaService.transformFile(file, "idValue", "nomenclatureName", "suggesterDescription", "version", "idepUtilisateur", "timbre");
@@ -130,7 +130,37 @@ class ColecticaServiceImplTest {
     }
 
     @Test
-    public void testUploadItem() {
+    void testTransformToJson() throws Exception {
+        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl();
+
+        // Mock the Resource to simulate the XML input
+        Resource mockResource = Mockito.mock(Resource.class);
+        Mockito.when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream("<root><element>Test</element></root>".getBytes()));
+
+        // Provide a valid XSLT as InputStream
+        String xsltContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n" +
+                "    <xsl:output method=\"xml\" indent=\"yes\"/>\n" +
+                "    <xsl:template match=\"/\">\n" +
+                "        <transformed>\n" +
+                "            <xsl:copy-of select=\"*\"/>\n" +
+                "        </transformed>\n" +
+                "    </xsl:template>\n" +
+                "</xsl:stylesheet>";
+        InputStream xsltStream = new ByteArrayInputStream(xsltContent.getBytes());
+
+        // Call the method to be tested
+        String result = colecticaService.transformToJson(mockResource, xsltStream, "user");
+
+        // Assertions
+        assertNotNull(result);
+        assertTrue(!result.isEmpty());
+        assertTrue(result.contains("<transformed>"));
+        assertTrue(result.contains("<element>Test</element>"));
+    }
+
+    @Test
+    void testUploadItem() {
         ColecticaServiceImpl colecticaService = mock(ColecticaServiceImpl.class);
         String jsonContent = "{\n" +
                 "   \"Items\":\n" +
@@ -156,4 +186,15 @@ class ColecticaServiceImplTest {
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("Le fichier a été envoyé avec succès à l'API.", result.getBody());
     }
+
+    @Test
+    void testGetDocument() throws Exception {
+        String xml = "<root><element>value</element></root>";
+        Document doc = DocumentBuilderUtils.getDocument(xml);
+
+        assertNotNull(doc);
+        assertEquals("root", doc.getDocumentElement().getNodeName());
+    }
+
+
 }
