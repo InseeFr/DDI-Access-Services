@@ -38,8 +38,8 @@ public class GetItem {
         this.colecticaService = colecticaService;
     }
 
-    @GetMapping("ddiInstance/uuid")
-    @Operation(summary = "Get ddiInstance by uuid", description = "Get an XML document for a ddi:Instance from Colectica repository.")
+    @GetMapping("fragmentInstance/uuid")
+    @Operation(summary = "Get FragmentInstance by uuid", description = "Get an XML document for a Fragment:Instance from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
     public ResponseEntity<String> findInstanceByUuidColectica(
             @Parameter(
