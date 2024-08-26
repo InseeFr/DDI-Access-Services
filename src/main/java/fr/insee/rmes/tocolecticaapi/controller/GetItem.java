@@ -69,10 +69,10 @@ public class GetItem {
     @Produces(MediaType.APPLICATION_XML)
     public String findFragmentByUuidWithChildrenColectica(
             @Parameter(
-                    description = "id de l'objet colectica",
+                    description = "id de l'objet colectica sous la forme uuid/version",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws Exception {
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93/2")) String uuid) throws Exception {
         return colecticaService.findFragmentByUuidWithChildren(uuid);
 
     }

@@ -375,7 +375,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     }
 
     protected ResponseEntity<String> getStringResponseEntity(String uuid, CloseableHttpClient httpClient) throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException {
-        if (!uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$")) {
+        if (!uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}(\\/\\d+)?$")) {
             throw new IllegalArgumentException("UUID invalide");
         }
         HttpGet httpGet = getHttpGet(uuid);
@@ -384,7 +384,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             return getStringResponseEntity(response);
         } catch (IOException e) {
               return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Une erreur s'est produite lors de la requête vers Colectica.");
+                    .body(ERREUR_COLECTICA);
         }
     }
 
