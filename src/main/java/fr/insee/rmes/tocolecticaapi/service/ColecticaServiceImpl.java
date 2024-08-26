@@ -15,6 +15,7 @@ import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.models.*;
 import fr.insee.rmes.tocolecticaapi.randomUUID;
+import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.utils.ExportUtils;
 import fr.insee.rmes.utils.FilesUtils;
 import fr.insee.rmes.utils.XMLUtils;
@@ -62,6 +63,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -79,6 +81,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
+import static fr.insee.rmes.transfoxsl.controller.TransformationController.DEREFERENCE_XSL;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ERROR;
 
 @Service
@@ -153,6 +156,8 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     public CloseableHttpClient httpClient;
 
+    @Autowired
+    private XsltTransformationService xsltTransformationService;
     public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
     this.elasticsearchClient=elasticsearchClient;
     this.restTemplate=restTemplate;
@@ -246,17 +251,100 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     @Override
     public String findFragmentByUuidWithChildren(String uuid) throws Exception {
+        // Appel au service Colectica pour obtenir l'instance
         ResponseEntity<?> responseEntity = searchColecticaInstanceByUuid(uuid);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = (String) responseEntity.getBody();
-            Set<String> resultIntermediaire = extractUniqueIdentifiers(responseBody);
-            JSONArray resultArray = processUuidsAndFetchData(resultIntermediaire);
+
+            // Transformer la réponse XML avec le service de déréférencement
+            String dereferencedXml = dereferenceXml(responseBody);
+
+            // Convertir le XML transformé en InputStream pour l'analyse
+            InputStream inputStream = new ByteArrayInputStream(dereferencedXml.getBytes(StandardCharsets.UTF_8));
+
+            // Appeler la méthode parseDereferencedXmlWithEnum pour générer le tableau JSON
+            JSONArray resultArray = parseDereferencedXmlWithEnum(inputStream);
+
+            // Retourner le résultat final en JSON formaté
             return resultArray.toString(4);
         } else {
             return "L'objet n'existe pas";
         }
     }
+
+    // Nouvelle méthode pour déréférencer le XML directement
+    private String dereferenceXml(String xmlResponse) throws Exception {
+        // Convertir le XML en InputStream
+        InputStream inputStream = new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8));
+
+        // Appeler le service de transformation XSLT pour effectuer le déréférencement
+        List<String> outputText = xsltTransformationService.transform(inputStream, DEREFERENCE_XSL, false);
+
+        // Combiner le résultat en une seule chaîne de caractères
+        return String.join("\n", outputText);
+    }
+
+    public JSONArray parseDereferencedXmlWithEnum(InputStream inputStream) throws Exception {
+        // Créer et configurer le DocumentBuilderFactory de manière sécurisée
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+
+        // Désactiver l'accès aux entités externes pour éviter les attaques XXE
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
+        // Construire le document XML
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(inputStream);
+
+        // Initialiser XPath avec le contexte de l'espace de noms
+        XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPath xpath = xpathFactory.newXPath();
+
+        // Configurer les espaces de noms en utilisant NamespaceContextMap existant
+        NamespaceContext nsContext = new NamespaceContextMap(
+                "ddi", "ddi:instance:3_3",
+                "r", "ddi:reusable:3_3"
+        );
+        xpath.setNamespaceContext(nsContext);
+
+        JSONArray jsonArray = new JSONArray();
+
+        // Parcourir toutes les balises dans le document XML
+        NodeList allNodes = document.getElementsByTagName("*");
+
+        for (int i = 0; i < allNodes.getLength(); i++) {
+            Element element = (Element) allNodes.item(i);
+            String tagName = element.getLocalName();  // Utiliser getLocalName pour ignorer l'espace de noms
+
+            // Vérifier si le nom de la balise existe dans l'enum
+            DDIItemType itemType = DDIItemType.searchByName(tagName);
+
+            if (itemType != null) {
+                // Extraire les informations r:ID, r:Agency, r:Version en tenant compte de l'espace de noms
+                String identifier = xpath.evaluate(".//r:ID", element);
+                String agencyId = xpath.evaluate(".//r:Agency", element);
+                String version = xpath.evaluate(".//r:Version", element);
+
+                // Si les valeurs sont trouvées, les ajouter à l'objet JSON
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Identifier", identifier != null ? identifier : "");
+                jsonObject.put("AgencyId", agencyId != null ? agencyId : "");
+                jsonObject.put("Version", version != null ? version : "");
+                jsonObject.put("ItemType", itemType.getName());
+
+                // Ajouter l'objet JSON au tableau
+                jsonArray.put(jsonObject);
+            }
+        }
+
+        return jsonArray;
+    }
+
+
 
     public Set<String> extractUniqueIdentifiers(String xmlResponse) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -560,21 +648,24 @@ public class ColecticaServiceImpl implements ColecticaService {
 
                 String name = source.path("name_fr-FR").asText();
                 String label = source.path("label_fr-FR").asText();
+                String version = source.path("itemVersion").asText();  // Récupérer la version
 
                 // Filtrer les éléments avec name ou label non vide
                 if (!name.isEmpty() || !label.isEmpty()) {
                     ObjectNode filteredSource = objectMapper.createObjectNode();
                     filteredSource.put("name", name);
                     filteredSource.put("label", label);
+                    filteredSource.put("version", version);  // Ajouter la version à l'objet JSON
 
                     String versionlessId = source.path("versionlessId").asText();
                     if (versionlessId.startsWith("fr.insee:")) {
                         versionlessId = versionlessId.substring("fr.insee:".length());
                     }
-                    filteredSource.put("Id",  versionlessId);
+                    filteredSource.put("Id", versionlessId);
 
                     filteredHitsArray.add(filteredSource);
-                }}
+                }
+            }
 
             return filteredHitsArray.toString();
         } catch (IOException e) {

@@ -43,7 +43,7 @@ public class GetItem {
     @Produces(MediaType.APPLICATION_XML)
     public ResponseEntity<String> findInstanceByUuidColectica(
             @Parameter(
-                    description = "id de l'objet colectica",
+                    description = "id de l'objet colectica sous la forme uuid/version",
                     required = true,
                     schema = @Schema(
                             type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RmesExceptionIO, ParseException {
@@ -56,7 +56,7 @@ public class GetItem {
     @Produces(MediaType.APPLICATION_XML)
     public ResponseEntity<String> findFragmentByUuidColectica(
             @Parameter(
-                    description = "id de l'objet colectica",
+                    description = "id de l'objet colectica sous la forme uuid/version",
                     required = true,
                     schema = @Schema(
                             type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws ExceptionColecticaUnreachable, IOException {
@@ -64,8 +64,8 @@ public class GetItem {
 
     }
 
-    @GetMapping("ddiFragment/uuid/withChildren")
-    @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
+    @GetMapping("FragmentInstance/uuid/withChildren")
+    @Operation(summary = "Get Fragments by uuid", description = "Get an XML document for a Fragment:Instance from Colectica repository.")
     @Produces(MediaType.APPLICATION_XML)
     public String findFragmentByUuidWithChildrenColectica(
             @Parameter(

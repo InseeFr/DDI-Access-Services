@@ -32,7 +32,7 @@ public enum DDIItemType {
 	QUALITYSTATEMENT_SCHEME("QualityStatementScheme","quality-statement-scheme","4AA7EA9C-495D-4919-95F7-AC107C877F56"),
 	CONCEPTUALVARIABLE_SCHEME("ConceptualVariableScheme","conceptual-variable-scheme","CE0F8AF6-DB9C-4FB3-A31A-E9523FC53668"),
 	REPRESENTEDVARIABLE_SCHEME("RepresentedVariableScheme","represented-variable-scheme","14404696-2DB3-45AC-A94D-139521DE6E21"),
-	REPRESENTED_VARAIBLE("RepresentedVariable","represented-variable","1044459C-8AE2-474A-AD96-6EC18B04953C"),
+	REPRESENTED_VARIABLE("RepresentedVariable","represented-variable","1044459C-8AE2-474A-AD96-6EC18B04953C"),
 	REPRESENTED_VARIABLE_GROUP("RepresentedVariableGroup","represented-variable-group","A8CECEF5-4493-47B8-9C83-82A2F1CFB08E"),
 	NCUBE_SCHEME("NCubeScheme","n-cube-scheme","31E8515B-C0CC-4E88-9E00-AE4BB6D4AC25"),
 	INSTRUMENT_SCHEME("InstrumentScheme","instrument-scheme","F152EE61-08BA-4FCA-8A3A-DAF8F87F972E"),
