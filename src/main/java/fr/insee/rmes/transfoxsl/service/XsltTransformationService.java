@@ -26,13 +26,15 @@ public class XsltTransformationService {
         this.processor = new Processor(false);
     }
 
-    public List<String> transform(InputStream inputStream, String xslFileName, boolean isTextOutput)  throws XsltTransformationException, IOException {
+    public List<String> transform(InputStream inputStream, String xslFileName, boolean isTextOutput) throws XsltTransformationException, IOException {
         try {
             logger.log(Level.INFO, "Starting transformation with XSLT file: {0}", xslFileName);
 
             XsltCompiler compiler = processor.newXsltCompiler();
-            File xslFile = new ClassPathResource(xslFileName).getFile();
-            XsltExecutable executable = compiler.compile(new StreamSource(xslFile));
+
+            // Remplacer l'utilisation de getFile() par getInputStream() pour charger la ressource du classpath
+            InputStream xslInputStream = new ClassPathResource(xslFileName).getInputStream();
+            XsltExecutable executable = compiler.compile(new StreamSource(xslInputStream));
             XsltTransformer transformer = executable.load();
 
             transformer.setSource(new StreamSource(inputStream));
