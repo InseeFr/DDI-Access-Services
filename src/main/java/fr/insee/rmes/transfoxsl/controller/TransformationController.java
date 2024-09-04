@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/xsl")
@@ -30,6 +31,7 @@ import java.util.List;
 public class TransformationController {
 
     public static final String DDI_2_VTL_XSL = "ddi2vtl.xsl";
+    public static final String DDI_2_JSON_XSL = "dataRelationShipTransfo.xsl";
     public static final String DEREFERENCE_XSL = "dereference.xsl";
     public static final String FAILED_TO_PROCESS_THE_INPUT_FILE = "Failed to process the input file";
     public static final String TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING = "Transformation failed during the XSLT processing";
@@ -107,7 +109,7 @@ public class TransformationController {
 
     @Operation(summary = "Générer les règles VTL à partir d'une physicalInstance et renvoyer sous forme de JSON")
     @PostMapping(value = "/ddi2vtlJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<String>> ddi2vtlJson(@RequestParam("file") MultipartFile file)  {
+    public ResponseEntity<String> ddi2vtlJson(@RequestParam("file") MultipartFile file)  {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
@@ -115,14 +117,17 @@ public class TransformationController {
             // Première transformation - XML en sortie
             List<String> intermediateOutput = xsltTransformationService.transform(inputStream, DEREFERENCE_XSL, false);
 
-            // Deuxième transformation - Texte en sortie
+            // Deuxième transformation - JSON en sortie
             InputStream intermediateInputStream = new ByteArrayInputStream(String.join("\n", intermediateOutput).getBytes(StandardCharsets.UTF_8));
-            List<String> outputText = xsltTransformationService.transform(intermediateInputStream, DDI_2_VTL_XSL, true);
+            String outputJson = xsltTransformationService.transform(intermediateInputStream, DDI_2_JSON_XSL, true)
+                    .stream()
+                    .collect(Collectors.joining());
 
-            // Retourner la liste sous forme de JSON
+            // Retourner la sortie JSON sous forme d'objet JSON
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(outputText);
+                    .body(outputJson);  // Retourner la chaîne JSON brute sans encodage supplémentaire
+
         } catch (IOException e) {
             throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
         } catch (XsltTransformationException e) {

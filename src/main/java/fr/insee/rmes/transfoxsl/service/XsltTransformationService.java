@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +32,7 @@ public class XsltTransformationService {
 
             XsltCompiler compiler = processor.newXsltCompiler();
 
-            // Remplacer l'utilisation de getFile() par getInputStream() pour charger la ressource du classpath
+            // Charger le fichier XSL depuis le classpath
             InputStream xslInputStream = new ClassPathResource(xslFileName).getInputStream();
             XsltExecutable executable = compiler.compile(new StreamSource(xslInputStream));
             XsltTransformer transformer = executable.load();
@@ -44,22 +44,28 @@ public class XsltTransformationService {
 
             Serializer out = processor.newSerializer(outputStream);
             if (isTextOutput) {
-                out.setOutputProperty(Serializer.Property.METHOD, "text");  // Configurer pour un texte simple
-                out.setOutputProperty(Serializer.Property.OMIT_XML_DECLARATION, "yes");  // Pas de déclaration XML pour le texte
+                out.setOutputProperty(Serializer.Property.METHOD, "text");
+                out.setOutputProperty(Serializer.Property.OMIT_XML_DECLARATION, "yes");
             } else {
-                out.setOutputProperty(Serializer.Property.METHOD, "xml");  // Configurer pour un XML si nécessaire
+                out.setOutputProperty(Serializer.Property.METHOD, "xml");
             }
+
             transformer.setDestination(out);
             transformer.transform();
 
             // Capture de la sortie sous forme de chaîne
-            String result = outputStream.toString();
+            String result = outputStream.toString(StandardCharsets.UTF_8);
 
-            // Si sortie texte, on peut découper par ligne et retourner une liste de String
+            // Si c'est une sortie texte simple, on peut continuer à découper, sinon retourner directement le JSON complet
             if (isTextOutput) {
+                // Si la sortie est un JSON valide, ne pas découper par ligne
+                if (result.trim().startsWith("[") || result.trim().startsWith("{")) {
+                    return Collections.singletonList(result);
+                }
+                // Sinon, découper par ligne (utile pour d'autres formats texte simples)
                 return Arrays.asList(result.split("\n"));
             } else {
-                // Pour XML, on retourne une seule chaîne sous forme de liste (vous pouvez adapter selon vos besoins)
+                // Pour XML ou JSON, on retourne le résultat complet comme une seule chaîne
                 return Collections.singletonList(result);
             }
         } catch (SaxonApiException e) {
