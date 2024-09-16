@@ -109,7 +109,7 @@ public class TransformationController {
     }
 
     @Operation(summary = "Transformer un objet dataRelationShip en JSON")
-    @PostMapping(value = "/ddi2vtlJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/dataRelationShiptoJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> ddiDataRelationShiptoJson(@RequestParam("file") MultipartFile file)  {
         try {
             // Conversion du MultipartFile en InputStream
