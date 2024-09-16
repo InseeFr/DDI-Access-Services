@@ -1,5 +1,7 @@
 package fr.insee.rmes.transfoxsl.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.rmes.exceptions.VtlTransformationException;
 import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
@@ -33,6 +35,7 @@ public class TransformationController {
     public static final String DEREFERENCE_XSL = "dereference.xsl";
     public static final String FAILED_TO_PROCESS_THE_INPUT_FILE = "Failed to process the input file";
     public static final String TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING = "Transformation failed during the XSLT processing";
+    public static final String REL_TO_JSON_XSL = "dataRelToJson.xsl";
     private final XsltTransformationService xsltTransformationService;
     private final MultipartFileUtils multipartFileUtils;
 
@@ -105,24 +108,29 @@ public class TransformationController {
         }
     }
 
-    @Operation(summary = "Générer les règles VTL à partir d'une physicalInstance et renvoyer sous forme de JSON")
+    @Operation(summary = "Transformer un objet dataRelationShip en JSON")
     @PostMapping(value = "/ddi2vtlJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<String>> ddi2vtlJson(@RequestParam("file") MultipartFile file)  {
+    public ResponseEntity<String> ddiDataRelationShiptoJson(@RequestParam("file") MultipartFile file)  {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
 
             // Première transformation - XML en sortie
-            List<String> intermediateOutput = xsltTransformationService.transform(inputStream, DEREFERENCE_XSL, false);
+            List<String> outputText = xsltTransformationService.transform(inputStream, REL_TO_JSON_XSL, true);
+            // Joindre les éléments de la liste en une seule chaîne JSON propre
+            String jsonOutput = String.join("", outputText);
 
-            // Deuxième transformation - Texte en sortie
-            InputStream intermediateInputStream = new ByteArrayInputStream(String.join("\n", intermediateOutput).getBytes(StandardCharsets.UTF_8));
-            List<String> outputText = xsltTransformationService.transform(intermediateInputStream, DDI_2_VTL_XSL, true);
+            // Utiliser Jackson pour vérifier la validité du JSON
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(jsonOutput); // Désérialisation pour vérifier
+
+            // Sérialiser à nouveau le JSON proprement
+            String cleanJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
 
             // Retourner la liste sous forme de JSON
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(outputText);
+                    .body(cleanJson);
         } catch (IOException e) {
             throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
         } catch (XsltTransformationException e) {
