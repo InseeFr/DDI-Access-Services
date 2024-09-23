@@ -5,11 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.rmes.exceptions.VtlTransformationException;
 import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
+import fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer;
+import fr.insee.rmes.transfoxsl.service.internal.DDITransformerToVtl;
 import fr.insee.rmes.transfoxsl.utils.MultipartFileUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,10 +34,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/xsl")
 @Tag(name = "TransformationController", description = "API pour lancer des transformations XSLT")
+@Slf4j
 public class TransformationController {
 
-    public static final String DDI_2_VTL_XSL = "ddi2vtl.xsl";
-    public static final String DEREFERENCE_XSL = "dereference.xsl";
     public static final String FAILED_TO_PROCESS_THE_INPUT_FILE = "Failed to process the input file";
     public static final String TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING = "Transformation failed during the XSLT processing";
     public static final String REL_TO_JSON_XSL = "dataRelToJson.xsl";
@@ -47,50 +51,46 @@ public class TransformationController {
 
     @Operation(summary = "Déréférencer un objet DDI")
     @PostMapping(value = "/Derefddi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> Derefddi(@RequestParam("file") MultipartFile file)  {
-        try {
-            // Conversion du MultipartFile en InputStream
-            InputStream inputStream = multipartFileUtils.convertToInputStream(file);
+    public ResponseEntity<String> dereferenceDDI(@RequestParam("file") MultipartFile file)  {
+        DDIDerefencer ddiDerefencer = new DDIDerefencer(xsltTransformationService);
 
-            // Première transformation - XML en sortie
-            List<String> outputText = xsltTransformationService.transform(inputStream, DEREFERENCE_XSL, false);
-            String finalOutput = String.join("\n", outputText);
+        try {
+            InputStream inputStream = multipartFileUtils.convertToInputStream(file);
+            String finalOutput = ddiDerefencer.dereferenceToString(inputStream);
             // Retourner la liste sous forme de JSON
             return ResponseEntity.ok()
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(finalOutput);
         } catch (IOException e) {
-            throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
-        } catch (XsltTransformationException e) {
-            throw new VtlTransformationException(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + ".", e);
-        } catch (VtlTransformationException e) {
+            log.error("Error while processing dereferenceDDI", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (XsltTransformationException e) {
+            log.info("Exception with user input", e.getCause());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING+" : "+e.getXmlErrorMessage());
         }
     }
 
 
     @Operation(summary = "Générer un fichier texte contenant les règles VTL à partir d'une physicalInstance")
     @PostMapping(value = "/ddi2vtl", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<InputStreamResource> ddi2vtl(@RequestParam("file") MultipartFile file)  {
+    public ResponseEntity<Resource> ddi2vtl(@RequestParam("file") MultipartFile file)  {
+
+        DDITransformerToVtl ddiTransformerToVtl = new DDITransformerToVtl(xsltTransformationService);
+
         try {
-            // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
 
             // Première transformation - XML en sortie (on récupère la sortie en tant que chaîne)
-            List<String> intermediateOutput = xsltTransformationService.transform(inputStream, DEREFERENCE_XSL, false);
+            List<String> intermediateOutput = xsltTransformationService.transformToXml(inputStream, DEREFERENCE_XSL, false);
 
             // Conversion de la sortie intermédiaire en InputStream pour la deuxième transformation
             InputStream intermediateInputStream = new ByteArrayInputStream(String.join("\n", intermediateOutput).getBytes(StandardCharsets.UTF_8));
 
-            // Deuxième transformation - Texte en sortie (on récupère directement une liste de lignes de texte)
-            List<String> outputText = xsltTransformationService.transform(intermediateInputStream, DDI_2_VTL_XSL, true);
 
-            // Préparation du contenu à retourner sous forme d'InputStream
-            String finalOutput = String.join("\n", outputText);
-            ByteArrayInputStream finalInputStream = new ByteArrayInputStream(finalOutput.getBytes(StandardCharsets.UTF_8));
+
 
             // Préparation de la réponse avec le fichier texte
-            InputStreamResource resource = new InputStreamResource(finalInputStream);
+            Resource resource = new ByteArrayResource(ddiTransformerToVtl.transform(inputStream));
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=vtl.txt");
 

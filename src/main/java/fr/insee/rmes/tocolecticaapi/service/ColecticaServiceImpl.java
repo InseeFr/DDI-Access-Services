@@ -1,6 +1,5 @@
 package fr.insee.rmes.tocolecticaapi.service;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,6 +20,7 @@ import fr.insee.rmes.utils.FilesUtils;
 import fr.insee.rmes.utils.XMLUtils;
 import fr.insee.rmes.utils.export.XDocReport;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
@@ -81,10 +81,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
-import static fr.insee.rmes.transfoxsl.controller.TransformationController.DEREFERENCE_XSL;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ERROR;
 
 @Service
+@RequiredArgsConstructor
 public class ColecticaServiceImpl implements ColecticaService {
 
     private static final String CONTENT_TYPE = "Content-Type";
@@ -92,8 +92,6 @@ public class ColecticaServiceImpl implements ColecticaService {
     private static final String APPLICATION_JSON = "application/json";
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER = "Bearer ";
-    private static final String HTTP = "http://";
-    private static final String HTTPS = "https://";
     private static final String VERSION = "version";
     private static final String SEARCH = "/_search";
     private static final String APIKEYHEADER = "apiKey ";
@@ -139,44 +137,19 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Value("${fr.insee.rmes.elasticsearch.url}")
     private String  elasticUrl;
 
-    @Value("${fr.insee.rmes.elasticsearch.apiId}")
-    private String apiId;
-
     @Value("${fr.insee.rmes.elasticsearch.apikey}")
     private String apiKey;
 
-    @Autowired
-    public ElasticsearchClient elasticsearchClient;
-    @Autowired
     public  RestTemplate restTemplate;
     @Autowired
-    XDocReport xdr;
+    private final XDocReport xdr;
     @Autowired
-    ExportUtils exportUtils;
+    private final ExportUtils exportUtils;
 
-    public CloseableHttpClient httpClient;
+    private final CloseableHttpClient httpClient;
 
     @Autowired
-    private XsltTransformationService xsltTransformationService;
-    public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
-    this.elasticsearchClient=elasticsearchClient;
-    this.restTemplate=restTemplate;
-    }
-    private CloseableHttpClient mockHttpClient;
-    public ColecticaServiceImpl(CloseableHttpClient mockHttpClient,ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
-        this.elasticsearchClient=elasticsearchClient;
-        this.restTemplate=restTemplate;
-        this.mockHttpClient=mockHttpClient;
-    }
-
-    public ColecticaServiceImpl(){
-
-    }
-    @Autowired
-    public ColecticaServiceImpl(CloseableHttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
-
+    private final XsltTransformationService xsltTransformationService;
 
     @Override
     public ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException {

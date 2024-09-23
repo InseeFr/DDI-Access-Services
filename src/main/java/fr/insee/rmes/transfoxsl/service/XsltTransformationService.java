@@ -1,34 +1,29 @@
 package fr.insee.rmes.transfoxsl.service;
 
 import fr.insee.rmes.exceptions.XsltTransformationException;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.saxon.s9api.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
+@Slf4j
 public class XsltTransformationService {
 
-    private static final Logger logger = Logger.getLogger(XsltTransformationService.class.getName());
     private final Processor processor;
 
     public XsltTransformationService() {
         this.processor = new Processor(false);
     }
 
-    public List<String> transform(InputStream inputStream, String xslFileName, boolean isTextOutput) throws XsltTransformationException, IOException {
+    byte[] transform(InputStream inputStream, String xslFileName, SerializerConfigurer serializerConfigurer) throws XsltTransformationException, IOException {
         try {
-            logger.log(Level.INFO, "Starting transformation with XSLT file: {0}", xslFileName);
+            log.atDebug().log(()->"Starting transformation with XSLT file: "+ xslFileName);
 
             XsltCompiler compiler = processor.newXsltCompiler();
 
@@ -42,30 +37,38 @@ public class XsltTransformationService {
             // Utilisation d'un OutputStream pour capturer la sortie en mémoire
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-            Serializer out = processor.newSerializer(outputStream);
-            if (isTextOutput) {
-                out.setOutputProperty(Serializer.Property.METHOD, "text");  // Configurer pour un texte simple
-                out.setOutputProperty(Serializer.Property.OMIT_XML_DECLARATION, "yes");  // Pas de déclaration XML pour le texte
-            } else {
-                out.setOutputProperty(Serializer.Property.METHOD, "xml");  // Configurer pour un XML si nécessaire
-            }
-            transformer.setDestination(out);
+            Serializer serializer = serializerConfigurer.configure(outputStream);
+
+            transformer.setDestination(serializer);
             transformer.transform();
 
-            // Capture de la sortie sous forme de chaîne
-            String result = outputStream.toString();
+           return outputStream.toByteArray();
 
-            // Si sortie texte, on peut découper par ligne et retourner une liste de String
-            if (isTextOutput) {
-                return Arrays.asList(result.split("\n"));
-            } else {
-                // Pour XML, on retourne une seule chaîne sous forme de liste (vous pouvez adapter selon vos besoins)
-                return Collections.singletonList(result);
-            }
+//            // Si sortie texte, on peut découper par ligne et retourner une liste de String
+//            if (isTextOutput) {
+//                return Arrays.asList(result.split("\n"));
+//            } else {
+//                // Pour XML, on retourne une seule chaîne sous forme de liste (vous pouvez adapter selon vos besoins)
+//                return Collections.singletonList(result);
+//            }
         } catch (SaxonApiException e) {
             throw new XsltTransformationException("Error during XSLT transformation", e);
-        } catch (IOException e) {
-            throw new IOException("I/O error during XSLT transformation", e);
         }
+    }
+
+    public String transformToXmlString(InputStream inputStream, String xslFileName)throws XsltTransformationException, IOException {
+        return toXmlString(transformToXml(inputStream, xslFileName));
+    }
+
+    public byte[] transformToXml(InputStream inputStream, String xslFileName) throws IOException {
+        return transform(inputStream, xslFileName, SerializerConfigurer.forXmlString(processor));
+    }
+
+    private String toXmlString(byte[] result) {
+        return new String(result);
+    }
+
+    public byte[] transformToRawText(InputStream stream, String ddi2VtlXsl) throws IOException {
+        return transform(stream, ddi2VtlXsl, SerializerConfigurer.forRawText(processor));
     }
 }
