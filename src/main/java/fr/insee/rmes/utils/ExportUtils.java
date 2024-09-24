@@ -2,7 +2,6 @@ package fr.insee.rmes.utils;
 
 import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.tocolecticaapi.service.Constants;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import javax.xml.transform.TransformerException;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,23 +36,23 @@ public class ExportUtils {
         this.maxLength = maxLength;
     }
 
-    public ResponseEntity<Resource> exportAsODT(String fileName, Map<String, String> xmlContent, String xslFile, String xmlPattern, String zip, String objectType) throws RmesException {
-        return exportAsFileByExtension(fileName, xmlContent, xslFile, xmlPattern, zip, objectType, FilesUtils.ODT_EXTENSION);
+    public ResponseEntity<Resource> exportAsODT(Path fileName, Map<String, String> xmlContent, String xslFile, String xmlPattern, String zip, String objectType) throws RmesException {
+        return exportAsFileByExtension(fileName, xmlContent, xslFile, xmlPattern, zip, objectType, FileExtension.ODT_EXTENSION);
     }
 
-    public ResponseEntity<Resource> exportAsODS(String fileName, Map<String, String> xmlContent, String xslFile, String xmlPattern, String zip, String objectType) throws RmesException {
-        return exportAsFileByExtension(fileName, xmlContent, xslFile, xmlPattern, zip, objectType, FilesUtils.ODS_EXTENSION);
+    public ResponseEntity<Resource> exportAsODS(Path fileName, Map<String, String> xmlContent, String xslFile, String xmlPattern, String zip, String objectType) throws RmesException {
+        return exportAsFileByExtension(fileName, xmlContent, xslFile, xmlPattern, zip, objectType, FileExtension.ODS_EXTENSION);
     }
 
-    private ResponseEntity<Resource> exportAsFileByExtension(String fileName, Map<String, String> xmlContent, String xslFile, String xmlPattern, String zip, String objectType, String extension) throws RmesException {
+    private ResponseEntity<Resource> exportAsFileByExtension(Path fileName, Map<String, String> xmlContent, String xslFile, String xmlPattern, String zip, String objectType, FileExtension extension) throws RmesException {
         logger.debug("Begin To export {} as Response", objectType);
-        fileName = fileName.replace(extension, "");
 
-        InputStream input = exportAsInputStream(fileName, xmlContent, xslFile, xmlPattern, zip, objectType, extension);
+
+        InputStream input = exportAsInputStream(fileName, xmlContent, xslFile, xmlPattern, zip, objectType);
         if (input == null)
             throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_T_GENERATE_CODEBOOK, NULL_STREAM);
 
-        ByteArrayResource resource = null;
+        ByteArrayResource resource;
         try {
             resource = new ByteArrayResource(IOUtils.toByteArray(input));
             input.close();
@@ -60,7 +62,7 @@ public class ExportUtils {
         }
         logger.debug("End To export {} as Response", objectType);
 
-        HttpHeaders responseHeaders = HttpUtils.generateHttpHeaders(fileName, extension, this.maxLength);
+        HttpHeaders responseHeaders = HttpUtils.generateHttpHeaders(fileName.toString(), extension, this.maxLength);
 
         return ResponseEntity.ok()
                 .headers(responseHeaders)
@@ -69,60 +71,39 @@ public class ExportUtils {
                 .body(resource);
     }
 
-    public InputStream exportAsInputStream(String fileName, Map<String, String> xmlContent, String xslFile, String xmlPattern, String zip, String objectType, String extension) throws RmesException {
+    public InputStream exportAsInputStream(Path fileName, Map<String, String> xmlContent, String xslFile, String xmlPattern, String zip, String objectType) throws RmesException {
         logger.debug("Begin To export {} as InputStream", objectType);
-
-        File output = null;
-        InputStream odtFileIS = null;
-        InputStream xslFileIS = null;
-        InputStream zipToCompleteIS = null;
-        fileName = fileName.replace(extension, ""); //Remove extension if exists
 
 
         try {
-            xslFileIS = getClass().getResourceAsStream(xslFile);
-            odtFileIS = getClass().getResourceAsStream(xmlPattern);
-            zipToCompleteIS = getClass().getResourceAsStream(zip);
+            Path outputPath = Files.createTempFile(Constants.OUTPUT, FileExtension.XML_EXTENSION.extension());
 
-            // prepare output
-            output = File.createTempFile(Constants.OUTPUT, FilesUtils.getExtension(Constants.XML));
-            output.deleteOnExit();
+            try (
+                    InputStream xslFileIS = getClass().getResourceAsStream(xslFile);
+                    InputStream odtFileIS = getClass().getResourceAsStream(xmlPattern);
+                    InputStream zipToCompleteIS = getClass().getResourceAsStream(zip);
+                    OutputStream osOutputFile = Files.newOutputStream(outputPath);
+                    PrintStream printStream = new PrintStream(osOutputFile)) {
 
-        } catch (IOException ioe) {
-            logger.error(ioe.getMessage());
-        }
+                outputPath.toFile().deleteOnExit();
 
-        try (OutputStream osOutputFile = FileUtils.openOutputStream(output);
-             PrintStream printStream = new PrintStream(osOutputFile);) {
 
-            Path tempDir = Files.createTempDirectory("forExport");
-            Path finalPath = Paths.get(tempDir.toString(), fileName + extension);
+                Path tempDir = Files.createTempDirectory("forExport");
+                Path finalPath = Paths.get(tempDir.toString()).resolve(fileName);
 
-            // transform
-            XsltUtils.xsltTransform(xmlContent, odtFileIS, xslFileIS, printStream, tempDir);
-            // create odt
-            XsltUtils.createOdtFromXml(output, finalPath, zipToCompleteIS, tempDir);
+                // transform
+                XsltUtils.xsltTransform(xmlContent, odtFileIS, xslFileIS, printStream, tempDir);
+                // create odt
+                XsltUtils.createOdtFromXml(outputPath, finalPath, zipToCompleteIS, tempDir);
 
-            logger.debug("End To export {} as InputStream", objectType);
+                logger.debug("End To export {} as InputStream", objectType);
 
-            return Files.newInputStream(finalPath);
+                return Files.newInputStream(finalPath);
+            }
         } catch (IOException | TransformerException e) {
             throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e.getClass().getSimpleName());
-        } finally {
-            try {
-                if (odtFileIS != null)
-                    odtFileIS.close();
-                if (xslFileIS != null)
-                    xslFileIS.close();
-                if (zipToCompleteIS != null)
-                    zipToCompleteIS.close();
-            } catch (IOException ioe) {
-                logger.error(ioe.getMessage());
-            }
         }
     }
-
-
 
 
 }

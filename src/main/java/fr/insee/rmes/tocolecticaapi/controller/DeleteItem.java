@@ -42,12 +42,9 @@ public class DeleteItem {
 
     private final ColecticaService colecticaService;
 
-    private final RestTemplate restTemplate;
-
     @Autowired
-    public DeleteItem(ColecticaService colecticaService, RestTemplate restTemplate) {
+    public DeleteItem(ColecticaService colecticaService) {
         this.colecticaService = colecticaService;
-        this.restTemplate = restTemplate;
     }
 
     @DeleteMapping(value = "/deleteCodeList")

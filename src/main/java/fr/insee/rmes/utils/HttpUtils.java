@@ -13,12 +13,12 @@ public final class HttpUtils {
     private HttpUtils() {
     }
 
-    public static HttpHeaders generateHttpHeaders(String fileName, String extension, int maxLength) {
-        MediaType contentType = FilesUtils.getMediaTypeFromExtension(extension);
+    public static HttpHeaders generateHttpHeaders(String fileName, FileExtension extension, int maxLength) {
+        MediaType contentType = extension.getMediaTypeFromExtension();
 
         ContentDisposition content = ContentDisposition.builder(HttpUtils.ATTACHMENT).filename(
                 FilesUtils.reduceFileNameSize(
-                        FilesUtils.removeAsciiCharacters(fileName), maxLength) + extension
+                        FilesUtils.removeAsciiCharacters(fileName), maxLength)
                 ).build();
 
         List<String> allowHeaders = List.of(CONTENT_DISPOSITION,
