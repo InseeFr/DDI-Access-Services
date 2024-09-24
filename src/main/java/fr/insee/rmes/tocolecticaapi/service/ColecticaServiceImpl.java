@@ -1,6 +1,5 @@
 package fr.insee.rmes.tocolecticaapi.service;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,19 +20,10 @@ import fr.insee.rmes.utils.FilesUtils;
 import fr.insee.rmes.utils.XMLUtils;
 import fr.insee.rmes.utils.export.XDocReport;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -77,14 +67,17 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
-import static fr.insee.rmes.transfoxsl.controller.TransformationController.DEREFERENCE_XSL;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ERROR;
 
 @Service
+@RequiredArgsConstructor
 public class ColecticaServiceImpl implements ColecticaService {
 
     private static final String CONTENT_TYPE = "Content-Type";
@@ -92,8 +85,6 @@ public class ColecticaServiceImpl implements ColecticaService {
     private static final String APPLICATION_JSON = "application/json";
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER = "Bearer ";
-    private static final String HTTP = "http://";
-    private static final String HTTPS = "https://";
     private static final String VERSION = "version";
     private static final String SEARCH = "/_search";
     private static final String APIKEYHEADER = "apiKey ";
@@ -139,44 +130,17 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Value("${fr.insee.rmes.elasticsearch.url}")
     private String  elasticUrl;
 
-    @Value("${fr.insee.rmes.elasticsearch.apiId}")
-    private String apiId;
-
     @Value("${fr.insee.rmes.elasticsearch.apikey}")
     private String apiKey;
 
-    @Autowired
-    public ElasticsearchClient elasticsearchClient;
-    @Autowired
     public  RestTemplate restTemplate;
     @Autowired
-    XDocReport xdr;
+    private final XDocReport xdr;
     @Autowired
-    ExportUtils exportUtils;
-
-    public CloseableHttpClient httpClient;
+    private final ExportUtils exportUtils;
 
     @Autowired
-    private XsltTransformationService xsltTransformationService;
-    public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
-    this.elasticsearchClient=elasticsearchClient;
-    this.restTemplate=restTemplate;
-    }
-    private CloseableHttpClient mockHttpClient;
-    public ColecticaServiceImpl(CloseableHttpClient mockHttpClient,ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
-        this.elasticsearchClient=elasticsearchClient;
-        this.restTemplate=restTemplate;
-        this.mockHttpClient=mockHttpClient;
-    }
-
-    public ColecticaServiceImpl(){
-
-    }
-    @Autowired
-    public ColecticaServiceImpl(CloseableHttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
-
+    private final XsltTransformationService xsltTransformationService;
 
     @Override
     public ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException {
@@ -191,8 +155,8 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     private ResponseEntity<String> searchColecticaFragmentByUuid(String uuid) throws
             ExceptionColecticaUnreachable, IOException {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = getGetSearchColecticaFragmentByUuid(uuid);
+        try (HttpClient httpClient = HttpClient.newHttpClient()) {
+            HttpRequest getRequest = getGetSearchColecticaFragmentByUuid(uuid);
 
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 return getResponseEntitySearchColecticaFragmentByUuid(response);
@@ -207,9 +171,10 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
-    private HttpGet getGetSearchColecticaFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException {
+    private HttpRequest getGetSearchColecticaFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException {
         String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, uuid);
-        HttpGet httpGet = new HttpGet(url);
+        HttpRequest httpGet = HttpRequest.newBuilder().build();
+        httpGet.headers()
         httpGet.addHeader(CONTENT_TYPE, APPLICATION_XML);
         httpGet.addHeader("Accept", APPLICATION_JSON);
 
@@ -1492,7 +1457,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         HashMap<String, String> contentXML = new HashMap<>();
         contentXML.put("ddi-file", Files.readString(ddiRemoveNameSpaces.toPath()));
 
-        return exportUtils.exportAsODT("export.odt", contentXML, dicoCode, xslPatternFile, zipRmes, "dicoVariable");
+        return exportUtils.exportAsODT(Path.of("export.odt"), contentXML, dicoCode, xslPatternFile, zipRmes, "dicoVariable");
     }
 
     public static void transformerStringWithXsl(String ddi,InputStream xslRemoveNameSpaces, File output) throws Exception{
