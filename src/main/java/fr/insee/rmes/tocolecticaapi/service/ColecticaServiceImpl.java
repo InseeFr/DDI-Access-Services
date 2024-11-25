@@ -1,6 +1,5 @@
 package fr.insee.rmes.tocolecticaapi.service;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,25 +17,14 @@ import fr.insee.rmes.tocolecticaapi.randomUUID;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.utils.ExportUtils;
 import fr.insee.rmes.utils.FilesUtils;
-import fr.insee.rmes.utils.XMLUtils;
+import fr.insee.rmes.utils.XsltUtils;
 import fr.insee.rmes.utils.export.XDocReport;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.ExtensionFunction;
 import net.sf.saxon.s9api.Processor;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -45,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -77,14 +65,18 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
-import static fr.insee.rmes.transfoxsl.controller.TransformationController.DEREFERENCE_XSL;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ERROR;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ColecticaServiceImpl implements ColecticaService {
 
     private static final String CONTENT_TYPE = "Content-Type";
@@ -92,8 +84,6 @@ public class ColecticaServiceImpl implements ColecticaService {
     private static final String APPLICATION_JSON = "application/json";
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER = "Bearer ";
-    private static final String HTTP = "http://";
-    private static final String HTTPS = "https://";
     private static final String VERSION = "version";
     private static final String SEARCH = "/_search";
     private static final String APIKEYHEADER = "apiKey ";
@@ -103,7 +93,6 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     private static final String ATTACHMENT = "attachment";
 
-    static final Logger logger = LogManager.getLogger(ColecticaServiceImpl.class);
     public static final String DISALLOW_DOCTYPE_DECL = "http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl";
     public static final String DISALLOW_DOCTYPE_DECL1 = "http://apache.org/xml/features/disallow-doctype-decl";
     public static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
@@ -111,10 +100,8 @@ public class ColecticaServiceImpl implements ColecticaService {
 
 
     @NonNull
-    @Autowired
-    private KeycloakServices kc;
+    private final KeycloakServices kc;
 
-    private String token;
     @Value("${auth.api.url}")
     private String authApiUrl;
 
@@ -139,44 +126,17 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Value("${fr.insee.rmes.elasticsearch.url}")
     private String  elasticUrl;
 
-    @Value("${fr.insee.rmes.elasticsearch.apiId}")
-    private String apiId;
-
     @Value("${fr.insee.rmes.elasticsearch.apikey}")
     private String apiKey;
 
-    @Autowired
-    public ElasticsearchClient elasticsearchClient;
-    @Autowired
     public  RestTemplate restTemplate;
     @Autowired
-    XDocReport xdr;
+    private final XDocReport xdr;
     @Autowired
-    ExportUtils exportUtils;
-
-    public CloseableHttpClient httpClient;
+    private final ExportUtils exportUtils;
 
     @Autowired
-    private XsltTransformationService xsltTransformationService;
-    public ColecticaServiceImpl(ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
-    this.elasticsearchClient=elasticsearchClient;
-    this.restTemplate=restTemplate;
-    }
-    private CloseableHttpClient mockHttpClient;
-    public ColecticaServiceImpl(CloseableHttpClient mockHttpClient,ElasticsearchClient elasticsearchClient, RestTemplate restTemplate) {
-        this.elasticsearchClient=elasticsearchClient;
-        this.restTemplate=restTemplate;
-        this.mockHttpClient=mockHttpClient;
-    }
-
-    public ColecticaServiceImpl(){
-
-    }
-    @Autowired
-    public ColecticaServiceImpl(CloseableHttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
-
+    private final XsltTransformationService xsltTransformationService;
 
     @Override
     public ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException {
@@ -191,13 +151,12 @@ public class ColecticaServiceImpl implements ColecticaService {
 
     private ResponseEntity<String> searchColecticaFragmentByUuid(String uuid) throws
             ExceptionColecticaUnreachable, IOException {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = getGetSearchColecticaFragmentByUuid(uuid);
+        try (HttpClient httpClient = HttpClient.newHttpClient()) {
+            HttpRequest getRequest = getGetSearchColecticaFragmentByUuid(uuid);
 
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 return getResponseEntitySearchColecticaFragmentByUuid(response);
             } catch (IOException e) {
-
                 throw new IOException("Erreur IO lors de la récupération des données pour UUID: " + uuid, e);
             }
         } catch (ExceptionColecticaUnreachable e) {
@@ -207,21 +166,22 @@ public class ColecticaServiceImpl implements ColecticaService {
         }
     }
 
-    private HttpGet getGetSearchColecticaFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException {
+    private HttpRequest getGetSearchColecticaFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException {
         String url = String.format("%s/api/v1/item/%s/%s", serviceUrl, agency, uuid);
-        HttpGet httpGet = new HttpGet(url);
+        HttpRequest httpGet = HttpRequest.newBuilder().build();
+        httpGet.headers()
         httpGet.addHeader(CONTENT_TYPE, APPLICATION_XML);
         httpGet.addHeader("Accept", APPLICATION_JSON);
 
-        String authToken;
-        if (!serviceUrl.contains("kube")) {
-            authToken = getFreshToken();
-        } else {
-            String token2 = getAuthToken();
-            authToken = extractAccessToken(token2);
-        }
-        httpGet.setHeader(AUTHORIZATION, BEARER + authToken);
+        httpGet.setHeader(AUTHORIZATION, BEARER + resolveBearerToken());
         return httpGet;
+    }
+
+    private String resolveBearerToken() throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException {
+        if (serviceUrl.contains("kube")) {
+            return extractAccessToken(getAuthToken());
+        }
+        return kc.getFreshToken();
     }
 
     protected static ResponseEntity<String> getResponseEntitySearchColecticaFragmentByUuid(CloseableHttpResponse response) throws IOException {
@@ -393,7 +353,7 @@ public class ColecticaServiceImpl implements ColecticaService {
                 }
             } else {
                 String message = "Erreur ou élément non trouvé pour UUID:" + uuid;
-                logger.log( Level.ERROR,message);
+                log.log( Level.ERROR,message);
             }
         }
 
@@ -436,7 +396,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             return fragmentData;
         } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
             // Log the exception
-            logger.error("Error extracting data from fragment XML: {}", e.getMessage());
+            log.error("Error extracting data from fragment XML: {}", e.getMessage());
 
             // Return an appropriate response to the client
             return new JSONObject();
@@ -505,7 +465,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody =  responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
-            logger.info("Réponse filtrée avec succès pour searchTexte");
+            log.info("Réponse filtrée avec succès pour searchTexte");
             return ResponseEntity.ok(filteredResponse);
         } else {
             return responseEntity;
@@ -518,7 +478,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody =  responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
-            logger.info("Réponse filtrée avec succès pour searchByType");
+            log.info("Réponse filtrée avec succès pour searchByType");
             return ResponseEntity.ok(filteredResponse);
         } else {
             return responseEntity;
@@ -531,7 +491,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
              String responseBody = responseEntity.getBody();
             String filteredResponse = filterAndTransformResponse(responseBody);
-            logger.info("Réponse filtrée avec succès pour searchTexteByType");
+            log.info("Réponse filtrée avec succès pour searchTexteByType");
             return ResponseEntity.ok(filteredResponse);
         } else {
             return responseEntity;
@@ -677,14 +637,8 @@ public class ColecticaServiceImpl implements ColecticaService {
     public ResponseEntity<List<Map<String,String>>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception {
         String apiUrl = serviceUrl+"/api/v1/jsonset/fr.insee/" + identifier;
 
-        if (!serviceUrl.contains("kube")){
-            token = getFreshToken();
-        } else {
-            String token2 = getAuthToken();
-            token = extractAccessToken(token2);
-        }
         HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, BEARER + token);
+        headers.set(AUTHORIZATION, BEARER + resolveBearerToken());
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         try {
@@ -722,12 +676,6 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         String apiUrl = serviceUrl + "/api/v1/jsonset/fr.insee/" + uuid;
 
-        if (!serviceUrl.contains("kube")) {
-            token = getFreshToken();
-        } else {
-            String token2 = getAuthToken();
-            token = extractAccessToken(token2);
-        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, BEARER + token);
@@ -750,7 +698,7 @@ public class ColecticaServiceImpl implements ColecticaService {
                 result = mapperFinal.writeValueAsString(countriesWithCodesAndLabels);
             } catch (RestClientException e) {
                 // Log the exception
-                logger.error("Error while calling the REST API: {}", e.getMessage());
+                log.error("Error while calling the REST API: {}", e.getMessage());
                 // Rethrow the exception or handle it appropriately
                 throw new ExceptionColecticaUnreachable("Error while calling the REST API", e);
             }
@@ -862,12 +810,6 @@ public class ColecticaServiceImpl implements ColecticaService {
     @Override
     public ResponseEntity<String> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable, ParseException {
 
-        if (!serviceUrl.contains("kube")){
-            token = getFreshToken();
-        } else {
-            String token2 = getAuthToken();
-            token = extractAccessToken(token2);
-        }
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, BEARER + token);
 
@@ -895,13 +837,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         try {
             RestTemplate restTemplate=new RestTemplate();
             String initTransactionUrl = serviceUrl + "/api/v1/transaction";
-            String authentToken;
-            if (serviceUrl.contains("kube")) {
-                String token2 = getAuthToken();
-                authentToken = extractAccessToken(token2);
-            } else {
-                authentToken = getFreshToken();
-            }
+            String authentToken=resolveBearerToken();
 
             HttpHeaders initTransactionHeaders = new HttpHeaders();
             initTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -1026,7 +962,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             String resultFileName2 = UUID.randomUUID().toString() + ".json";
 
             MultipartFile outputFile = processFile(file);
-            logger.log( Level.ERROR,"Le fichier a été modifié avec succès (ajout balise data) !");
+            log.log( Level.ERROR,"Le fichier a été modifié avec succès (ajout balise data) !");
 
             InputStream xsltStream1 = getClass().getResourceAsStream("/jsontoDDIXML.xsl");
             String xmlContent = transformToXml(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, timbre,version);
@@ -1064,7 +1000,7 @@ public class ColecticaServiceImpl implements ColecticaService {
             String resultFileName2 = UUID.randomUUID() + ".json";
 
             MultipartFile outputFile = processFile(file);
-            logger.log(Level.getLevel(ERROR),"Le fichier a été modifié avec succès (ajout balise data) !");
+            log.log(Level.getLevel(ERROR),"Le fichier a été modifié avec succès (ajout balise data) !");
 
             InputStream xsltStream1 = getClass().getResourceAsStream("/jsonToDdiXmlForComplexList.xsl");
             String xmlContent = transformToXmlForComplexList(outputFile, xsltStream1, idValue, nomenclatureName, suggesterDescription, timbre,version,principale,secondaire,labelSecondaire);
@@ -1280,19 +1216,20 @@ public class ColecticaServiceImpl implements ColecticaService {
             throw new RmesExceptionIO(401, "Impossible d'obtenir le token d'authentification.", "toto");
         }
     }
-    public static String extractAccessToken(String token) throws ParseException {
+
+    private static String extractAccessToken(String token) throws ParseException {
         try {
             JSONParser parser = new JSONParser();
             JSONObject json = (JSONObject) parser.parse(token);
             return (String) json.get("access_token");
         } catch (ParseException e) {
             // Log the exception
-            logger.error("Error parsing JSON token: {}", e.getMessage());
+            log.error("Error parsing JSON token: {}", e.getMessage());
             // Rethrow the exception
             throw e;
         } catch (ClassCastException e) {
             // Log the exception
-            logger.error("Error casting JSON token: {}", e.getMessage());
+            log.error("Error casting JSON token: {}", e.getMessage());
             // Convert the exception to a ParseException
             throw new ParseException(ParseException.ERROR_UNEXPECTED_TOKEN, e);
         }
@@ -1302,14 +1239,7 @@ public class ColecticaServiceImpl implements ColecticaService {
     public String sendDeleteColectica(String uuid, TransactionType transactionType) throws JsonProcessingException, ExceptionColecticaUnreachable, RmesExceptionIO, ParseException {
         RestTemplate restTemplate = new RestTemplate();
         String initTransactionUrl = serviceUrl + "/api/v1/transaction";
-        String authentToken;
-
-        if (serviceUrl.contains("kube")) {
-            String token2 = getAuthToken();
-            authentToken = extractAccessToken(token2);
-        } else {
-            authentToken = getFreshToken();
-        }
+        String authentToken = resolveBearerToken();
 
         HttpHeaders initTransactionHeaders = new HttpHeaders();
         initTransactionHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -1453,11 +1383,11 @@ public class ColecticaServiceImpl implements ColecticaService {
 
         File ddiRemoveNameSpaces = File.createTempFile("ddiRemoveNameSpaces", ".xml");
         ddiRemoveNameSpaces.deleteOnExit();
-        transformerStringWithXsl(ddi, xslRemoveNameSpaces, ddiRemoveNameSpaces);
+        XsltUtils.transformerStringWithXsl(ddi, xslRemoveNameSpaces, ddiRemoveNameSpaces);
 
         File control = File.createTempFile("control", ".xml");
         control.deleteOnExit();
-        transformerFileWithXsl(ddiRemoveNameSpaces, xslCheckReference, control);
+        XsltUtils.transformerFileWithXsl(ddiRemoveNameSpaces, xslCheckReference, control);
 
         // Créer un DocumentBuilderFactory sécurisé
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1492,23 +1422,7 @@ public class ColecticaServiceImpl implements ColecticaService {
         HashMap<String, String> contentXML = new HashMap<>();
         contentXML.put("ddi-file", Files.readString(ddiRemoveNameSpaces.toPath()));
 
-        return exportUtils.exportAsODT("export.odt", contentXML, dicoCode, xslPatternFile, zipRmes, "dicoVariable");
-    }
-
-    public static void transformerStringWithXsl(String ddi,InputStream xslRemoveNameSpaces, File output) throws Exception{
-        Source stylesheetSource = new StreamSource(xslRemoveNameSpaces);
-        Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
-        Source inputSource = new StreamSource(new StringReader(ddi));
-        Result outputResult = new StreamResult(output);
-        transformer.transform(inputSource, outputResult);
-    }
-
-    public static void transformerFileWithXsl(File input,InputStream xslCheckReference, File output) throws Exception {
-        Source stylesheetSource = new StreamSource(xslCheckReference);
-        Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
-        Source inputSource = new StreamSource(input);
-        Result outputResult = new StreamResult(output);
-        transformer.transform(inputSource, outputResult);
+        return exportUtils.exportAsODT(Path.of("export.odt"), contentXML, dicoCode, xslPatternFile, zipRmes, "dicoVariable");
     }
 
 
@@ -1519,12 +1433,12 @@ public class ColecticaServiceImpl implements ColecticaService {
         InputStream xslRemoveNameSpaces = getClass().getResourceAsStream("/xslTransformerFiles/remove-namespaces.xsl");
         File ddiRemoveNameSpaces = File.createTempFile("ddiRemoveNameSpaces", ".xml");
         ddiRemoveNameSpaces.deleteOnExit();
-        transformerInputStreamWithXsl(codeBook,xslRemoveNameSpaces,ddiRemoveNameSpaces);
+        XsltUtils.transformerInputStreamWithXsl(codeBook,xslRemoveNameSpaces,ddiRemoveNameSpaces);
 
         InputStream xslCodeBookCheck = getClass().getResourceAsStream("/xslTransformerFiles/dico-codes-test-ddi-content.xsl");
         File codeBookCheck = File.createTempFile("codeBookCheck", ".xml");
         codeBookCheck.deleteOnExit();
-        transformerFileWithXsl(ddiRemoveNameSpaces,xslCodeBookCheck,codeBookCheck);
+        XsltUtils.transformerFileWithXsl(ddiRemoveNameSpaces,xslCodeBookCheck,codeBookCheck);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + codeBookCheck.getName());
@@ -1544,24 +1458,5 @@ public class ColecticaServiceImpl implements ColecticaService {
                 .body(resourceByte);
     }
 
-
-    public static void transformerInputStreamWithXsl(InputStream input,InputStream xslCheckReference, File output) throws Exception {
-        Source stylesheetSource = new StreamSource(xslCheckReference);
-        Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
-        Source inputSource = new StreamSource(input);
-        Result outputResult = new StreamResult(output);
-        transformer.transform(inputSource, outputResult);
-    }
-    public String getFreshToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
-        if ( ! kc.isTokenValid(token)) {
-            token = getToken();
-        }
-        return token;
-    }
-
-    public String getToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
-        return kc.getKeycloakAccessToken();
-
-    }
 
 }

@@ -54,6 +54,8 @@ public class KeycloakServices {
     @Value("${auth.password}")
     private String password;
     private static final Logger logger = LoggerFactory.getLogger(KeycloakServices.class);
+    private String token;
+
     /**
      * Permet de récuperer un jeton keycloak
      * @return jeton
@@ -147,5 +149,17 @@ public class KeycloakServices {
             logger.error("Erreur lors de l'extraction de l'access token : {}", e.getMessage(), e);
         }
         return null;
+    }
+
+    public String getFreshToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
+        if ( ! this.isTokenValid(this.token)) {
+            token = getToken();
+        }
+        return token;
+    }
+
+    private String getToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
+        return this.getKeycloakAccessToken();
+
     }
 }

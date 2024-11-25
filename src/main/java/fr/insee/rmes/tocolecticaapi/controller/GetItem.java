@@ -2,20 +2,19 @@ package fr.insee.rmes.tocolecticaapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
-import fr.insee.rmes.model.DDIItemType;
-import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.exceptions.RmesExceptionIO;
+import fr.insee.rmes.model.DDIItemType;
+import fr.insee.rmes.tocolecticaapi.fragments.DdiFragment;
+import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,18 +28,15 @@ import java.nio.charset.StandardCharsets;
 @RestController
 @RequestMapping("/Item")
 @Tag(name= "DEMO-Colectica",description = "Services for upgrade Colectica-API")
+@Slf4j
+@RequiredArgsConstructor
 public class GetItem {
-    static final Logger logger = LogManager.getLogger(GetItem.class);
-    @Autowired
+
     private final ColecticaService colecticaService;
+    private final DdiFragment ddiFragment;
 
-    public GetItem(ColecticaService colecticaService) {
-        this.colecticaService = colecticaService;
-    }
-
-    @GetMapping("fragmentInstance/uuid")
+    @GetMapping(value = "fragmentInstance/uuid", produces = MediaType.APPLICATION_XML_VALUE)
     @Operation(summary = "Get FragmentInstance by uuid", description = "Get an XML document for a Fragment:Instance from Colectica repository.")
-    @Produces(MediaType.APPLICATION_XML)
     public ResponseEntity<String> findInstanceByUuidColectica(
             @Parameter(
                     description = "id de l'objet colectica sous la forme uuid/version",
@@ -48,12 +44,20 @@ public class GetItem {
                     schema = @Schema(
                             type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RmesExceptionIO, ParseException {
         return colecticaService.findInstanceByUuid(uuid);
-
     }
 
-    @GetMapping("ddiFragment/uuid")
+    @GetMapping(value = "ddiFragment/{uuid}/dataRelationship", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Fournir une représentationn JSON de l'objet dataRelationShip du DDI Fragment dont l'uuid est en paramètre")
+    public ResponseEntity<String> extractDataRelationshipFromFragment(@Parameter(
+            description = "id du fragment DDI sous la forme uuid",
+            required = true,
+            schema = @Schema(type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))
+            @PathVariable String uuid){
+        return ResponseEntity.ok(this.ddiFragment.extractDataRelationship(uuid));
+    }
+
+    @GetMapping(value = "ddiFragment/uuid", produces = MediaType.APPLICATION_XML_VALUE)
     @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
-    @Produces(MediaType.APPLICATION_XML)
     public ResponseEntity<String> findFragmentByUuidColectica(
             @Parameter(
                     description = "id de l'objet colectica sous la forme uuid/version",
@@ -64,9 +68,8 @@ public class GetItem {
 
     }
 
-    @GetMapping("FragmentInstance/uuid/withChildren")
+    @GetMapping(value = "FragmentInstance/uuid/withChildren", produces = MediaType.APPLICATION_XML_VALUE)
     @Operation(summary = "Get Fragments by uuid", description = "Get an XML document for a Fragment:Instance from Colectica repository.")
-    @Produces(MediaType.APPLICATION_XML)
     public String findFragmentByUuidWithChildrenColectica(
             @Parameter(
                     description = "id de l'objet colectica sous la forme uuid/version",
@@ -146,8 +149,7 @@ public class GetItem {
 
 
 
-    @GetMapping("suggesters/jsonWithChild")
-    @Produces(MediaType.APPLICATION_JSON)
+    @GetMapping(value = "suggesters/jsonWithChild", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get JSON for Suggester/codelist simple (id,label)", description = "Get a JSON document for suggester or codelist from Colectica repository including an item with childs.")
        public Object getJsonWithChild(
             @Parameter(

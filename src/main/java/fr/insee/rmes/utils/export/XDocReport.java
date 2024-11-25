@@ -8,9 +8,9 @@ import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import freemarker.ext.dom.NodeModel;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -57,7 +57,7 @@ public record XDocReport(VarBookExportBuilder varBookExport) {
 			xml = NodeModel.parse( projectInputSource );
 			context = report.createContext();
 		} catch (SAXException | IOException | ParserConfigurationException | XDocReportException e) {
-			throw new RmesException(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage(), e.getClass()+" - Can't put xml in XdocReport context");
+			throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e.getClass()+" - Can't put xml in XdocReport context");
 		}
 		context.put("racine", xml);
 		return context;

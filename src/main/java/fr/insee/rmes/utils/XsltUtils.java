@@ -1,20 +1,19 @@
 package fr.insee.rmes.utils;
 
-import fr.insee.rmes.tocolecticaapi.service.Constants;
 import fr.insee.rmes.exceptions.RmesException;
+import fr.insee.rmes.tocolecticaapi.service.Constants;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Map;
@@ -51,7 +50,7 @@ public class XsltUtils {
 	private static void addParameter(Transformer xsltTransformer, String paramName, String paramData, Path tempDir) throws RmesException {
 		CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
 		try {
-			Path tempFile = Files.createTempFile(tempDir, paramName, FilesUtils.XML_EXTENSION);
+			Path tempFile = Files.createTempFile(tempDir, paramName, FileExtension.XML_EXTENSION.extension());
 			String absolutePath = tempFile.toFile().getAbsolutePath();
 			InputStream is = IOUtils.toInputStream(paramData, StandardCharsets.UTF_8);
 			Files.copy(is, tempFile, options);
@@ -61,17 +60,17 @@ public class XsltUtils {
 			logger.debug("Setting XSLT parameter '{}' to '{}'", paramName, fileUri);
 			xsltTransformer.setParameter(paramName, fileUri);
 		} catch (IOException e) {
-			throw new RmesException(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage(), "IOException - Can't create temp files for XSLT Transformer");
+			throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "IOException - Can't create temp files for XSLT Transformer");
 		}
 	}
 	
-	public static void createOdtFromXml(File output, Path finalPath, InputStream zipToCompleteIS, Path tempDir)
+	public static void createOdtFromXml(Path outputPath, Path finalPath, InputStream zipToCompleteIS, Path tempDir)
 			throws IOException {
 		Path contentPath = Paths.get(tempDir.toString() + "/content.xml");
-		Files.copy(Paths.get(output.getAbsolutePath()), contentPath, StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(outputPath, contentPath, StandardCopyOption.REPLACE_EXISTING);
 		Path zipPath = Paths.get(tempDir.toString() + "/export.zip");
 		Files.copy(zipToCompleteIS, zipPath, StandardCopyOption.REPLACE_EXISTING);
-		FilesUtils.addFileToZipFolder(contentPath.toFile(), zipPath.toFile());
+		FilesUtils.addFileToZipFolder(contentPath, zipPath);
 		Files.copy(zipPath, finalPath, StandardCopyOption.REPLACE_EXISTING);
 	}
 	
@@ -100,4 +99,27 @@ public class XsltUtils {
 		return XMLUtils.encodeXml(parametersXML);
 	}
 
+    public static void transformerInputStreamWithXsl(InputStream input,InputStream xslCheckReference, File output) throws Exception {
+        Source stylesheetSource = new StreamSource(xslCheckReference);
+        Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
+        Source inputSource = new StreamSource(input);
+        Result outputResult = new StreamResult(output);
+        transformer.transform(inputSource, outputResult);
+    }
+
+	public static void transformerStringWithXsl(String ddi,InputStream xslRemoveNameSpaces, File output) throws Exception{
+		Source stylesheetSource = new StreamSource(xslRemoveNameSpaces);
+		Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
+		Source inputSource = new StreamSource(new StringReader(ddi));
+		Result outputResult = new StreamResult(output);
+		transformer.transform(inputSource, outputResult);
+	}
+
+	public static void transformerFileWithXsl(File input, InputStream xslCheckReference, File output) throws Exception {
+		Source stylesheetSource = new StreamSource(xslCheckReference);
+		Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
+		Source inputSource = new StreamSource(input);
+		Result outputResult = new StreamResult(output);
+		transformer.transform(inputSource, outputResult);
+	}
 }
