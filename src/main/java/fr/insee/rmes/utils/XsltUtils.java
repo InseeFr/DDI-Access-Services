@@ -7,13 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Map;
@@ -99,4 +99,27 @@ public class XsltUtils {
 		return XMLUtils.encodeXml(parametersXML);
 	}
 
+    public static void transformerInputStreamWithXsl(InputStream input,InputStream xslCheckReference, File output) throws Exception {
+        Source stylesheetSource = new StreamSource(xslCheckReference);
+        Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
+        Source inputSource = new StreamSource(input);
+        Result outputResult = new StreamResult(output);
+        transformer.transform(inputSource, outputResult);
+    }
+
+	public static void transformerStringWithXsl(String ddi,InputStream xslRemoveNameSpaces, File output) throws Exception{
+		Source stylesheetSource = new StreamSource(xslRemoveNameSpaces);
+		Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
+		Source inputSource = new StreamSource(new StringReader(ddi));
+		Result outputResult = new StreamResult(output);
+		transformer.transform(inputSource, outputResult);
+	}
+
+	public static void transformerFileWithXsl(File input, InputStream xslCheckReference, File output) throws Exception {
+		Source stylesheetSource = new StreamSource(xslCheckReference);
+		Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
+		Source inputSource = new StreamSource(input);
+		Result outputResult = new StreamResult(output);
+		transformer.transform(inputSource, outputResult);
+	}
 }
