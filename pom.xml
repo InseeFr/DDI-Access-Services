@@ -25,6 +25,10 @@
         <json-simple.version>1.1.1</json-simple.version>
         <commons-io.version>2.17.0</commons-io.version>
         <io.swagger.version>1.6.14</io.swagger.version>
+
+        <sonar.organization>inseefr</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.projectKey>InseeFr_DDI-Access-Services</sonar.projectKey>
     </properties>
     <dependencies>
 
