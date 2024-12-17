@@ -25,7 +25,7 @@
         <json-simple.version>1.1.1</json-simple.version>
         <commons-io.version>2.17.0</commons-io.version>
         <io.swagger.version>1.6.14</io.swagger.version>
-
+        <jacoco.version>0.8.12</jacoco.version>
         <sonar.organization>inseefr</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>InseeFr_DDI-Access-Services</sonar.projectKey>
@@ -183,6 +183,28 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <!-- Prepare the property pointing to the JaCoCo runtime agent which is
+                         passed as VM argument when the Maven Surefire plugin is executed. -->
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
