@@ -10,12 +10,15 @@ import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer;
 import fr.insee.rmes.transfoxsl.service.internal.DDITransformerToVtl;
 import fr.insee.rmes.transfoxsl.utils.MultipartFileUtils;
+import fr.insee.rmes.utils.FileExtension;
+import fr.insee.rmes.utils.export.XDocReport;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
+import static fr.insee.rmes.tocolecticaapi.controller.ControllerUtils.xmltoResponseEntity;
 import static fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer.DEREFERENCE_XSL;
 
 @Controller
@@ -44,14 +48,17 @@ public class TransformationController {
 
     public static final String FAILED_TO_PROCESS_THE_INPUT_FILE = "Failed to process the input file";
     public static final String TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING = "Transformation failed during the XSLT processing";
+    public static final MediaType APPLICATION_ODT = MediaType.valueOf("application/vnd.oasis.opendocument.text");
     public static final String REL_TO_JSON_XSL = "dataRelToJson.xsl";
     private final XsltTransformationService xsltTransformationService;
     private final MultipartFileUtils multipartFileUtils;
+    private final XDocReport xDocReport;
 
     @Autowired
-    public TransformationController(XsltTransformationService xsltTransformationService, MultipartFileUtils multipartFileUtils) {
+    public TransformationController(XsltTransformationService xsltTransformationService, MultipartFileUtils multipartFileUtils, XDocReport xDocReport) {
         this.xsltTransformationService = xsltTransformationService;
         this.multipartFileUtils = multipartFileUtils;
+        this.xDocReport = xDocReport;
     }
 
     @Operation(summary = "Déréférencer un objet DDI")
@@ -231,6 +238,101 @@ public class TransformationController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(xsltTransformationService.transformFileForComplexList(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre, principale, secondaire, labelSecondaire);
+    }
+
+
+    @GetMapping(value = "/transform/ddi-to-codebook",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"},
+            produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"}
+    )
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
+    @Operation(operationId = "getCodeBook", summary = "Produce a codebook from a DDI")
+
+    public ResponseEntity<Resource> ddiToCodeBook(
+
+            @Parameter(schema = @Schema(type = "string", format = "String", description = "Accept"))
+            @RequestHeader(required = false) String accept,
+
+            @Parameter(schema = @Schema(type = "string", format = "binary", description = "file in DDI"))
+            @RequestParam(value = "ddiFile") MultipartFile ddiFile, // InputStream isDDI,
+
+            @Parameter(schema = @Schema(type = "string", format = "binary", description = "file for structure"))
+            @RequestParam(value = "codeBookFile") MultipartFile codeBookFile //InputStream isCodeBook
+
+    )
+            throws RmesException {
+        log.info("Generate CodeBook from DDI {}, {}", ddiFile.getOriginalFilename(), codeBookFile.getOriginalFilename());
+        try {
+            String ddi = new String(ddiFile.getBytes(), StandardCharsets.UTF_8);
+            Resource response = new ByteArrayResource(xDocReport.exportVariableBookInOdt(ddi, codeBookFile.getBytes()));
+            log.debug("Codebook is generated");
+            return xmltoResponseEntity(response, "Codebook" + FileExtension.forHeader(accept).extension(), APPLICATION_ODT);
+        } catch (IOException e) {
+            throw new RmesException(HttpStatus.BAD_REQUEST, e.getMessage(), "Files can't be read");
+        }
+    }
+
+
+    @GetMapping(value = "/transform/ddi-to-codebook/V2",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"}
+    )
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
+    @Operation(operationId = "getCodeBookV2", summary = "Produce a codebook from a DDI")
+    public ResponseEntity<?> getCodeBookV2(
+            @Parameter(schema = @Schema(type = "string", allowableValues = {"concis", "concis avec expression", "scindable", "non scindable"}))
+            @RequestParam(value = "dicoVar") String isCodeBook, //InputStream isCodeBook,
+            @RequestParam(value = "ddiFile") MultipartFile ddiFile // InputStream isDDI,
+    ) throws Exception {
+
+        String ddi = new String(ddiFile.getBytes(), StandardCharsets.UTF_8);
+        String xslPatternFile = null;
+        switch (isCodeBook) {
+            case "concis":
+                String xmlFileConcis = "/xslTransformerFiles/dicoCodes/dicoConcisPatternContent.xml";
+                xslPatternFile = xmlFileConcis;
+                break;
+            case "concis avec expression":
+                String xmlFileConcisAvecExpression = "/xslTransformerFiles/dicoCodes/dicoConcisDescrPatternContent.xml";
+                xslPatternFile = xmlFileConcisAvecExpression;
+                break;
+            case "scindable":
+                String xmlFileScindable = "/xslTransformerFiles/dicoCodes/dicoScindablePatternContent.xml";
+                xslPatternFile = xmlFileScindable;
+                break;
+            case "non scindable":
+                String xmlFileNonScindable = "/xslTransformerFiles/dicoCodes/dicoNonScindablePatternContent.xml";
+                xslPatternFile = xmlFileNonScindable;
+                break;
+            default:
+                log.error("Choix incorrect");
+                break;
+        }
+
+        return xDocReport.getCodeBookExportV2(ddi, xslPatternFile);
+    }
+
+    @GetMapping(value = "/check/is-codebook",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"},
+            produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"}
+    )
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
+    @Operation(operationId = "getCodeBookCheck", summary = "Check the DDI before made the codebook export")
+    public ResponseEntity<?> getCodeBookCheck(
+            @RequestParam(value = "ddiFile") MultipartFile ddiFile)throws Exception {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + codeBookCheck.getName());
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+
+        return xDocReport.getCodeBookCheck(ddiFile.getBytes());
+        ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(codeBookCheck.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resourceByte);
     }
 
 }

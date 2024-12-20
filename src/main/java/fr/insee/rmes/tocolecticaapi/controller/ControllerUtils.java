@@ -11,7 +11,7 @@ import java.io.IOException;
 public class ControllerUtils {
     private ControllerUtils() {}
 
-    static ResponseEntity<Resource> xmltoResponseEntity(Resource response, String fileNameWithExtension, MediaType contentType) throws IOException {
+    public static ResponseEntity<Resource> xmltoResponseEntity(Resource response, String fileNameWithExtension, MediaType contentType) throws IOException {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(fileNameWithExtension).build().toString())
                 .contentLength(response.contentLength())
@@ -19,7 +19,7 @@ public class ControllerUtils {
                 .body(response);
     }
 
-    static ResponseEntity<String> xmltoResponseEntity(String xmlContent) {
+    public static ResponseEntity<String> xmltoResponseEntity(String xmlContent) {
         return ResponseEntity.ok(xmlContent.replace("\\\"", "\"").replace("ï»¿", ""));
     }
 

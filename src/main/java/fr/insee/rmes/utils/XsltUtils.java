@@ -1,7 +1,6 @@
 package fr.insee.rmes.utils;
 
 import fr.insee.rmes.exceptions.RmesException;
-import fr.insee.rmes.tocolecticaapi.service.Constants;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ public class XsltUtils {
 			PrintStream printStream, Path tempDir) throws TransformerException {
 		// prepare transformer
 		StreamSource xsrc = new StreamSource(xslFileIS);
-		Transformer xsltTransformer = XMLUtils.getTransformerFactory().newTransformer(xsrc);
+		Transformer xsltTransformer = XMLUtils.newTransformer(xsrc);
 
 		// Pass parameters in a file to the transformer
 		xmlContent.forEach((paramName, xmlData) -> {
@@ -51,7 +50,6 @@ public class XsltUtils {
 		CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
 		try {
 			Path tempFile = Files.createTempFile(tempDir, paramName, FileExtension.XML_EXTENSION.extension());
-			String absolutePath = tempFile.toFile().getAbsolutePath();
 			InputStream is = IOUtils.toInputStream(paramData, StandardCharsets.UTF_8);
 			Files.copy(is, tempFile, options);
 
@@ -66,60 +64,30 @@ public class XsltUtils {
 	
 	public static void createOdtFromXml(Path outputPath, Path finalPath, InputStream zipToCompleteIS, Path tempDir)
 			throws IOException {
-		Path contentPath = Paths.get(tempDir.toString() + "/content.xml");
+		Path contentPath = Paths.get(tempDir + "/content.xml");
 		Files.copy(outputPath, contentPath, StandardCopyOption.REPLACE_EXISTING);
-		Path zipPath = Paths.get(tempDir.toString() + "/export.zip");
+		Path zipPath = Paths.get(tempDir + "/export.zip");
 		Files.copy(zipToCompleteIS, zipPath, StandardCopyOption.REPLACE_EXISTING);
 		FilesUtils.addFileToZipFolder(contentPath, zipPath);
 		Files.copy(zipPath, finalPath, StandardCopyOption.REPLACE_EXISTING);
 	}
-	
-	public static String buildParams(Boolean lg1, Boolean lg2, Boolean includeEmptyFields, String targetType) {
-		String includeEmptyFieldsString = (Boolean.TRUE.equals(includeEmptyFields) ? "true" : "false");
-		String parametersXML = "";
 
-		parametersXML = parametersXML.concat(Constants.XML_OPEN_PARAMETERS_TAG);
-
-		parametersXML = parametersXML.concat(Constants.XML_OPEN_LANGUAGES_TAG);
-		if (Boolean.TRUE.equals(lg1))
-			parametersXML = parametersXML.concat("<language id=\"Fr\">1</language>");
-		if (Boolean.TRUE.equals(lg2))
-			parametersXML = parametersXML.concat("<language id=\"En\">2</language>");
-		parametersXML = parametersXML.concat(Constants.XML_END_LANGUAGES_TAG);
-
-		parametersXML = parametersXML.concat(Constants.XML_OPEN_INCLUDE_EMPTY_FIELDS_TAG);
-		parametersXML = parametersXML.concat(includeEmptyFieldsString);
-		parametersXML = parametersXML.concat(Constants.XML_END_INCLUDE_EMPTY_FIELDS_TAG);
-
-		parametersXML = parametersXML.concat(Constants.XML_OPEN_TARGET_TYPE_TAG);
-		parametersXML = parametersXML.concat(targetType);
-		parametersXML = parametersXML.concat(Constants.XML_END_TARGET_TYPE_TAG);
-
-		parametersXML = parametersXML.concat(Constants.XML_END_PARAMETERS_TAG);
-		return XMLUtils.encodeXml(parametersXML);
-	}
-
-    public static void transformerInputStreamWithXsl(InputStream input,InputStream xslCheckReference, File output) throws Exception {
-        Source stylesheetSource = new StreamSource(xslCheckReference);
-        Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
-        Source inputSource = new StreamSource(input);
-        Result outputResult = new StreamResult(output);
-        transformer.transform(inputSource, outputResult);
+	public static byte[] transformerInputStreamWithXsl(byte[] input,InputStream xslCheckReference) throws TransformerException {
+		return doTransform(new StreamSource(xslCheckReference),new StreamSource(new ByteArrayInputStream(input)) );
     }
 
-	public static void transformerStringWithXsl(String ddi,InputStream xslRemoveNameSpaces, File output) throws Exception{
-		Source stylesheetSource = new StreamSource(xslRemoveNameSpaces);
-		Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
-		Source inputSource = new StreamSource(new StringReader(ddi));
-		Result outputResult = new StreamResult(output);
-		transformer.transform(inputSource, outputResult);
+	public static byte[] transformerStringWithXsl(String ddi, InputStream xslRemoveNameSpaces) throws TransformerException {
+		  return doTransform(new StreamSource(xslRemoveNameSpaces), new StreamSource(new StringReader(ddi)));
 	}
 
-	public static void transformerFileWithXsl(File input, InputStream xslCheckReference, File output) throws Exception {
-		Source stylesheetSource = new StreamSource(xslCheckReference);
-		Transformer transformer = XMLUtils.getTransformerFactory().newTransformer(stylesheetSource);
-		Source inputSource = new StreamSource(input);
-		Result outputResult = new StreamResult(output);
-		transformer.transform(inputSource, outputResult);
+	public static byte[] transformerFileWithXsl(File input, InputStream xslCheckReference) throws TransformerException {
+        return doTransform(new StreamSource(xslCheckReference), new StreamSource(input));
+	}
+
+	private static byte[] doTransform(Source stylesheetSource, Source inputSource) throws TransformerException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		Result outputResult = new StreamResult(baos);
+		XMLUtils.newTransformer(stylesheetSource).transform(inputSource, outputResult);
+		return baos.toByteArray();
 	}
 }

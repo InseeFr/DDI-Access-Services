@@ -3,11 +3,14 @@ package fr.insee.rmes.transfoxsl.service;
 import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.model.DDIItemType;
-import fr.insee.rmes.tocolecticaapi.RandomUUIDExtensionFunction;
+import fr.insee.rmes.tocolecticaapi.models.FragmentData;
+import fr.insee.rmes.tocolecticaapi.models.NamespaceContextMap;
+import fr.insee.rmes.utils.XMLUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.s9api.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -24,39 +27,38 @@ import org.xml.sax.InputSource;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Slf4j
 public class XsltTransformationService {
 
-    public static final String DISALLOW_DOCTYPE_DECL = "http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl";
     public static final String DISALLOW_DOCTYPE_DECL1 = "http://apache.org/xml/features/disallow-doctype-decl";
     public static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
     public static final String EXTERNAL_PARAMETER_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
     private static final String VERSION = "version";
     static final byte[] DATA_TAG_BEGIN = "<data>".getBytes();
     static final byte[] DATA_TAG_END = "</data>".getBytes();
-    static final TransformerFactory saxonFactoryWithRandomUUIDExtension = initSaxonFactoryWithRandomUUIDExtension();
 
     private final Processor processor;
 
     public XsltTransformationService() {
         this.processor = new Processor(false);
-    }
-
-
-    private static TransformerFactory initSaxonFactoryWithRandomUUIDExtension() {
-        TransformerFactoryImpl factory = new net.sf.saxon.TransformerFactoryImpl();
-        ((Processor) factory.getConfiguration().getProcessor()).registerExtensionFunction(new RandomUUIDExtensionFunction());
-
-        return factory;
     }
 
 
@@ -117,7 +119,7 @@ public class XsltTransformationService {
 
     private static byte[] transformWithSaxon(InputStream xsltFile, StreamSource input, Map<String, Object> parameters) throws TransformerException {
 
-        Transformer transformer = saxonFactoryWithRandomUUIDExtension.newTransformer(new StreamSource(xsltFile));
+        Transformer transformer = XMLUtils.newTransformer(new StreamSource(xsltFile));
         parameters.forEach(transformer::setParameter);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -149,7 +151,7 @@ public class XsltTransformationService {
     }
 
 
-    private String doTransformFile(MultipartFile file, String idepUtilisateur, String jsonToDdiXslFilename, DDIProcessor ddiProcessor, String DdiToJsonXslFilename) throws RmesException {
+    private String doTransformFile(MultipartFile file, String idepUtilisateur, String jsonToDdiXslFilename, DDIProcessor ddiProcessor, String ddiToJsonXslFilename) throws RmesException {
         if (file.isEmpty()) {
             throw new RmesException(HttpStatus.BAD_REQUEST, "Uploaded file is empty", null);
         }
@@ -162,7 +164,7 @@ public class XsltTransformationService {
             byte[] xmlContent = ddiProcessor.process(inputData, xsltStream1);
 
             
-            InputStream xsltStream2 = getClass().getResourceAsStream(DdiToJsonXslFilename);
+            InputStream xsltStream2 = getClass().getResourceAsStream(ddiToJsonXslFilename);
             return new String(transformToJson(new ByteArrayResource(xmlContent), xsltStream2, idepUtilisateur));
         } catch (Exception e) {
             throw new ServerErrorException("Erreur lors de la transformation du fichier.", e);
@@ -209,15 +211,8 @@ public class XsltTransformationService {
     static byte[] transformWithParameters(byte[] source, InputStream xsltFileJson, Map<String, String> parameters) throws javax.xml.transform.TransformerException {
         // Créer un transformateur XSLT sécurisé
         // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
-        TransformerFactory factory = TransformerFactory.newInstance();
-        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        factory.setFeature(DISALLOW_DOCTYPE_DECL, true);
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "file,jar:file");
-
         Source xslt = new StreamSource(xsltFileJson);
-
-        Transformer transformer = factory.newTransformer(xslt);
+        Transformer transformer = XMLUtils.newTransformer(xslt);
         parameters.forEach(transformer::setParameter);
 
         // Effectuer la transformation
@@ -313,12 +308,7 @@ public class XsltTransformationService {
     }
 
     private static ByteArrayOutputStream onlyIndent(Document document) throws TransformerException {
-        // Désactivation des entités externes dans TransformerFactory pour éviter les attaques XXE
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        transformerFactory.setFeature(DISALLOW_DOCTYPE_DECL, true);
-
-        Transformer transformer = transformerFactory.newTransformer();
+        Transformer transformer = XMLUtils.newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
         ByteArrayOutputStream outputStreamResult = new ByteArrayOutputStream();
@@ -328,6 +318,60 @@ public class XsltTransformationService {
 
     private static String transformToJson(byte[] source, InputStream xsltFileJson, String idepUtilisateur, int version) throws TransformerException {
         return new String(transformWithParameters(source, xsltFileJson, Map.of("idepUtilisateur", idepUtilisateur, VERSION, String.valueOf(version))));
+    }
+
+    public static JSONArray extractIdentifiersFromDiiInstance(String fragmentXml) {
+        Set<FragmentData> uniqueData = new HashSet<>();
+
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            // Désactiver l'accès aux entités externes pour des raisons de sécurité (prévention des attaques XXE)
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature(DISALLOW_DOCTYPE_DECL1, true);
+            factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
+
+            factory.setNamespaceAware(true);
+
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new ByteArrayInputStream(fragmentXml.getBytes(StandardCharsets.UTF_8)));
+
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            XPath xpath = xpathFactory.newXPath();
+
+            xpath.setNamespaceContext(new NamespaceContextMap("r", "ddi:reusable:3_3", "ddi", "ddi:instance:3_3"));
+
+            // Sélectionner tous les nœuds ayant un ID, Agency ou Version
+            NodeList nodes = (NodeList) xpath.evaluate("//*[local-name()='ID' or local-name()='Agency' or local-name()='Version']", document, XPathConstants.NODESET);
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node currentNode = nodes.item(i).getParentNode();
+
+                String id = xpath.evaluate("r:ID", currentNode);
+                String agency = xpath.evaluate("r:Agency", currentNode);
+                String version = xpath.evaluate("r:Version", currentNode);
+
+                FragmentData fragmentData = new FragmentData(id, agency, version);
+                uniqueData.add(fragmentData);
+            }
+
+            // Convertir Set en JSONArray
+            JSONArray allFragmentsData = new JSONArray();
+            for (FragmentData data : uniqueData) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Identifier", data.getIdentifier());
+                jsonObject.put("AgencyId", data.getAgencyId());
+                jsonObject.put("Version", data.getVersion());
+                allFragmentsData.put(jsonObject);
+            }
+
+            return allFragmentsData;
+
+        } catch (Exception e) {
+            log.error("Error while extractIdentifiersFromDiiInstance "+e.getMessage(), e);
+            return new JSONArray();
+        }
     }
 
     @FunctionalInterface
