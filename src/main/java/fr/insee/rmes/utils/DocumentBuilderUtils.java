@@ -1,6 +1,5 @@
 package fr.insee.rmes.utils;
 
-import fr.insee.rmes.utils.ddi.DDIDocumentBuilder;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,9 +41,5 @@ public class DocumentBuilderUtils {
 		// Transfer ownership of the new node into the destination document
 		doc.adoptNode(newNode);
 		return newNode;
-	}
-	
-	public static Node getNode(String fragment, DDIDocumentBuilder doc) throws Exception {
-		return getNode(fragment, doc.getDocument());
 	}
 }

@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaServiceImpl;
+import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.utils.DocumentBuilderUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -150,7 +151,7 @@ class ColecticaServiceImplTest {
         InputStream xsltStream = new ByteArrayInputStream(xsltContent.getBytes());
 
         // Call the method to be tested
-        String result = colecticaService.transformToJson(mockResource, xsltStream, "user");
+        String result = XsltTransformationService.transformToJson(mockResource, xsltStream, "user");
 
         // Assertions
         assertNotNull(result);
@@ -159,33 +160,6 @@ class ColecticaServiceImplTest {
         assertTrue(result.contains("<element>Test</element>"));
     }
 
-    @Test
-    void testUploadItem() {
-        ColecticaServiceImpl colecticaService = mock(ColecticaServiceImpl.class);
-        String jsonContent = "{\n" +
-                "   \"Items\":\n" +
-                "[\n" +
-                "{\n" +
-                "\"ItemType\": \"8b108ef8-b642-4484-9c49-f88e4bf7cf1d\",\n" +
-                "\"AgencyId\": \"fr.insee\",\n" +
-                "\"Version\": 1,\n" +
-                "\"Identifier\": \"4aea85af-27c9-4b87-a057-ccbd78ec95bf\",\n" +
-                "\"Item\": \" </Fragment>\",\n" +
-                "\"VersionDate\": \"2024-02-21T09:31:22.0300000Z\",\n" +
-                "\"VersionResponsibility\": \"QZ6ICW\",\n" +
-                "\"IsPublished\": false,\n" +
-                "\"IsDeprecated\": false,\n" +
-                "\"IsProvisional\": false,\n" +
-                "\"ItemFormat\": \"DC337820-AF3A-4C0B-82F9-CF02535CDE83\"\n" +
-                "}]";
-        MockMultipartFile file = new MockMultipartFile("file", "test.json", "application/json", jsonContent.getBytes());
-        ResponseEntity<String> mockedResponse = ResponseEntity.ok("Le fichier a été envoyé avec succès à l'API.");
-        when(colecticaService.uploadItem(file)).thenReturn(mockedResponse);
-        ResponseEntity<String> result = colecticaService.uploadItem(file);
-        assertNotNull(result);
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals("Le fichier a été envoyé avec succès à l'API.", result.getBody());
-    }
 
     @Test
     void testGetDocument() throws Exception {

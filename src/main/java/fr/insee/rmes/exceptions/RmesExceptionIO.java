@@ -4,12 +4,8 @@ import java.io.IOException;
 
 public class RmesExceptionIO extends IOException {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5786486664894878082L;
-    private int status;
-    private String details;
+    private final int status;
+    private final String details;
 
     /**
      *

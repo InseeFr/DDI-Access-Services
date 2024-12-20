@@ -5,9 +5,9 @@ import fr.insee.rmes.exceptions.RmesNotAcceptableException;
 import fr.insee.rmes.utils.DocumentBuilders;
 import fr.insee.rmes.utils.StringUtils;
 import fr.insee.rmes.utils.XMLUtils;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,7 +42,7 @@ public record VarBookExportBuilder() {
 		try {
 			return XMLUtils.toString(xmlReadyToExport);
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
-			throw new RmesException(HttpStatus.SC_BAD_REQUEST, e.getMessage(),
+			throw new RmesException(HttpStatus.BAD_REQUEST, e.getMessage(),
 					"IOException - Can't convert xml to text");
 		}
 	}
@@ -68,7 +68,7 @@ public record VarBookExportBuilder() {
 			xmlOutput = builder.newDocument();
 			
 		} catch (ParserConfigurationException e) {
-			throw new RmesException(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage(),
+			throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(),
 					"ParserConfigurationException");
 		}
 
@@ -195,7 +195,7 @@ public record VarBookExportBuilder() {
 			db = DocumentBuilders.createSaferDocumentBuilder(DocumentBuilderFactory::isIgnoringElementContentWhitespace);
 			xmlInitial = db.parse(stream);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			throw new RmesException(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage(),
+			throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(),
 					e.getClass() + " Can't parse xml");
 		} 
 		return xmlInitial;
