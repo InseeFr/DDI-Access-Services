@@ -24,7 +24,7 @@ public enum FileExtension {
         return mediaType;
     }
 
-    public static FileExtension get(String acceptHeader) {
+    public static FileExtension forHeader(String acceptHeader) {
         return switch (acceptHeader) {
             case "application/octet-stream" -> PDF_EXTENSION;
             case "flatODT" -> FODT_EXTENSION;

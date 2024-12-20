@@ -6,6 +6,7 @@ import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.models.TransactionType;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
+import fr.insee.rmes.utils.FileExtension;
 import fr.insee.rmes.utils.FilesUtils;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,15 +21,14 @@ import org.apache.logging.log4j.Logger;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -36,10 +36,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
+
+import static fr.insee.rmes.tocolecticaapi.controller.ControllerUtils.xmltoResponseEntity;
 
 @Controller
 @RequestMapping("/postItem")
-@Tag(name= "DEMO-Colectica",description = "Services for upgrade Colectica-API")
+@Tag(name = "DEMO-Colectica", description = "Services for upgrade Colectica-API")
 @SecurityRequirement(name = "bearerAuth")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Success"),
@@ -54,48 +57,12 @@ import java.util.List;
 public class PostItem {
 
     static final Logger logger = LogManager.getLogger(PostItem.class);
+    public static final MediaType APPLICATION_ODT = MediaType.valueOf("application/vnd.oasis.opendocument.text");
     private final ColecticaService colecticaService;
+
     @Autowired
-    public PostItem( ColecticaService colecticaService) {
+    public PostItem(ColecticaService colecticaService) {
         this.colecticaService = colecticaService;
-    }
-
-
-    @PostMapping(value = "/transformJsonToJsonForAPi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "transform an JSON Codelist (Id,Label) to an another json for Colectica API ",
-            description = "tranform a codeList in json to another json with DDI item inside")
-    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
-    public ResponseEntity<String> transformFile(@RequestParam("file") MultipartFile file,
-                                           @RequestParam("nom metier") String idValue,
-                                           @RequestParam("label") String nomenclatureName,
-                                           @RequestParam("description") String suggesterDescription,
-                                           @RequestParam(value = "version",defaultValue = "1") String version,
-                                           @RequestParam("idepUtilisateur") String idepUtilisateur,
-                                           // peut-être lire le jeton pour recup le timbre directement
-                                           @RequestParam("timbre") String timbre, @AuthenticationPrincipal
-    OidcUser principal) {
-
-            return colecticaService.transformFile(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre);
-        }
-
-    @PostMapping(value = "/transformJsonToJsonForApiForComplexCodeList", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "transform an JSON Codelist with multiple field for one id to an another json for Colectica API ",
-            description = "tranform a codeList in json to another json with DDI item inside")
-    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
-    public ResponseEntity<String> transformFileForComplexCodeList(@RequestParam("file") MultipartFile file,
-                                           @RequestParam("nom metier") String idValue,
-                                           @RequestParam("label") String nomenclatureName,
-                                           @RequestParam("description") String suggesterDescription,
-                                           @RequestParam(value = "version",defaultValue = "1") String version,
-                                           @RequestParam("idepUtilisateur") String idepUtilisateur,
-                                           // peut-être lire le jeton pour recup le timbre directement et l'idep
-                                           @RequestParam("timbre") String timbre,
-                                           @RequestParam("principale") String principale,
-                                           @RequestParam("secondaire") List <String> secondaire,
-                                           @RequestParam("labelSecondaire") List <String> labelSecondaire, @AuthenticationPrincipal
-                                                                      OidcUser principal)  {
-
-        return colecticaService.transformFileForComplexList(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre,principale,secondaire,labelSecondaire);
     }
 
 
@@ -105,13 +72,10 @@ public class PostItem {
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     public ResponseEntity<String> sendUpdateColectica(
             @RequestBody String ddiUpdatingInJson,
-            @RequestParam("transactionType") TransactionType transactionType
-            , @AuthenticationPrincipal
-            OidcUser principal) throws IOException {
-        return colecticaService.sendUpdateColectica(ddiUpdatingInJson, transactionType);
-
+            @RequestParam("transactionType") TransactionType transactionType) throws RmesException {
+        colecticaService.sendUpdateColectica(ddiUpdatingInJson, transactionType);
+        return ResponseEntity.ok("Transaction success");
     }
-
 
 
     @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -123,7 +87,7 @@ public class PostItem {
             throws IOException, ExceptionColecticaUnreachable {
         String fileContent = new String(file.getBytes());
         return colecticaService.sendUpdateColectica(fileContent, TransactionType.COPYCOMMIT);
-         }
+    }
 
 
     @Hidden
@@ -132,27 +96,27 @@ public class PostItem {
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     public ResponseEntity<String> byType(
             @PathVariable("type") DDIItemType type, @AuthenticationPrincipal
-    OidcUser principal)
+            OidcUser principal)
             throws IOException, ExceptionColecticaUnreachable, ParseException {
 
         return colecticaService.getByType(type);
     }
 
 
-    @PostMapping(value="/operation/codebook",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE,"application/vnd.oasis.opendocument.text" },
-            produces = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_OCTET_STREAM_VALUE,"application/vnd.oasis.opendocument.text" }
+    @PostMapping(value = "/operation/codebook",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"},
+            produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"}
     )
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     @Operation(operationId = "getCodeBook", summary = "Produce a codebook from a DDI")
 
-    public  ResponseEntity<?> getCodeBook(
+    public ResponseEntity<Resource> getCodeBook(
 
             @Parameter(schema = @Schema(type = "string", format = "String", description = "Accept"))
-            @RequestHeader(required=false) String accept,
+            @RequestHeader(required = false) String accept,
 
             @Parameter(schema = @Schema(type = "string", format = "binary", description = "file in DDI"))
-            @RequestParam(value="file") MultipartFile isDDI, // InputStream isDDI,
+            @RequestParam(value = "file") MultipartFile isDDI, // InputStream isDDI,
 
             @Parameter(schema = @Schema(type = "string", format = "binary", description = "file for structure"))
             @RequestParam(value = "dicoVar") MultipartFile isCodeBook //InputStream isCodeBook
@@ -164,43 +128,36 @@ public class PostItem {
         File codeBookFile;
         try {
             ddi = new String(isDDI.getBytes(), StandardCharsets.UTF_8);
-            codeBookFile = FilesUtils.streamToFile(isCodeBook.getInputStream(), "dicoVar",".odt");
-        } catch (IOException e1) {
-            throw new RmesException(HttpStatus.BAD_REQUEST, e1.getMessage(), "Files can't be read");
-        }
-        ResponseEntity<Resource> response;
-
-        try {
-            response=colecticaService.getCodeBookExport(ddi,codeBookFile,accept);
+            codeBookFile = FilesUtils.streamToFile(isCodeBook.getInputStream(), "dicoVar", ".odt");
+            Resource response = colecticaService.exportCodeBookAsOdt(ddi, codeBookFile);
             logger.debug("Codebook is generated");
+            return xmltoResponseEntity(response, "Codebook" + FileExtension.forHeader(accept).extension(), APPLICATION_ODT);
+        } catch (IOException e) {
+            throw new RmesException(HttpStatus.BAD_REQUEST, e.getMessage(), "Files can't be read");
         }
-        catch (RmesException e) {
-            logger.error("Failed to generate codebook {}", e.getMessageAndDetails());
-            return returnRmesException(e);
-        }
-        return response;
     }
 
-    @PostMapping(value="/operation/codebook/V2",
+    @PostMapping(value = "/operation/codebook/V2",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
-            produces = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_OCTET_STREAM_VALUE,"application/vnd.oasis.opendocument.text" }
+            produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"}
     )
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     @Operation(operationId = "getCodeBookV2", summary = "Produce a codebook from a DDI")
-    public  ResponseEntity<?> getCodeBookV2(
+    public ResponseEntity<?> getCodeBookV2(
 
             @Parameter(schema = @Schema(type = "string", format = "String", description = "Accept"))
-            @RequestHeader(required=false) String accept,
+            @RequestHeader(required = false) String accept,
 
-            @Parameter(schema = @Schema(type = "string", allowableValues = { "concis" , "concis avec expression" , "scindable" , "non scindable" }))
+            @Parameter(schema = @Schema(type = "string", allowableValues = {"concis", "concis avec expression", "scindable", "non scindable"}))
             @RequestParam(value = "dicoVar") String isCodeBook, //InputStream isCodeBook,
 
-            @RequestParam(value="file") MultipartFile isDDI // InputStream isDDI,
+            @RequestParam(value = "file") MultipartFile isDDI // InputStream isDDI,
 
     )
             throws Exception {
-        if (isDDI == null) throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't generate codebook","Stream is null");
-        InputStream ddiInputStream =  new BufferedInputStream(isDDI.getInputStream());
+        if (isDDI == null)
+            throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't generate codebook", "Stream is null");
+        InputStream ddiInputStream = new BufferedInputStream(isDDI.getInputStream());
         String ddi = new String(ddiInputStream.readAllBytes(), StandardCharsets.UTF_8);
         String xslPatternFile = null;
         switch (isCodeBook) {
@@ -228,22 +185,23 @@ public class PostItem {
         return colecticaService.getCodeBookExportV2(ddi, xslPatternFile);
     }
 
-    @PostMapping(value="/operation/codebook/checkCodeBookContent",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_OCTET_STREAM_VALUE,"application/vnd.oasis.opendocument.text"},
-            produces = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_OCTET_STREAM_VALUE,"application/vnd.oasis.opendocument.text" }
+    @PostMapping(value = "/operation/codebook/checkCodeBookContent",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"},
+            produces = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/vnd.oasis.opendocument.text"}
     )
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     @Operation(operationId = "getCodeBookCheck", summary = "Check the DDI before made the codebook export")
 
-    public  ResponseEntity<?> getCodeBookCheck(
+    public ResponseEntity<?> getCodeBookCheck(
 
-            @RequestParam(value="file") MultipartFile isCodeBook // InputStream isDDI,
+            @RequestParam(value = "file") MultipartFile isCodeBook // InputStream isDDI,
 
     )
             throws Exception {
 
         return colecticaService.getCodeBookCheck(isCodeBook);
     }
+
     protected ResponseEntity<Object> returnRmesException(RmesException e) {
         logger.error(e.getMessageAndDetails(), e);
         return ResponseEntity.status(e.getStatus()).contentType(MediaType.TEXT_PLAIN).body(e.getMessage());

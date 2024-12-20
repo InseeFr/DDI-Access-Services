@@ -2,6 +2,7 @@ package fr.insee.rmes.tocolecticaapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
+import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.fragments.DdiFragment;
@@ -16,10 +17,8 @@ import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -63,10 +62,12 @@ public class GetItem {
                     description = "id de l'objet colectica sous la forme uuid/version",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws ExceptionColecticaUnreachable, IOException {
-        return colecticaService.findFragmentByUuid(uuid);
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RmesException {
+        return getResponseEntitySearchColecticaFragmentByUuid(colecticaService.findFragmentByUuid(uuid));
 
     }
+
+
 
     @GetMapping(value = "FragmentInstance/uuid/withChildren", produces = MediaType.APPLICATION_XML_VALUE)
     @Operation(summary = "Get Fragments by uuid", description = "Get an XML document for a Fragment:Instance from Colectica repository.")
@@ -162,22 +163,10 @@ public class GetItem {
         return colecticaService.getJsonWithChild(identifier, outputField, fieldLabelName);
     }
 
-    @GetMapping("/RessourcePackageToJson")
-    public String convertXmlToJson(
+    @GetMapping(value = "/RessourcePackageToJson", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getRessourcePackage(
             @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException {
-        return colecticaService.convertXmlToJson(uuid);
-    }
-
-    @PutMapping ("/replace-xml-parameters")
-    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
-    @Operation(summary = "Modify a fragment DDI", description = "Modify a fragment DDI. All field need to be filled with the same data if there are no changes, except for the version number, which takes a plus 1.")
-    public String replaceXmlParameters(@RequestBody String inputXml,
-                                       @RequestParam ("Type") DDIItemType type,
-                                       @RequestParam ("Label") String label,
-                                       @RequestParam ("Version") int version,
-                                       @RequestParam ("Name") String name,
-                                       @RequestParam ("VersionResponsibility") String idepUtilisateur) {
-        return colecticaService.replaceXmlParameters(inputXml, type, label, version, name, idepUtilisateur);
+        return colecticaService.getRessourcePackage(uuid);
     }
 
 

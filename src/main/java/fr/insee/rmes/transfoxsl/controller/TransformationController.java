@@ -2,8 +2,10 @@ package fr.insee.rmes.transfoxsl.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.VtlTransformationException;
 import fr.insee.rmes.exceptions.XsltTransformationException;
+import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer;
 import fr.insee.rmes.transfoxsl.service.internal.DDITransformerToVtl;
@@ -19,17 +21,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
+
+import static fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer.DEREFERENCE_XSL;
 
 @Controller
 @RequestMapping("/xsl")
@@ -168,5 +173,65 @@ public class TransformationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+
+    @PutMapping("/replace-xml-parameters")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
+    @Operation(summary = "Modify a fragment DDI", description = "Modify a fragment DDI. All field need to be filled with the same data if there are no changes, except for the version number, which takes a plus 1.")
+    public String replaceXmlParameters(@RequestBody String inputXml,
+                                       @RequestParam ("Type") DDIItemType type,
+                                       @RequestParam ("Label") String label,
+                                       @RequestParam ("Version") int version,
+                                       @RequestParam ("Name") String name,
+                                       @RequestParam ("VersionResponsibility") String idepUtilisateur) {
+        return xsltTransformationService.replaceXmlParameters(inputXml, type, label, version, name, idepUtilisateur);
+    }
+
+    @GetMapping(value = "/transformJsonToJsonForAPI", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "transform an JSON Codelist (Id,Label) to an another json for Colectica API ",
+            description = "tranform a codeList in json to another json with DDI item inside")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
+    public ResponseEntity<String> transformFile(@RequestParam("file") MultipartFile file,
+                                                @RequestParam("nom metier") String idValue,
+                                                @RequestParam("label") String nomenclatureName,
+                                                @RequestParam("description") String suggesterDescription,
+                                                @RequestParam(value = "version", defaultValue = "1") String version,
+                                                @RequestParam("idepUtilisateur") String idepUtilisateur,
+                                                // peut-être lire le jeton pour recup le timbre directement
+                                                @RequestParam("timbre") String timbre) throws RmesException {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", UriUtils.encode(UUID.randomUUID() + ".json", StandardCharsets.UTF_8));
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(xsltTransformationService.transformFile(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre));
+    }
+
+    @GetMapping(value = "/transformJsonToJsonForApiForComplexCodeList", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "transform an JSON Codelist with multiple field for one id to an another json for Colectica API ",
+            description = "tranform a codeList in json to another json with DDI item inside")
+    @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
+    public ResponseEntity<String> transformFileForComplexCodeList(@RequestParam("file") MultipartFile file,
+                                                                  @RequestParam("nom metier") String idValue,
+                                                                  @RequestParam("label") String nomenclatureName,
+                                                                  @RequestParam("description") String suggesterDescription,
+                                                                  @RequestParam(value = "version", defaultValue = "1") String version,
+                                                                  @RequestParam("idepUtilisateur") String idepUtilisateur,
+                                                                  // peut-être lire le jeton pour recup le timbre directement et l'idep
+                                                                  @RequestParam("timbre") String timbre,
+                                                                  @RequestParam("principale") String principale,
+                                                                  @RequestParam("secondaire") List<String> secondaire,
+                                                                  @RequestParam("labelSecondaire") List<String> labelSecondaire) throws RmesException {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", UriUtils.encode(UUID.randomUUID() + ".json", StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(xsltTransformationService.transformFileForComplexList(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre, principale, secondaire, labelSecondaire);
+    }
+
 }
 

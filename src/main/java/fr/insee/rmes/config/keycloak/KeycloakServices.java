@@ -17,6 +17,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,16 +28,16 @@ import java.util.Date;
 public class KeycloakServices {
 
 
-	@Value("${fr.insee.rmes.metadata.keycloak.secret}")
+    @Value("${fr.insee.rmes.metadata.keycloak.secret}")
     String secret;
-	
-	@Value("${fr.insee.rmes.metadata.keycloak.resource}")
+
+    @Value("${fr.insee.rmes.metadata.keycloak.resource}")
     String resource;
-	
-	@Value("${fr.insee.rmes.metadata.keycloak.server}")
+
+    @Value("${fr.insee.rmes.metadata.keycloak.server}")
     String server;
-	
-	@Value("${fr.insee.rmes.metadata.keycloak.realm}")
+
+    @Value("${fr.insee.rmes.metadata.keycloak.realm}")
     String realm;
 
     @Value("${fr.insee.rmes.api.remote.metadata.url}")
@@ -58,9 +59,10 @@ public class KeycloakServices {
 
     /**
      * Permet de récuperer un jeton keycloak
+     *
      * @return jeton
      */
-    public String getKeycloakAccessToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
+    public String getKeycloakAccessToken() {
 
         if (!testKube.contains(".dev.kube.insee.fr")) {
             RestTemplate keycloakClient = new RestTemplate();
@@ -74,25 +76,22 @@ public class KeycloakServices {
             body.add("client_id", resource);
             body.add("client_secret", secret);
             HttpEntity<Object> entity = new HttpEntity<>(body, headers);
-            try {
 
-                Token accessToken = keycloakClient.postForObject(keycloakUrl, entity, Token.class);
+            Token accessToken = keycloakClient.postForObject(keycloakUrl, entity, Token.class);
 
-                log.trace("Keycloak token provided");
-                return accessToken.getAccessToken();
-            } catch (RestClientException e) {
-                throw new ExceptionColecticaUnreachable("Le serveur Keycloak est injoignable");
-            }
+            log.trace("Keycloak token provided");
+            return accessToken.getAccessToken();
+
         } else {
 
-            String token = getAuthToken();
-            return extractAccessToken(token);
+            return extractAccessToken(getAuthToken());
         }
 
     }
 
     /**
      * Verifie si le jeton keycloak a expiré
+     *
      * @param token
      * @return boolean
      */
@@ -108,16 +107,18 @@ public class KeycloakServices {
                 log.info("Token is valid");
                 isValid = true;
             }
-        }
-        catch (JWTDecodeException exception) {
+        } catch (JWTDecodeException exception) {
             System.out.println("erreur" + exception.toString());
 
         }
         return isValid;
     }
 
-    private String getAuthToken() throws JsonProcessingException {
+    private String getAuthToken() {
         RestTemplate restTemplate = new RestTemplate();
+
+        // TODO utiliser
+        //RestClient.create().post().contentType(MediaType.APPLICATION_JSON).body(new AuthRequest("","")).retrieve().body(String.class);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -151,15 +152,11 @@ public class KeycloakServices {
         return null;
     }
 
-    public String getFreshToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
-        if ( ! this.isTokenValid(this.token)) {
-            token = getToken();
+    public String getFreshToken() {
+        if (!this.isTokenValid(this.token)) {
+            token = getKeycloakAccessToken();
         }
         return token;
     }
 
-    private String getToken() throws ExceptionColecticaUnreachable, JsonProcessingException {
-        return this.getKeycloakAccessToken();
-
-    }
 }

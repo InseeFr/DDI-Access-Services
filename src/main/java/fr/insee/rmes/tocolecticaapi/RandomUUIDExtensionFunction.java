@@ -5,7 +5,7 @@ import net.sf.saxon.s9api.*;
 import java.util.UUID;
 
 
-public class randomUUID implements ExtensionFunction{
+public class RandomUUIDExtensionFunction implements ExtensionFunction{
 
     @Override
     public QName getName() {
