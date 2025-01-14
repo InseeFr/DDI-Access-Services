@@ -1,6 +1,7 @@
 package fr.insee.rmes.tocolecticaapi.controller;
 
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
+import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.tocolecticaapi.models.TransactionType;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,12 +13,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
@@ -51,9 +52,10 @@ public class DeleteItem {
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     @Operation(summary = "Delete a CodeList via Colectica API",
             description = "Delete a CodeList and all their children.")
-    public String deleteCodeList(@RequestParam("uuid") String uuid)
-            throws IOException, ExceptionColecticaUnreachable, ParseException {
-        return colecticaService.sendDeleteColectica(uuid, TransactionType.COPYCOMMIT);
+    public ResponseEntity<Void> deleteCodeList(@RequestParam("uuid") String uuid)
+            throws IOException, ExceptionColecticaUnreachable, ParseException, RmesException {
+        colecticaService.sendDeleteColectica(uuid, TransactionType.COPYCOMMIT);
+        return ResponseEntity.noContent().build();
     }
 
 }

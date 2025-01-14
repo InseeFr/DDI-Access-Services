@@ -1,6 +1,6 @@
 package fr.insee.rmes.tocolecticaapi.controller;
 
-import fr.insee.rmes.tocolecticaapi.fragments.DdiFragment;
+import fr.insee.rmes.tocolecticaapi.fragments.DdiFragmentService;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +50,8 @@ class GetItemTest {
     @TestConfiguration
     static class ConfigurationForTest{
         @Bean
-        DdiFragment ddiFragment(){
-            return new DdiFragment() {
+        DdiFragmentService ddiFragment(){
+            return new DdiFragmentService() {
                 @Override
                 public String extractDataRelationship(String uuid) {
                     return "";

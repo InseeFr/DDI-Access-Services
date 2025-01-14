@@ -15,7 +15,13 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class XsltUtils {
 
@@ -25,69 +31,38 @@ public class XsltUtils {
 		    throw new IllegalStateException("Utility class");
 	}
 
-
-	public static void xsltTransform(Map<String, String> xmlContent, InputStream odtFileIS, InputStream xslFileIS,
-			PrintStream printStream, Path tempDir) throws TransformerException {
-		// prepare transformer
-		StreamSource xsrc = new StreamSource(xslFileIS);
-		Transformer xsltTransformer = XMLUtils.newTransformer(xsrc);
-
-		// Pass parameters in a file to the transformer
-		xmlContent.forEach((paramName, xmlData) -> {
-			try {
-				addParameter(xsltTransformer, paramName, xmlData, tempDir);
-			} catch (RmesException e) {
-				logger.error(e.getMessageAndDetails());
-			}
-		});
-
-		// transformation
-		xsltTransformer.transform(new StreamSource(odtFileIS), new StreamResult(printStream));
+	static byte[] createOdtFromXml(byte[] contentXml, byte[] zipBase) throws IOException {
+		  var byteArrayOutputStream = new ByteArrayOutputStream(zipBase.length);
+		  byteArrayOutputStream.writeBytes(zipBase);
+		  var zip = new ZipOutputStream(byteArrayOutputStream);
+		  zip.putNextEntry(new ZipEntry("content.xml"));
+		  zip.write(contentXml);
+		  zip.close();
+		  return byteArrayOutputStream.toByteArray();
 	}
 
-
-	private static void addParameter(Transformer xsltTransformer, String paramName, String paramData, Path tempDir) throws RmesException {
-		CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-		try {
-			Path tempFile = Files.createTempFile(tempDir, paramName, FileExtension.XML_EXTENSION.extension());
-			InputStream is = IOUtils.toInputStream(paramData, StandardCharsets.UTF_8);
-			Files.copy(is, tempFile, options);
-
-			// Convert to file URI
-			String fileUri = tempFile.toUri().toString();
-			logger.debug("Setting XSLT parameter '{}' to '{}'", paramName, fileUri);
-			xsltTransformer.setParameter(paramName, fileUri);
-		} catch (IOException e) {
-			throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "IOException - Can't create temp files for XSLT Transformer");
-		}
-	}
-	
-	public static void createOdtFromXml(Path outputPath, Path finalPath, InputStream zipToCompleteIS, Path tempDir)
-			throws IOException {
-		Path contentPath = Paths.get(tempDir + "/content.xml");
-		Files.copy(outputPath, contentPath, StandardCopyOption.REPLACE_EXISTING);
-		Path zipPath = Paths.get(tempDir + "/export.zip");
-		Files.copy(zipToCompleteIS, zipPath, StandardCopyOption.REPLACE_EXISTING);
-		FilesUtils.addFileToZipFolder(contentPath, zipPath);
-		Files.copy(zipPath, finalPath, StandardCopyOption.REPLACE_EXISTING);
-	}
-
-	public static byte[] transformerInputStreamWithXsl(byte[] input,InputStream xslCheckReference) throws TransformerException {
-		return doTransform(new StreamSource(xslCheckReference),new StreamSource(new ByteArrayInputStream(input)) );
+	public static byte[] transformerInputStreamWithXsl(byte[] input,InputStream xslStyleSheet) throws TransformerException {
+		return doTransform(new StreamSource(xslStyleSheet),new StreamSource(new ByteArrayInputStream(input)), Optional.empty() );
     }
 
-	public static byte[] transformerStringWithXsl(String ddi, InputStream xslRemoveNameSpaces) throws TransformerException {
-		  return doTransform(new StreamSource(xslRemoveNameSpaces), new StreamSource(new StringReader(ddi)));
+	public static byte[] transformerStringWithXsl(String ddi, InputStream xslStyleSheet) throws TransformerException {
+		  return doTransform(new StreamSource(xslStyleSheet), new StreamSource(new StringReader(ddi)), Optional.empty());
+	}
+
+	public static byte[] transformerInputStreamWithXslWithParameters(InputStream input, InputStream xslStyleSheet, Consumer<Transformer> parameterSetter) throws TransformerException {
+		return doTransform(new StreamSource(xslStyleSheet),new StreamSource(input), Optional.of(parameterSetter ));
 	}
 
 	public static byte[] transformerFileWithXsl(File input, InputStream xslCheckReference) throws TransformerException {
-        return doTransform(new StreamSource(xslCheckReference), new StreamSource(input));
+        return doTransform(new StreamSource(xslCheckReference), new StreamSource(input), Optional.empty());
 	}
 
-	private static byte[] doTransform(Source stylesheetSource, Source inputSource) throws TransformerException {
+	private static byte[] doTransform(Source stylesheetSource, Source inputSource, Optional<Consumer<Transformer>> parameterSetter) throws TransformerException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		Result outputResult = new StreamResult(baos);
-		XMLUtils.newTransformer(stylesheetSource).transform(inputSource, outputResult);
+		Transformer transformer = XMLUtils.newTransformer(stylesheetSource);
+		parameterSetter.ifPresent(p -> p.accept(transformer));
+		transformer.transform(inputSource, outputResult);
 		return baos.toByteArray();
 	}
 }

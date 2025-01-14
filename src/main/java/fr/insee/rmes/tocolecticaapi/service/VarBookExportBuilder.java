@@ -5,8 +5,6 @@ import fr.insee.rmes.exceptions.RmesNotAcceptableException;
 import fr.insee.rmes.utils.DocumentBuilders;
 import fr.insee.rmes.utils.StringUtils;
 import fr.insee.rmes.utils.XMLUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -27,14 +25,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.TreeMap;
 
 @Component
 public record VarBookExportBuilder() {
 
 	private static final String REFERENCE = "Reference";
-
-	static final Logger logger = LoggerFactory.getLogger(VarBookExportBuilder.class);
 
 
 	public String getData(String xml) throws RmesException {
@@ -64,7 +61,7 @@ public record VarBookExportBuilder() {
 		Node root = alls.item(0);
 		Document xmlOutput = null;
 		try {
-			DocumentBuilder builder = DocumentBuilders.createSaferDocumentBuilder(DocumentBuilderFactory::isIgnoringElementContentWhitespace);
+			DocumentBuilder builder = DocumentBuilders.createSaferDocumentBuilder(Optional.of(DocumentBuilderFactory::isIgnoringElementContentWhitespace));
 			xmlOutput = builder.newDocument();
 			
 		} catch (ParserConfigurationException e) {
@@ -192,7 +189,7 @@ public record VarBookExportBuilder() {
 		Document xmlInitial = null;
 
 		try (InputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) {
-			db = DocumentBuilders.createSaferDocumentBuilder(DocumentBuilderFactory::isIgnoringElementContentWhitespace);
+			db = DocumentBuilders.createSaferDocumentBuilder(Optional.of(DocumentBuilderFactory::isIgnoringElementContentWhitespace));
 			xmlInitial = db.parse(stream);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(),

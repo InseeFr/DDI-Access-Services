@@ -5,7 +5,7 @@ import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
-import fr.insee.rmes.tocolecticaapi.fragments.DdiFragment;
+import fr.insee.rmes.tocolecticaapi.fragments.DdiFragmentService;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -32,7 +31,7 @@ import java.nio.charset.StandardCharsets;
 public class GetItem {
 
     private final ColecticaService colecticaService;
-    private final DdiFragment ddiFragment;
+    private final DdiFragmentService ddiFragmentService;
 
     @GetMapping(value = "fragmentInstance/uuid", produces = MediaType.APPLICATION_XML_VALUE)
     @Operation(summary = "Get FragmentInstance by uuid", description = "Get an XML document for a Fragment:Instance from Colectica repository.")
@@ -41,8 +40,8 @@ public class GetItem {
                     description = "id de l'objet colectica sous la forme uuid/version",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RmesExceptionIO, ParseException {
-        return colecticaService.findInstanceByUuid(uuid);
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RmesException {
+        return ResponseEntity.ok(colecticaService.searchColecticaInstanceByUuid(uuid));
     }
 
     @GetMapping(value = "ddiFragment/{uuid}/dataRelationship", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,8 +50,8 @@ public class GetItem {
             description = "id du fragment DDI sous la forme uuid",
             required = true,
             schema = @Schema(type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))
-            @PathVariable String uuid){
-        return ResponseEntity.ok(this.ddiFragment.extractDataRelationship(uuid));
+            @PathVariable String uuid) throws RmesException {
+        return ResponseEntity.ok(this.ddiFragmentService.extractDataRelationship(uuid));
     }
 
     @GetMapping(value = "ddiFragment/uuid", produces = MediaType.APPLICATION_XML_VALUE)
@@ -62,22 +61,22 @@ public class GetItem {
                     description = "id de l'objet colectica sous la forme uuid/version",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) throws RmesException {
-        return getResponseEntitySearchColecticaFragmentByUuid(colecticaService.findFragmentByUuid(uuid));
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
+        return ResponseEntity.ok(colecticaService.findFragmentByUuid(uuid));
 
     }
 
 
 
-    @GetMapping(value = "FragmentInstance/uuid/withChildren", produces = MediaType.APPLICATION_XML_VALUE)
+    @GetMapping(value = "FragmentInstance/uuid/withChildren", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get Fragments by uuid", description = "Get an XML document for a Fragment:Instance from Colectica repository.")
-    public String findFragmentByUuidWithChildrenColectica(
+    public ResponseEntity<String> findFragmentByUuidWithChildrenColectica(
             @Parameter(
                     description = "id de l'objet colectica sous la forme uuid/version",
                     required = true,
                     schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93/2")) String uuid) throws Exception {
-        return colecticaService.findFragmentByUuidWithChildren(uuid);
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93/2")) String uuid) throws RmesException {
+        return ResponseEntity.ok(colecticaService.findFragmentByUuidWithChildren(uuid).toString());
 
     }
 
@@ -94,8 +93,8 @@ public class GetItem {
                         description = "texte à rechercher. le * sert de wildcard",
                         required = true,
                         schema = @Schema(
-                                type = "string", example="sugg*")) String texte) {
-            return colecticaService.filteredSearchText(index, texte);
+                                type = "string", example="sugg*")) String texte) throws RmesException {
+            return ResponseEntity.ok(colecticaService.filteredSearchText(index, texte));
     }
 
     @GetMapping("/filtered-search/texteByType")
@@ -117,7 +116,7 @@ public class GetItem {
                     description = "type à selectionner",
                     required = true)
             @RequestParam DDIItemType ddiItemType
-    ) throws UnsupportedEncodingException {
+    ) throws RmesException {
 
         // Validation des entrées
         if (!index.matches("^[a-zA-Z0-9_*]+$") || !texte.matches("^[a-zA-Z0-9_*]+$")) {
@@ -125,11 +124,11 @@ public class GetItem {
         }
 
         // Encodage des entrées
-        String encodedIndex = URLEncoder.encode(index, StandardCharsets.UTF_8.toString());
-        String encodedText = URLEncoder.encode(texte, StandardCharsets.UTF_8.toString());
+        String encodedIndex = URLEncoder.encode(index, StandardCharsets.UTF_8);
+        String encodedText = URLEncoder.encode(texte, StandardCharsets.UTF_8);
 
         // Appel au service avec les valeurs encodées
-        return colecticaService.searchTexteByType(encodedIndex, encodedText, ddiItemType);
+        return ResponseEntity.ok(colecticaService.searchTexteByType(encodedIndex, encodedText, ddiItemType));
     }
 
 
@@ -144,8 +143,8 @@ public class GetItem {
             String index ,
             @Parameter(
                     description = "type à selectionner",
-                    required = true)  @RequestParam DDIItemType ddiItemType) {
-        return colecticaService.searchByType(index, ddiItemType);
+                    required = true)  @RequestParam DDIItemType ddiItemType) throws RmesException {
+        return ResponseEntity.ok(colecticaService.searchByType(index, ddiItemType));
     }
 
 

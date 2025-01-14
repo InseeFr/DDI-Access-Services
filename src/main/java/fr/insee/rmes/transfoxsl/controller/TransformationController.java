@@ -6,18 +6,19 @@ import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.VtlTransformationException;
 import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.model.DDIItemType;
+import fr.insee.rmes.model.DicoVar;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer;
 import fr.insee.rmes.transfoxsl.service.internal.DDITransformerToVtl;
 import fr.insee.rmes.transfoxsl.utils.MultipartFileUtils;
 import fr.insee.rmes.utils.FileExtension;
+import fr.insee.rmes.utils.HttpUtils;
 import fr.insee.rmes.utils.export.XDocReport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -39,6 +40,8 @@ import java.util.UUID;
 
 import static fr.insee.rmes.tocolecticaapi.controller.ControllerUtils.xmltoResponseEntity;
 import static fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer.DEREFERENCE_XSL;
+import static fr.insee.rmes.transfoxsl.service.internal.DDITransformerToVtl.DDI_2_VTL_XSL;
+import static fr.insee.rmes.utils.ExportUtils.FILENAME_MAX_LENGTH;
 
 @Controller
 @RequestMapping("/xsl")
@@ -54,7 +57,6 @@ public class TransformationController {
     private final MultipartFileUtils multipartFileUtils;
     private final XDocReport xDocReport;
 
-    @Autowired
     public TransformationController(XsltTransformationService xsltTransformationService, MultipartFileUtils multipartFileUtils, XDocReport xDocReport) {
         this.xsltTransformationService = xsltTransformationService;
         this.multipartFileUtils = multipartFileUtils;
@@ -63,7 +65,7 @@ public class TransformationController {
 
     @Operation(summary = "Déréférencer un objet DDI")
     @PostMapping(value = "/Derefddi", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> dereferenceDDI(@RequestParam("file") MultipartFile file)  {
+    public ResponseEntity<String> dereferenceDDI(@RequestParam("file") MultipartFile file) {
         DDIDerefencer ddiDerefencer = new DDIDerefencer(xsltTransformationService);
 
         try {
@@ -78,14 +80,14 @@ public class TransformationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         } catch (XsltTransformationException e) {
             log.info("Exception with user input", e.getCause());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING+" : "+e.getXmlErrorMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + " : " + e.getXmlErrorMessage());
         }
     }
 
 
     @Operation(summary = "Générer un fichier texte contenant les règles VTL à partir d'une physicalInstance")
     @PostMapping(value = "/ddi2vtl", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Resource> ddi2vtl(@RequestParam("file") MultipartFile file)  {
+    public ResponseEntity<Resource> ddi2vtl(@RequestParam("file") MultipartFile file) {
 
         DDITransformerToVtl ddiTransformerToVtl = new DDITransformerToVtl(xsltTransformationService);
 
@@ -93,16 +95,13 @@ public class TransformationController {
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
 
             // Première transformation - XML en sortie (on récupère la sortie en tant que chaîne)
-            List<String> intermediateOutput = xsltTransformationService.transformToXml(inputStream, DEREFERENCE_XSL, false);
+            var intermediateOutput = xsltTransformationService.transformToXml(inputStream, DEREFERENCE_XSL);
 
             // Conversion de la sortie intermédiaire en InputStream pour la deuxième transformation
-            InputStream intermediateInputStream = new ByteArrayInputStream(String.join("\n", intermediateOutput).getBytes(StandardCharsets.UTF_8));
-
-
-
+            InputStream intermediateInputStream = new ByteArrayInputStream(intermediateOutput);
 
             // Préparation de la réponse avec le fichier texte
-            Resource resource = new ByteArrayResource(ddiTransformerToVtl.transform(inputStream));
+            Resource resource = new ByteArrayResource(ddiTransformerToVtl.transform(intermediateInputStream));
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=vtl.txt");
 
@@ -122,15 +121,13 @@ public class TransformationController {
 
     @Operation(summary = "Transformer un objet dataRelationShip en JSON")
     @PostMapping(value = "/dataRelationShiptoJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> ddiDataRelationShiptoJson(@RequestParam("file") MultipartFile file)  {
+    public ResponseEntity<String> ddiDataRelationShiptoJson(@RequestParam("file") MultipartFile file) {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
 
             // Première transformation - XML en sortie
-            List<String> outputText = xsltTransformationService.transform(inputStream, REL_TO_JSON_XSL, true);
-            // Joindre les éléments de la liste en une seule chaîne JSON propre
-            String jsonOutput = String.join("", outputText);
+            var jsonOutput = xsltTransformationService.transformToRawText(inputStream, REL_TO_JSON_XSL);
 
             // Utiliser Jackson pour vérifier la validité du JSON
             ObjectMapper mapper = new ObjectMapper();
@@ -154,24 +151,19 @@ public class TransformationController {
 
     @Operation(summary = "Générer les règles VTL à partir d'une physicalInstance et renvoyer sous forme de texte brut")
     @PostMapping(value = "/ddi2vtlBrut", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> ddi2vtlBrut(@RequestParam("file") MultipartFile file)  {
+    public ResponseEntity<String> ddi2vtlBrut(@RequestParam("file") MultipartFile file) {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
 
             // Première transformation - XML en sortie
-            List<String> intermediateOutput = xsltTransformationService.transform(inputStream, DEREFERENCE_XSL, false);
+            var intermediateOutput = xsltTransformationService.transformToXml(inputStream, DEREFERENCE_XSL);
 
-            // Deuxième transformation - Texte en sortie
-            InputStream intermediateInputStream = new ByteArrayInputStream(String.join("\n", intermediateOutput).getBytes(StandardCharsets.UTF_8));
-            List<String> outputText = xsltTransformationService.transform(intermediateInputStream, DDI_2_VTL_XSL, true);
-
-            // Retourner le texte directement dans la réponse HTTP
-            String finalOutput = String.join("\n", outputText);
+            var output = xsltTransformationService.transformToRawText(new ByteArrayInputStream(intermediateOutput), DDI_2_VTL_XSL);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.TEXT_PLAIN)
-                    .body(finalOutput);
+                    .body(new String(output));
         } catch (IOException e) {
             throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
         } catch (XsltTransformationException e) {
@@ -186,11 +178,11 @@ public class TransformationController {
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     @Operation(summary = "Modify a fragment DDI", description = "Modify a fragment DDI. All field need to be filled with the same data if there are no changes, except for the version number, which takes a plus 1.")
     public String replaceXmlParameters(@RequestBody String inputXml,
-                                       @RequestParam ("Type") DDIItemType type,
-                                       @RequestParam ("Label") String label,
-                                       @RequestParam ("Version") int version,
-                                       @RequestParam ("Name") String name,
-                                       @RequestParam ("VersionResponsibility") String idepUtilisateur) {
+                                       @RequestParam("Type") DDIItemType type,
+                                       @RequestParam("Label") String label,
+                                       @RequestParam("Version") int version,
+                                       @RequestParam("Name") String name,
+                                       @RequestParam("VersionResponsibility") String idepUtilisateur) {
         return xsltTransformationService.replaceXmlParameters(inputXml, type, label, version, name, idepUtilisateur);
     }
 
@@ -237,7 +229,7 @@ public class TransformationController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(xsltTransformationService.transformFileForComplexList(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre, principale, secondaire, labelSecondaire);
+                .body(xsltTransformationService.transformFileForComplexList(file, idValue, nomenclatureName, suggesterDescription, version, idepUtilisateur, timbre, principale, secondaire, labelSecondaire));
     }
 
 
@@ -279,37 +271,15 @@ public class TransformationController {
     )
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     @Operation(operationId = "getCodeBookV2", summary = "Produce a codebook from a DDI")
-    public ResponseEntity<?> getCodeBookV2(
-            @Parameter(schema = @Schema(type = "string", allowableValues = {"concis", "concis avec expression", "scindable", "non scindable"}))
-            @RequestParam(value = "dicoVar") String isCodeBook, //InputStream isCodeBook,
-            @RequestParam(value = "ddiFile") MultipartFile ddiFile // InputStream isDDI,
+    public ResponseEntity<Resource> getCodeBookV2(
+            @RequestParam(value = "dicoVar") DicoVar dicoVar,
+            @RequestParam(value = "ddiFile") MultipartFile ddiFile
     ) throws Exception {
 
         String ddi = new String(ddiFile.getBytes(), StandardCharsets.UTF_8);
-        String xslPatternFile = null;
-        switch (isCodeBook) {
-            case "concis":
-                String xmlFileConcis = "/xslTransformerFiles/dicoCodes/dicoConcisPatternContent.xml";
-                xslPatternFile = xmlFileConcis;
-                break;
-            case "concis avec expression":
-                String xmlFileConcisAvecExpression = "/xslTransformerFiles/dicoCodes/dicoConcisDescrPatternContent.xml";
-                xslPatternFile = xmlFileConcisAvecExpression;
-                break;
-            case "scindable":
-                String xmlFileScindable = "/xslTransformerFiles/dicoCodes/dicoScindablePatternContent.xml";
-                xslPatternFile = xmlFileScindable;
-                break;
-            case "non scindable":
-                String xmlFileNonScindable = "/xslTransformerFiles/dicoCodes/dicoNonScindablePatternContent.xml";
-                xslPatternFile = xmlFileNonScindable;
-                break;
-            default:
-                log.error("Choix incorrect");
-                break;
-        }
-
-        return xDocReport.getCodeBookExportV2(ddi, xslPatternFile);
+        return ResponseEntity.ok()
+                .headers(HttpUtils.generateHttpHeaders("export.odt", FileExtension.ODT_EXTENSION, FILENAME_MAX_LENGTH))
+                .body(new ByteArrayResource(xDocReport.getCodeBookExportV2(ddi, dicoVar.getTransformerFilePath())));
     }
 
     @GetMapping(value = "/check/is-codebook",
@@ -318,21 +288,12 @@ public class TransformationController {
     )
     @PreAuthorize("hasRole('Administrateur_RMESGOPS')")
     @Operation(operationId = "getCodeBookCheck", summary = "Check the DDI before made the codebook export")
-    public ResponseEntity<?> getCodeBookCheck(
-            @RequestParam(value = "ddiFile") MultipartFile ddiFile)throws Exception {
+    public ResponseEntity<Resource> getCodeBookCheck(
+            @RequestParam(value = "ddiFile") MultipartFile ddiFile) throws Exception {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + codeBookCheck.getName());
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-
-        return xDocReport.getCodeBookCheck(ddiFile.getBytes());
-        ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(codeBookCheck.length())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resourceByte);
+        return ResponseEntity.ok()
+                .headers(HttpUtils.generateHttpHeaders("codeBookCheck.odt", FileExtension.ODT_EXTENSION, FILENAME_MAX_LENGTH))
+                .body(new ByteArrayResource(xDocReport.getCodeBookCheck(ddiFile.getBytes())));
     }
 
 }

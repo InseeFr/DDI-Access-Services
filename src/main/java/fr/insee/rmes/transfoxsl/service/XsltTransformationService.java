@@ -96,9 +96,9 @@ public class XsltTransformationService {
     
 
 
-    public static byte[] transformToJson(Resource resultResource, InputStream xsltFileJson, String idepUtilisateur) throws
+    public static byte[] transformToJson(Resource resultResource, InputStream xsltFile, String idepUtilisateur) throws
             IOException, TransformerException {
-        return transformWithSaxon(xsltFileJson, new StreamSource(resultResource.getInputStream()),
+        return transformWithSaxon(xsltFile, new StreamSource(resultResource.getInputStream()),
                 Map.of("idepUtilisateur", idepUtilisateur)
         );
     }
@@ -237,8 +237,8 @@ public class XsltTransformationService {
         return new String(result);
     }
 
-    public byte[] transformToRawText(InputStream stream, String ddi2VtlXsl) throws IOException {
-        return transform(stream, ddi2VtlXsl, SerializerConfigurer.forRawText(processor));
+    public byte[] transformToRawText(InputStream stream, String xslFilename) throws IOException {
+        return transform(stream, xslFilename, SerializerConfigurer.forRawText(processor));
     }
 
 

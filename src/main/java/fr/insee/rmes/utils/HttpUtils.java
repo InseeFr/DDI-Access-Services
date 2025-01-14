@@ -28,7 +28,6 @@ public final class HttpUtils {
 
 
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setAccept(List.of(MediaType.ALL));
         responseHeaders.setContentDisposition(content);
         responseHeaders.setContentType(contentType);
         responseHeaders.setAccessControlExposeHeaders(allowHeaders);

@@ -4,11 +4,12 @@ import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.io.IOException;
 import java.net.URI;
 
 import static fr.insee.rmes.transfoxsl.utils.RestClientUtils.readBodySafely;
@@ -21,6 +22,10 @@ public record ElasticService(@Value("${fr.insee.rmes.elasticsearch.url}") String
 
     private static final String APIKEYHEADER = "apiKey ";
     private static final String SEARCH = "/_search";
+
+    public ElasticService{
+        elasticClient = initRestClient();
+    }
 
     private RestClient initRestClient() {
         return RestClient.builder()

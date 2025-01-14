@@ -3,6 +3,7 @@ package fr.insee.rmes.utils;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.util.Optional;
 
 public interface DocumentBuilders
 {
@@ -11,7 +12,7 @@ public interface DocumentBuilders
         void configureParser(DocumentBuilderFactory factory) throws ParserConfigurationException;
     }
 
-    static DocumentBuilder createSaferDocumentBuilder(ParserConfigurer parserConfigurer) throws ParserConfigurationException
+    static DocumentBuilder createSaferDocumentBuilder(Optional<ParserConfigurer> parserConfigurer) throws ParserConfigurationException
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -21,8 +22,9 @@ public interface DocumentBuilders
         factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         factory.setXIncludeAware(false);
         factory.setExpandEntityReferences(false);
-        parserConfigurer.configureParser(factory);
-
+        if (parserConfigurer.isPresent()){
+            parserConfigurer.get().configureParser(factory);
+        }
         return factory.newDocumentBuilder();
     }
 }

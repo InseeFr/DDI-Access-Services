@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
+import fr.insee.rmes.exceptions.RmesBadRequestException;
 import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
@@ -66,6 +67,10 @@ public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
 
     private static final String BEARER = "Bearer ";
     private static final String TRANSACTIONID = "{\"TransactionId\":";
+
+    public ColecticaServiceImpl{
+        restClient = initRestClient();
+    }
 
     private RestClient initRestClient() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
@@ -196,7 +201,7 @@ public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
     @Override
     public String searchColecticaInstanceByUuid(String uuid) throws RmesException {
 
-        if (!uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}(\\/\\d+)?$")) {
+        if (!uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}(/\\d+)?$")) {
             throw new RmesException(HttpStatus.BAD_REQUEST, "UUID invalide", uuid + " ne respecte pas le pattern d'un uuid");
         }
         return getWithRestClient(URI.create("ddiset/" + agency + "/" + uuid), MediaType.APPLICATION_XML);
@@ -368,13 +373,13 @@ public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
     }
 
     @Override
-    public String sendDeleteColectica(String uuid, TransactionType transactionType) throws RmesException {
+    public void sendDeleteColectica(String uuid, TransactionType transactionType) throws RmesException {
         int transactionId;
         try{
             transactionId = createTransaction();
         }catch (RmesException e){
             log.error("Error while creating delete transaction : "+e.getMessage(), e);
-            return "error no TransactionId";
+            throw new RmesBadRequestException("error no TransactionId");
         }
 
         String deleteTransactionRequestBody = bodyForDeleteWithPostRequest(uuid, transactionId);
@@ -382,8 +387,6 @@ public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
         log.debug("deleteTransactionRequestBody: {}", deleteTransactionRequestBody);
         // lancement de la requete à destination de l'api colectica
         postWithRestClient(URI.create("item/_delete"), Optional.of(deleteTransactionRequestBody), MediaType.APPLICATION_JSON);
-
-        return HttpStatus.OK.toString();
     }
 
     private String bodyForDeleteWithPostRequest(String uuid, int transactionId) throws RmesException {
