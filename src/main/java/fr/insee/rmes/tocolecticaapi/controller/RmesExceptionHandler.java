@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice(assignableTypes = {DeleteItem.class, GetItem.class, PostItem.class, TransformationController.class})
 public class RmesExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({RmesException.class, RmesExceptionIO.class})
+    @ExceptionHandler({RmesException.class})
     public final ResponseEntity<String> handleRmesException(RmesException exception){
         logger.error(exception.getMessageAndDetails(), exception);
         return ResponseEntity.status(exception.getStatus()).body(exception.getMessage());

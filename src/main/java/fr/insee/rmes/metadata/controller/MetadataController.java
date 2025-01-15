@@ -6,11 +6,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,13 +28,17 @@ import java.util.List;
         @ApiResponse(responseCode = "404", description = "Not found"),
         @ApiResponse(responseCode = "406", description = "Not Acceptable"),
         @ApiResponse(responseCode = "500", description = "Internal server error") })
+@Slf4j
 public class MetadataController {
 
-    static final Logger log = LogManager.getLogger(MetadataController.class);
-    @Autowired
-    private MetadataService metadataService;
-    @GetMapping("/units")
-    @Produces(MediaType.APPLICATION_JSON)
+    private final MetadataService metadataService;
+
+    public MetadataController(MetadataService metadataService) {
+        this.metadataService = metadataService;
+    }
+
+
+    @GetMapping(value = "/units", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Unit> getUnits() throws Exception{
         try {
             return metadataService.getUnits();

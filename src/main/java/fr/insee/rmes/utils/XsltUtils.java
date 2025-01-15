@@ -1,11 +1,5 @@
 package fr.insee.rmes.utils;
 
-import fr.insee.rmes.exceptions.RmesException;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -13,21 +7,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class XsltUtils {
 
-	private static final Logger logger = LoggerFactory.getLogger(XsltUtils.class);
-
-	  private XsltUtils() {
+    private XsltUtils() {
 		    throw new IllegalStateException("Utility class");
 	}
 

@@ -3,6 +3,7 @@ package fr.insee.rmes.tocolecticaapi.service;
 import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
 import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -15,23 +16,22 @@ import java.net.URI;
 import static fr.insee.rmes.transfoxsl.utils.RestClientUtils.readBodySafely;
 
 @Component
-public record ElasticService(@Value("${fr.insee.rmes.elasticsearch.url}") String elasticUrl,
-                             @Value("${fr.insee.rmes.elasticsearch.apikey}") String elasticApiKey,
-                             RestClient elasticClient
-                             ) {
+public record ElasticService(RestClient elasticClient) {
 
     private static final String APIKEYHEADER = "apiKey ";
     private static final String SEARCH = "/_search";
 
-    public ElasticService{
-        elasticClient = initRestClient();
+    @Autowired
+    public ElasticService(@Value("${fr.insee.rmes.elasticsearch.url}") String elasticUrl,
+                          @Value("${fr.insee.rmes.elasticsearch.apikey}") String elasticApiKey){
+        this(initRestClient(elasticApiKey, elasticUrl));
     }
 
-    private RestClient initRestClient() {
+    private static RestClient initRestClient(String elasticApiKey, String elasticUrl) {
         return RestClient.builder()
                 .defaultHeader(HttpHeaders.AUTHORIZATION, APIKEYHEADER+elasticApiKey)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .baseUrl(URI.create(this.elasticUrl+"/"))
+                .baseUrl(URI.create(elasticUrl+"/"))
                 .build();
     }
 

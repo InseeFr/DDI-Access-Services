@@ -1,6 +1,7 @@
 package fr.insee.rmes.tocolecticaapi.fragments;
 
 import fr.insee.rmes.exceptions.RmesException;
+import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import org.springframework.http.HttpStatus;
@@ -17,11 +18,11 @@ public record DdiFragmentServiceImpl(XsltTransformationService xsltTransformatio
     @Override
     public String extractDataRelationship(String uuid) throws RmesException {
         try {
-            return xsltTransformationService.transformToXmlString(
+            return new String(xsltTransformationService.transformToRawText(
                     new ByteArrayInputStream(colecticaService.searchColecticaInstanceByUuid(uuid).getBytes()),
                     ddiRelationshipToJsonXsl
-            );
-        } catch (IOException e) {
+            ));
+        } catch (IOException | XsltTransformationException e) {
             throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while processing DDI to json", e.getMessage());
         }
     }

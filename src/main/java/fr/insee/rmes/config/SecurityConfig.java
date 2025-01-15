@@ -1,55 +1,58 @@
 package fr.insee.rmes.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.http.HttpMethod;
-import java.util.*;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
 @Slf4j
 public class SecurityConfig {
 
-    @Autowired
-    private Environment environment;
-    @Autowired
-    InseeSecurityTokenProperties inseeSecurityTokenProperties;
-    @Value("${fr.insee.rmes.role.administrateur}")
-    private String administrateurRole;
+    private final InseeSecurityTokenProperties inseeSecurityTokenProperties;
 
-    @Value("${fr.insee.rmes.role.gestionnaire.colectica}")
-    private String gestionnaireColectica;
-    @Value("${fr.insee.rmes.metadata.cors.allowedOrigin}")
-    private Optional<String> allowedOrigin;
-    @Value("#{'${fr.insee.rmes.security.whitelist-matchers}'.split(',')}")
-    private String[] whiteList;
+    private final String administrateurRole;
+
+    private final String gestionnaireColectica;
+
+    private final String[] whiteList;
+
     private static final String ROLE_PREFIX = "ROLE_";
-    public static final String PROFILES_ACTIVE="spring.profiles.active" ;
-    final static Logger logger = LogManager.getLogger(SecurityConfig.class);
+
+    public SecurityConfig(InseeSecurityTokenProperties inseeSecurityTokenProperties,  @Value("${fr.insee.rmes.role.administrateur}") String administrateurRole,
+                          @Value("${fr.insee.rmes.role.gestionnaire.colectica}") String gestionnaireColectica,
+                          @Value("#{'${fr.insee.rmes.security.whitelist-matchers}'.split(',')}")String[] whiteList) {
+        this.inseeSecurityTokenProperties = inseeSecurityTokenProperties;
+        this.administrateurRole = administrateurRole;
+        this.gestionnaireColectica = gestionnaireColectica;
+        this.whiteList = whiteList;
+    }
+
     @Bean
-    @ConditionalOnProperty(name = PROFILES_ACTIVE, havingValue = "prod")
+    @Profile("prod")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        //Webservice/RestAPI : disable CSRF & no sesion
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 //disable sessions (stateless)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         for (var pattern : whiteList) {
@@ -75,11 +78,11 @@ public class SecurityConfig {
         return http.build();
     }
     @Bean
-    @ConditionalOnProperty(name = PROFILES_ACTIVE, havingValue = "dev")
-    public SecurityFilterChain filterChain_noSecurity(HttpSecurity http) throws Exception {
+    @Profile("dev")
+    public SecurityFilterChain filterChainNoSecurity(HttpSecurity http) throws Exception {
         //Allow frames to be able tu use the H2 web console
         http.headers(headers -> headers
-                .frameOptions(frameOptions -> frameOptions.sameOrigin()
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin
                 )
         );
 
@@ -93,39 +96,38 @@ public class SecurityConfig {
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setPrincipalClaimName(inseeSecurityTokenProperties.getOidcClaimUsername());
+        jwtAuthenticationConverter.setPrincipalClaimName(inseeSecurityTokenProperties.oidcClaimUsername());
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter());
         return jwtAuthenticationConverter;
     }
 
     Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter() {
-        return new Converter<Jwt, Collection<GrantedAuthority>>() {
-            @Override @SuppressWarnings({ "unchecked" }) public Collection<GrantedAuthority> convert(Jwt source) {
+        return source -> {
 
-                String[] claimPath = inseeSecurityTokenProperties.getOidcClaimRole().split("\\.");
-                Map<String, Object> claims = source.getClaims();
-                try {
+            String[] claimPath = inseeSecurityTokenProperties.oidcClaimRole().split("\\.");
+            Map<String, Object> claims = source.getClaims();
+            try {
 
-                    for (int i = 0; i < claimPath.length - 1; i++) {
-                        claims = (Map<String, Object>) claims.get(claimPath[i]);
+                for (int i = 0; i < claimPath.length - 1; i++) {
+                    claims = (Map<String, Object>) claims.get(claimPath[i]);
+                }
+
+                List<String> roles = (List<String>) claims.getOrDefault(claimPath[claimPath.length - 1], List.of());
+                //if we need to add customs roles to every connected user we could define this variable (static or from properties)
+                //roles.addAll(defaultRolesForUsers);
+                return Collections.unmodifiableCollection(roles.stream().map(s -> new GrantedAuthority() {
+                    @Override
+                    public String getAuthority() {
+                        return ROLE_PREFIX + s;
                     }
 
-                    List<String> roles = (List<String>) claims.getOrDefault(claimPath[claimPath.length - 1], List.of());
-                    //if we need to add customs roles to every connected user we could define this variable (static or from properties)
-                    //roles.addAll(defaultRolesForUsers);
-                    return Collections.unmodifiableCollection(roles.stream().map(s -> new GrantedAuthority() {
-                        @Override public String getAuthority() {
-                            return ROLE_PREFIX + s;
-                        }
-
-                        @Override public String toString() {
-                            return getAuthority();
-                        }
-                    }).toList());
-                }
-                catch (ClassCastException e) {
-                    return List.of();
-                }
+                    @Override
+                    public String toString() {
+                        return getAuthority();
+                    }
+                }).toList());
+            } catch (ClassCastException e) {
+                return List.of();
             }
         };
     }

@@ -10,16 +10,17 @@ import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.exceptions.RmesBadRequestException;
 import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.RmesExceptionIO;
+import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.models.NamespaceContextMap;
 import fr.insee.rmes.tocolecticaapi.models.RessourcePackage;
 import fr.insee.rmes.tocolecticaapi.models.TransactionType;
 import fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer;
 import fr.insee.rmes.utils.ExportUtils;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -53,26 +54,29 @@ import static fr.insee.rmes.transfoxsl.utils.RestClientUtils.readBodySafely;
 
 @Service
 @Slf4j
-public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
-                                   ElasticService elasticService,
+public record ColecticaServiceImpl(ElasticService elasticService,
                                    RestClient restClient,
                                    ExportUtils exportUtils,
                                    DDIDerefencer ddiDerefencer,
-                                   @Value("${fr.insee.rmes.api.remote.metadata.url}")
-                                   String serviceUrl,
-                                   @Value("${fr.insee.rmes.api.remote.metadata.agency}")
                                    String agency
 
 ) implements ColecticaService {
 
-    private static final String BEARER = "Bearer ";
     private static final String TRANSACTIONID = "{\"TransactionId\":";
 
-    public ColecticaServiceImpl{
-        restClient = initRestClient();
+    @Autowired
+    public ColecticaServiceImpl(KeycloakServices kc,
+                                ElasticService elasticService,
+                                ExportUtils exportUtils,
+                                DDIDerefencer ddiDerefencer,
+                                @Value("${fr.insee.rmes.api.remote.metadata.url}")
+                                    String serviceUrl,
+                                @Value("${fr.insee.rmes.api.remote.metadata.agency}")
+                                    String agency){
+        this(elasticService, initRestClient(kc, serviceUrl), exportUtils, ddiDerefencer, agency);
     }
 
-    private RestClient initRestClient() {
+    private static RestClient initRestClient(KeycloakServices kc, String serviceUrl) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(100_000); // Temps de connexion en millisecondes
         factory.setReadTimeout(100_000); // Temps de lecture en millisecondes
@@ -81,7 +85,6 @@ public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
                 .requestFactory(factory)
                 .baseUrl(URI.create(serviceUrl + "/").resolve("api/v1/"))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, BEARER)
                 .defaultHeaders(headers -> headers.setBearerAuth(kc.getFreshToken()))
                 .build();
     }
@@ -95,14 +98,15 @@ public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
 
 
     private String getWithRestClient(URI relativeUri, MediaType acceptedMediaType) {
-        return restClient.get().uri(relativeUri)
+        RestClient.ResponseSpec response = restClient.get().uri(relativeUri)
                 .accept(acceptedMediaType)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new RmesExceptionIO(response.getStatusCode().value(), "Bad request or inexisting resource", readBodySafely(response));
+                .retrieve();
+        return response
+                .onStatus(HttpStatusCode::is4xxClientError, (request, httpResponse) -> {
+                    throw new RmesExceptionIO(httpResponse.getStatusCode().value(), "Bad request or inexisting resource", readBodySafely(httpResponse));
                 })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                    throw new RmesExceptionIO(response.getStatusCode().value(), "Error while calling Colectica", readBodySafely(response));
+                .onStatus(HttpStatusCode::is5xxServerError, (request, httpResponse) -> {
+                    throw new RmesExceptionIO(httpResponse.getStatusCode().value(), "Error while calling Colectica", readBodySafely(httpResponse));
                 })
                 .body(String.class);
     }
@@ -129,7 +133,8 @@ public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
         String instance = searchColecticaInstanceByUuid(uuid);
         try {
             return XmlProcessing.parseDereferencedXmlWithEnum(this.ddiDerefencer.intermediateDereference(instance));
-        } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
+        } catch (IOException | XsltTransformationException | ParserConfigurationException | SAXException |
+                 XPathExpressionException e) {
             throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while processing XML from Colectica", e.getMessage());
         }
     }
@@ -270,7 +275,7 @@ public record ColecticaServiceImpl(@NonNull KeycloakServices kc,
     }
 
     @Override
-    public List<Map<String, String>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception {
+    public List<Map<String, String>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         JsonNode jsonNode = objectMapper.readTree(findJsonsetByIdentifier(identifier));

@@ -46,7 +46,7 @@ import java.util.Set;
 
 @Service
 @Slf4j
-public class XsltTransformationService {
+public record XsltTransformationService(Processor processor) {
 
     public static final String DISALLOW_DOCTYPE_DECL1 = "http://apache.org/xml/features/disallow-doctype-decl";
     public static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
@@ -55,10 +55,8 @@ public class XsltTransformationService {
     static final byte[] DATA_TAG_BEGIN = "<data>".getBytes();
     static final byte[] DATA_TAG_END = "</data>".getBytes();
 
-    private final Processor processor;
-
     public XsltTransformationService() {
-        this.processor = new Processor(false);
+        this(new Processor(false));
     }
 
 
@@ -225,11 +223,11 @@ public class XsltTransformationService {
         return outputStream.toByteArray();
     }
 
-    public String transformToXmlString(InputStream inputStream, String xslFileName) throws XsltTransformationException, IOException {
+    public String transformToXmlString(InputStream inputStream, String xslFileName) throws IOException, XsltTransformationException {
         return toXmlString(transformToXml(inputStream, xslFileName));
     }
 
-    public byte[] transformToXml(InputStream inputStream, String xslFileName) throws IOException {
+    public byte[] transformToXml(InputStream inputStream, String xslFileName) throws IOException, XsltTransformationException {
         return transform(inputStream, xslFileName, SerializerConfigurer.forXmlString(processor));
     }
 
@@ -237,7 +235,7 @@ public class XsltTransformationService {
         return new String(result);
     }
 
-    public byte[] transformToRawText(InputStream stream, String xslFilename) throws IOException {
+    public byte[] transformToRawText(InputStream stream, String xslFilename) throws IOException, XsltTransformationException {
         return transform(stream, xslFilename, SerializerConfigurer.forRawText(processor));
     }
 

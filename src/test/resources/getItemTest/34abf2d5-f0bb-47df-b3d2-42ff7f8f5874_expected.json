@@ -47,7 +47,7 @@
   ], "ordre": "4", "representation": "codes", "controles":
   {
     "codes": [
-      { "code": "1 " , "label": [{
+      { "code": "1" , "label": [{
         "langue": "fr",
         "contenu": "Agriculteurs exploitants"
       },
@@ -58,7 +58,7 @@
       ]
       }
 
-    ,{ "code": "2 " , "label": [{
+    ,{ "code": "2" , "label": [{
         "langue": "fr",
         "contenu": "Artisans, commerçants et chefs d'entreprise"
       },
@@ -69,7 +69,7 @@
       ]
       }
 
-    ,{ "code": "3 " , "label": [{
+    ,{ "code": "3" , "label": [{
         "langue": "fr",
         "contenu": "Cadres et professions intellectuelles supérieures"
       },
@@ -80,7 +80,7 @@
       ]
       }
 
-    ,{ "code": "4 " , "label": [{
+    ,{ "code": "4" , "label": [{
         "langue": "fr",
         "contenu": "Professions intermédiaires"
       },
@@ -91,7 +91,7 @@
       ]
       }
 
-    ,{ "code": "5 " , "label": [{
+    ,{ "code": "5" , "label": [{
         "langue": "fr",
         "contenu": "Employés"
       },
@@ -102,7 +102,7 @@
       ]
       }
 
-    ,{ "code": "6 " , "label": [{
+    ,{ "code": "6" , "label": [{
         "langue": "fr",
         "contenu": "Ouvriers"
       },
@@ -113,7 +113,7 @@
       ]
       }
 
-    ,{ "code": "7 " , "label": [{
+    ,{ "code": "7" , "label": [{
         "langue": "fr",
         "contenu": "Retraités"
       },
@@ -124,7 +124,7 @@
       ]
       }
 
-    ,{ "code": "8 " , "label": [{
+    ,{ "code": "8" , "label": [{
         "langue": "fr",
         "contenu": "Autres inactifs"
       },
@@ -147,7 +147,7 @@
   ], "ordre": "5", "representation": "codes", "controles":
   {
     "codes": [
-      { "code": "EE&FIP " , "label": [{
+      { "code": "EE&FIP" , "label": [{
         "langue": "fr",
         "contenu": "L’individu a été enquêté à l’enquête Emploi, et au moins une déclaration fiscale le concernant a été retrouvée"
       },
@@ -158,7 +158,7 @@
       ]
       }
 
-    ,{ "code": "EE_CAF " , "label": [{
+    ,{ "code": "EE_CAF" , "label": [{
         "langue": "fr",
         "contenu": "L’individu d’un ménage considéré comme répondant ERFS ne se retrouve dans aucune déclaration fiscale, mais ses revenus ont pu être estimés à partir d’un appariement réussi avec le fichier CNAF"
       },
@@ -169,7 +169,7 @@
       ]
       }
 
-    ,{ "code": "EE " , "label": [{
+    ,{ "code": "EE" , "label": [{
         "langue": "fr",
         "contenu": "L'individu d’un ménage considéré comme répondant ERFS ne se retrouve dans aucune des déclarations fiscales associées au ménage, ses revenus individuels seront donc entièrement imputés"
       },
@@ -180,7 +180,7 @@
       ]
       }
 
-    ,{ "code": "EE_NRT " , "label": [{
+    ,{ "code": "EE_NRT" , "label": [{
         "langue": "fr",
         "contenu": "Etudiants de moins de 26 ans formant un ménage à part dans l’Enquête Emploi et dont on n'a retrouvé aucune trace dans les fichiers fiscaux (non-réponse totale), vraisemblablement parce qu’ils étaient rattachés au foyer fiscal de leur(s) parent(s)"
       },
@@ -203,7 +203,7 @@
   ], "ordre": "6", "representation": "codes", "controles":
   {
     "codes": [
-      { "code": "vous " , "label": [{
+      { "code": "vous" , "label": [{
         "langue": "fr",
         "contenu": "L'individu est le déclarant"
       },
@@ -214,7 +214,7 @@
       ]
       }
 
-    ,{ "code": "conj " , "label": [{
+    ,{ "code": "conj" , "label": [{
         "langue": "fr",
         "contenu": "Conjoint"
       },
@@ -225,7 +225,7 @@
       ]
       }
 
-    ,{ "code": "pac " , "label": [{
+    ,{ "code": "pac" , "label": [{
         "langue": "fr",
         "contenu": "Personne à charge"
       },
@@ -248,7 +248,7 @@
   ], "ordre": "7", "representation": "codes", "controles":
   {
     "codes": [
-      { "code": "mad " , "label": [{
+      { "code": "mad" , "label": [{
         "langue": "fr",
         "contenu": "Madame"
       },
@@ -259,7 +259,7 @@
       ]
       }
 
-    ,{ "code": "mon " , "label": [{
+    ,{ "code": "mon" , "label": [{
         "langue": "fr",
         "contenu": "Monsieur"
       },
@@ -270,7 +270,7 @@
       ]
       }
 
-    ,{ "code": "vopa " , "label": [{
+    ,{ "code": "vopa" , "label": [{
         "langue": "fr",
         "contenu": "Individus atteignant l'âge de 18 ans l’année de référence, pouvant avoir une double déclaration (seule et sur celle de leurs parents)"
       },
@@ -752,7 +752,7 @@
   ], "ordre": "59", "representation": "codes", "controles":
   {
     "codes": [
-      { "code": "1 " , "label": [{
+      { "code": "1" , "label": [{
         "langue": "fr",
         "contenu": "Salarié"
       },
@@ -763,7 +763,7 @@
       ]
       }
 
-    ,{ "code": "2 " , "label": [{
+    ,{ "code": "2" , "label": [{
         "langue": "fr",
         "contenu": "Indépendant"
       },
@@ -774,7 +774,7 @@
       ]
       }
 
-    ,{ "code": "3 " , "label": [{
+    ,{ "code": "3" , "label": [{
         "langue": "fr",
         "contenu": "Chômeur"
       },
@@ -785,7 +785,7 @@
       ]
       }
 
-    ,{ "code": "4 " , "label": [{
+    ,{ "code": "4" , "label": [{
         "langue": "fr",
         "contenu": "Retraité"
       },
@@ -796,7 +796,7 @@
       ]
       }
 
-    ,{ "code": "5 " , "label": [{
+    ,{ "code": "5" , "label": [{
         "langue": "fr",
         "contenu": "Autre inactif"
       },

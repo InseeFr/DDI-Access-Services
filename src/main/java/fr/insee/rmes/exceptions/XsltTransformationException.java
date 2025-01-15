@@ -4,7 +4,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 
 import java.util.Optional;
 
-public class XsltTransformationException extends RuntimeException {
+public class XsltTransformationException extends Exception {
 
     public XsltTransformationException(String message, SaxonApiException cause) {
         super(message, cause);

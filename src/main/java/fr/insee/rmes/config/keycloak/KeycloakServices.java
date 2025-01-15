@@ -74,17 +74,15 @@ public class KeycloakServices {
         return expiration.get() != null && Instant.now().isBefore(expiration.get().minus(1, ChronoUnit.SECONDS));
     }
 
-    public String getFreshToken() {
+    public synchronized String getFreshToken() {
         if (!this.isCurrentTokenValid()) {
-            synchronized (this.expiration) {
                 token = getKeycloakAccessToken();
-                this.expiration.set(decodeToken(token));
-            }
+                this.expiration.set(expirationFrom(token));
         }
         return token;
     }
 
-    private Instant decodeToken(String token) {
+    private Instant expirationFrom(String token) {
         return JWT.decode(token).getExpiresAtAsInstant();
     }
 

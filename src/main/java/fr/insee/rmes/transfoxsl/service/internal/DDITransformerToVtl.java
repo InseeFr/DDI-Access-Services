@@ -1,5 +1,6 @@
 package fr.insee.rmes.transfoxsl.service.internal;
 
+import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 
 import java.io.ByteArrayInputStream;
@@ -14,11 +15,8 @@ public record DDITransformerToVtl(XsltTransformationService xsltTransformationSe
         this(xsltTransformationService, new DDIDerefencer(xsltTransformationService));
     }
 
-    public byte[] transform(InputStream inputStream) throws IOException {
-
-
+    public byte[] transform(InputStream inputStream) throws IOException, XsltTransformationException {
         // Deuxième transformation - Texte en sortie (on récupère directement une liste de lignes de texte)
         return xsltTransformationService.transformToRawText(new ByteArrayInputStream(ddiDerefencer.intermediateDereference(inputStream)), DDI_2_VTL_XSL);
-
     }
 }

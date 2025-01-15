@@ -3,7 +3,6 @@ package fr.insee.rmes.tocolecticaapi.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.exceptions.RmesException;
-import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.fragments.DdiFragmentService;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -158,13 +156,13 @@ public class GetItem {
             schema = @Schema(
                     type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier,
             @RequestParam(value = "fieldIdName",defaultValue = "id") String outputField,
-            @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws Exception {
+            @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws JsonProcessingException {
         return colecticaService.getJsonWithChild(identifier, outputField, fieldLabelName);
     }
 
     @GetMapping(value = "/RessourcePackageToJson", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getRessourcePackage(
-            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException {
+            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
         return colecticaService.getRessourcePackage(uuid);
     }
 

@@ -3,7 +3,6 @@ package fr.insee.rmes.transfoxsl.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.rmes.exceptions.RmesException;
-import fr.insee.rmes.exceptions.VtlTransformationException;
 import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.model.DicoVar;
@@ -30,7 +29,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +51,6 @@ import static fr.insee.rmes.utils.ExportUtils.FILENAME_MAX_LENGTH;
 @Slf4j
 public class TransformationController {
 
-    public static final String FAILED_TO_PROCESS_THE_INPUT_FILE = "Failed to process the input file";
     public static final String TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING = "Transformation failed during the XSLT processing";
     public static final MediaType APPLICATION_ODT = MediaType.valueOf("application/vnd.oasis.opendocument.text");
     public static final String REL_TO_JSON_XSL = "dataRelToJson.xsl";
@@ -87,7 +88,7 @@ public class TransformationController {
 
     @Operation(summary = "Générer un fichier texte contenant les règles VTL à partir d'une physicalInstance")
     @PostMapping(value = "/ddi2vtl", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Resource> ddi2vtl(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Resource> ddi2vtl(@RequestParam("file") MultipartFile file) throws RmesException {
 
         DDITransformerToVtl ddiTransformerToVtl = new DDITransformerToVtl(xsltTransformationService);
 
@@ -110,18 +111,14 @@ public class TransformationController {
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(resource);
 
-        } catch (IOException e) {
-            throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
-        } catch (XsltTransformationException e) {
-            throw new VtlTransformationException(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + ".", e);
-        } catch (VtlTransformationException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+         } catch (IOException | XsltTransformationException e) {
+            throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failure while processing input file or while xslt transfo", e.getMessage(), e);
         }
     }
 
     @Operation(summary = "Transformer un objet dataRelationShip en JSON")
     @PostMapping(value = "/dataRelationShiptoJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> ddiDataRelationShiptoJson(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> ddiDataRelationShiptoJson(@RequestParam("file") MultipartFile file) throws RmesException {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
@@ -140,18 +137,14 @@ public class TransformationController {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(cleanJson);
-        } catch (IOException e) {
-            throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
-        } catch (XsltTransformationException e) {
-            throw new VtlTransformationException(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + ".", e);
-        } catch (VtlTransformationException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (IOException | XsltTransformationException e) {
+            throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failure while processing input file or while xslt transfo", e.getMessage(), e);
         }
     }
 
     @Operation(summary = "Générer les règles VTL à partir d'une physicalInstance et renvoyer sous forme de texte brut")
     @PostMapping(value = "/ddi2vtlBrut", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> ddi2vtlBrut(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> ddi2vtlBrut(@RequestParam("file") MultipartFile file) throws RmesException {
         try {
             // Conversion du MultipartFile en InputStream
             InputStream inputStream = multipartFileUtils.convertToInputStream(file);
@@ -164,12 +157,8 @@ public class TransformationController {
             return ResponseEntity.ok()
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(new String(output));
-        } catch (IOException e) {
-            throw new VtlTransformationException(FAILED_TO_PROCESS_THE_INPUT_FILE + ".", e);
-        } catch (XsltTransformationException e) {
-            throw new VtlTransformationException(TRANSFORMATION_FAILED_DURING_THE_XSLT_PROCESSING + ".", e);
-        } catch (VtlTransformationException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (IOException | XsltTransformationException e) {
+            throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failure while processing input file or while xslt transfo", e.getMessage(), e);
         }
     }
 
@@ -274,7 +263,7 @@ public class TransformationController {
     public ResponseEntity<Resource> getCodeBookV2(
             @RequestParam(value = "dicoVar") DicoVar dicoVar,
             @RequestParam(value = "ddiFile") MultipartFile ddiFile
-    ) throws Exception {
+    ) throws IOException, RmesException, ParserConfigurationException, TransformerException, SAXException {
 
         String ddi = new String(ddiFile.getBytes(), StandardCharsets.UTF_8);
         return ResponseEntity.ok()

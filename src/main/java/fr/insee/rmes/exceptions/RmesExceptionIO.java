@@ -1,8 +1,9 @@
 package fr.insee.rmes.exceptions;
 
-import java.io.IOException;
+import lombok.Getter;
 
-public class RmesExceptionIO extends IOException {
+@Getter
+public class RmesExceptionIO extends RuntimeException {
 
     private final int status;
     private final String details;

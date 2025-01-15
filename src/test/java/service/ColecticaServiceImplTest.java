@@ -1,173 +1,59 @@
 package service;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import fr.insee.rmes.config.keycloak.KeycloakServices;
-import fr.insee.rmes.model.DDIItemType;
+import fr.insee.rmes.exceptions.RmesException;
+import fr.insee.rmes.exceptions.RmesExceptionIO;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaServiceImpl;
-import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
-import fr.insee.rmes.utils.DocumentBuilderUtils;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicStatusLine;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
+import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Document;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestClient;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withResourceNotFound;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@SpringBootTest
-@TestPropertySource(properties = {"fr.insee.rmes.api.remote.metadata.url=http://mock-url"})
-@RunWith(SpringRunner.class)
 class ColecticaServiceImplTest {
 
-    @Configuration
-    static class TestConfig {
-        // Configuration beans can be defined here if needed
-    }
-    static class TestableColecticaServiceImpl extends ColecticaServiceImpl {
-        public static ResponseEntity<String> callProtectedMethod(CloseableHttpResponse response) throws IOException {
-            return getResponseEntitySearchColecticaFragmentByUuid(response);
-        }
-    }
-
-    @Mock
-    private CloseableHttpClient mockHttpClient;
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
-    private ElasticsearchClient elasticsearchClient;
-
-    @Mock
-    private KeycloakServices keycloakServices;
-
-    @InjectMocks
-    private ColecticaServiceImpl colecticaServiceImpl;
-
-    @BeforeEach
-    void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
-        when(keycloakServices.isTokenValid(anyString())).thenReturn(true);
-
-        CloseableHttpResponse mockResponse = mock(CloseableHttpResponse.class);
-        when(mockResponse.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 404, "Not Found"));
-        StringEntity entity = new StringEntity("");
-        when(mockResponse.getEntity()).thenReturn(entity);
-        when(mockHttpClient.execute(any(HttpGet.class))).thenReturn(mockResponse);
-
-        colecticaServiceImpl = new ColecticaServiceImpl(mockHttpClient, elasticsearchClient, restTemplate);
-        when(keycloakServices.getKeycloakAccessToken()).thenReturn("un_token_valide");
-        ReflectionTestUtils.setField(colecticaServiceImpl, "serviceUrl", "http://mock-url");
-    }
-
     @Test
-    void getResponseEntity_NotOkStatus() throws IOException {
-        CloseableHttpResponse mockResponse = mock(CloseableHttpResponse.class);
-        when(mockResponse.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 404, "Not Found"));
-        ResponseEntity<String> result = TestableColecticaServiceImpl.callProtectedMethod(mockResponse);
-        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-        assertTrue(result.getBody().contains("Erreur lors de la requête vers Colectica."));
+    void getResponseEntity_NotOkStatus() {
+        var uuid="1";
+        var agency="insee";
+
+        MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
+        String baseUrl = "http://keycloak/";
+        RestClient.Builder builder = RestClient.builder()
+                .baseUrl(baseUrl);
+        customizer.customize(builder);
+        customizer.getServer().expect(requestTo(baseUrl+"item/"+agency+"/"+ uuid)).andRespond(withResourceNotFound());
+
+        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(null,  builder.build(), null, null, agency);
+        var expectedException=assertThrows(RmesExceptionIO.class, ()-> colecticaService.findFragmentByUuid(uuid));
+        assertThat(expectedException.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(expectedException.getMessage()).isEqualTo("Bad request or inexisting resource");
     }
 
     @Test
     void getResponseEntity_OkStatus() throws IOException {
-        String jsonContent = "{\"Item\": \"<xml>Contenu</xml>\"}";
-        CloseableHttpResponse mockResponse = mock(CloseableHttpResponse.class);
-        when(mockResponse.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, "OK"));
-        when(mockResponse.getEntity()).thenReturn(new StringEntity(jsonContent));
-        ResponseEntity<String> result = TestableColecticaServiceImpl.callProtectedMethod(mockResponse);
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertTrue(result.getBody().contains("<xml>Contenu</xml>"));
-    }
+        String xmlContent = "<xml>Contenu</xml>";
+        String jsonContent = "{\"Item\": \""+xmlContent+"\"}";
+        var uuid="1";
+        var agency="insee";
+        String baseUrl = "http://keycloak/";
 
-    @Test
-    void testReplaceXmlParameters() {
-        String inputXml = "<example><r:Version>1</r:Version><r:String>Old Name</r:String><r:Content>Old Label</r:Content><r:URN>urn:example:1</r:URN></example>";
-        DDIItemType type = DDIItemType.CODE_LIST;
-        String label = "New Label";
-        int version = 2;
-        String name = "New Name";
-        String idepUtilisateur = "user";
-        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticsearchClient, restTemplate);
-        String result = colecticaService.replaceXmlParameters(inputXml, type, label, version, name, idepUtilisateur);
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-    }
+        MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
+        RestClient.Builder builder = RestClient.builder()
+                .baseUrl(baseUrl);
+        customizer.customize(builder);
+        customizer.getServer().expect(requestTo(baseUrl+"item/"+agency+"/"+ uuid)).andRespond(withSuccess(jsonContent, MediaType.APPLICATION_JSON));
 
+        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(null,  builder.build(), null, null, agency);
 
-    @Test
-    void testTransformFile() {
-        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticsearchClient, restTemplate);
-        MockMultipartFile file = new MockMultipartFile("file", "test.json", "application/json", "[{\"id\": \"value\",\"label\": \"value\" }]".getBytes());
-        ResponseEntity<String> result = colecticaService.transformFile(file, "idValue", "nomenclatureName", "suggesterDescription", "version", "idepUtilisateur", "timbre");
-        assertNotNull(result);
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertNotNull(result.getBody());
-    }
-
-    @Test
-    void testTransformToJson() throws Exception {
-        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl();
-
-        // Mock the Resource to simulate the XML input
-        Resource mockResource = Mockito.mock(Resource.class);
-        Mockito.when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream("<root><element>Test</element></root>".getBytes()));
-
-        // Provide a valid XSLT as InputStream
-        String xsltContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n" +
-                "    <xsl:output method=\"xml\" indent=\"yes\"/>\n" +
-                "    <xsl:template match=\"/\">\n" +
-                "        <transformed>\n" +
-                "            <xsl:copy-of select=\"*\"/>\n" +
-                "        </transformed>\n" +
-                "    </xsl:template>\n" +
-                "</xsl:stylesheet>";
-        InputStream xsltStream = new ByteArrayInputStream(xsltContent.getBytes());
-
-        // Call the method to be tested
-        String result = XsltTransformationService.transformToJson(mockResource, xsltStream, "user");
-
-        // Assertions
-        assertNotNull(result);
-        assertTrue(!result.isEmpty());
-        assertTrue(result.contains("<transformed>"));
-        assertTrue(result.contains("<element>Test</element>"));
-    }
-
-
-    @Test
-    void testGetDocument() throws Exception {
-        String xml = "<root><element>value</element></root>";
-        Document doc = DocumentBuilderUtils.getDocument(xml);
-
-        assertNotNull(doc);
-        assertEquals("root", doc.getDocumentElement().getNodeName());
+        assertThat(colecticaService.findFragmentByUuid(uuid)).hasToString(xmlContent);
     }
 
 
