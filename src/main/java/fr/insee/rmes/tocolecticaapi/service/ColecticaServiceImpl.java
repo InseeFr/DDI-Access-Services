@@ -86,7 +86,9 @@ public record ColecticaServiceImpl(ElasticService elasticService,
                 .requestFactory(factory)
                 .baseUrl(URI.create(serviceUrl + "/").resolve("api/v1/"))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
-                .defaultHeaders(headers -> headers.setBearerAuth(kc.getFreshToken()))
+                .defaultRequest(requestHeadersSpec -> requestHeadersSpec.header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + kc.getFreshToken())
+                )
                 .build();
     }
 
@@ -98,6 +100,7 @@ public record ColecticaServiceImpl(ElasticService elasticService,
     }
 
     String getWithRestClient(URI relativeUri, MediaType acceptedMediaType) {
+        log.debug("Start processing GET {} as {}" ,relativeUri, acceptedMediaType);
         RestClient.ResponseSpec response = restClient.get().uri(relativeUri)
                 .accept(acceptedMediaType)
                 .retrieve();
@@ -109,7 +112,9 @@ public record ColecticaServiceImpl(ElasticService elasticService,
                     throw new RmesExceptionIO(httpResponse.getStatusCode().value(), "Error while calling Colectica", readBodySafely(httpResponse));
                 })
                 .body(byte[].class);
-        return HttpUtils.filterBOM(rawResponseContent);
+        String filteredResponse = HttpUtils.filterBOM(rawResponseContent);
+        log.trace("Filtered response: {}", filteredResponse);
+        return filteredResponse;
     }
 
     private String postWithRestClient(URI relativeUri, Optional<String> requestBody, MediaType contentType) {

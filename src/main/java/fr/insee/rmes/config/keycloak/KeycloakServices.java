@@ -12,6 +12,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -75,11 +77,19 @@ public class KeycloakServices {
     }
 
     public synchronized String getFreshToken() {
+        log.atTrace().log(() -> "Check if token is valid with expiration at " + expirationAsString());
         if (!this.isCurrentTokenValid()) {
-                token = getKeycloakAccessToken();
-                this.expiration.set(expirationFrom(token));
+            log.debug("Start refreshing token");
+            token = getKeycloakAccessToken();
+            this.expiration.set(expirationFrom(token));
+            log.atTrace().log(() -> "New token valid until " + expirationAsString());
         }
         return token;
+    }
+
+    private String expirationAsString() {
+        Instant expirationInstant = expiration.get();
+        return expirationInstant == null ? null : LocalDateTime.ofInstant(expirationInstant, ZoneId.systemDefault()).toString();
     }
 
     private Instant expirationFrom(String token) {
