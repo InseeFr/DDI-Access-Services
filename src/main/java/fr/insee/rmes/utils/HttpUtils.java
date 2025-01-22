@@ -4,6 +4,8 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 public final class HttpUtils {
@@ -32,6 +34,20 @@ public final class HttpUtils {
         responseHeaders.setContentType(contentType);
         responseHeaders.setAccessControlExposeHeaders(allowHeaders);
         return responseHeaders;
+    }
+
+    public static String filterBOM(byte[] bytes) {
+        if (hasBom(bytes)){
+            return new String(Arrays.copyOfRange(bytes, 3, bytes.length), StandardCharsets.UTF_8);
+        }
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    private static boolean hasBom(byte[] bytes) {
+        return bytes.length > 2
+                && bytes[0] == (byte) 0xEF
+                && bytes[1] == (byte) 0xBB
+                && bytes[2] == (byte) 0xBF;
     }
 
 }

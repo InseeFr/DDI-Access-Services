@@ -17,6 +17,7 @@ import fr.insee.rmes.tocolecticaapi.models.RessourcePackage;
 import fr.insee.rmes.tocolecticaapi.models.TransactionType;
 import fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer;
 import fr.insee.rmes.utils.ExportUtils;
+import fr.insee.rmes.utils.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -96,21 +97,20 @@ public record ColecticaServiceImpl(ElasticService elasticService,
 
     }
 
-
-    private String getWithRestClient(URI relativeUri, MediaType acceptedMediaType) {
+    String getWithRestClient(URI relativeUri, MediaType acceptedMediaType) {
         RestClient.ResponseSpec response = restClient.get().uri(relativeUri)
                 .accept(acceptedMediaType)
                 .retrieve();
-        return response
+        byte[] rawResponseContent = response
                 .onStatus(HttpStatusCode::is4xxClientError, (request, httpResponse) -> {
                     throw new RmesExceptionIO(httpResponse.getStatusCode().value(), "Bad request or inexisting resource", readBodySafely(httpResponse));
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (request, httpResponse) -> {
                     throw new RmesExceptionIO(httpResponse.getStatusCode().value(), "Error while calling Colectica", readBodySafely(httpResponse));
                 })
-                .body(String.class);
+                .body(byte[].class);
+        return HttpUtils.filterBOM(rawResponseContent);
     }
-
 
     private String postWithRestClient(URI relativeUri, Optional<String> requestBody, MediaType contentType) {
         RestClient.RequestBodySpec postRequest = restClient.post()
