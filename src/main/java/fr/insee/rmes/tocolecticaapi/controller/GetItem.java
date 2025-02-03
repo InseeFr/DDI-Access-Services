@@ -47,7 +47,7 @@ public class GetItem {
     public ResponseEntity<String> extractDataRelationshipFromFragment(@Parameter(
             description = "id du fragment DDI sous la forme uuid",
             required = true,
-            schema = @Schema(type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))
+            schema = @Schema(type = "string", example="16a35b68-4479-4282-95ed-ff7d151746e4"))
             @PathVariable String uuid) throws RmesException {
         return ResponseEntity.ok(this.ddiFragmentService.extractDataRelationship(uuid));
     }
