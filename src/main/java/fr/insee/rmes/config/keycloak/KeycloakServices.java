@@ -15,7 +15,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Slf4j
@@ -30,15 +29,15 @@ public class KeycloakServices {
     final String realm;
 
     private String token;
-    //TODO is it the right way to synchronize ?
-    private final AtomicReference<Instant> expiration;
+
+    private Instant expiration;
 
     public KeycloakServices(@Value("${fr.insee.rmes.metadata.keycloak.secret}") String secret, @Value("${fr.insee.rmes.metadata.keycloak.resource}") String resource, @Value("${fr.insee.rmes.metadata.keycloak.server}") String server, @Value("${fr.insee.rmes.metadata.keycloak.realm}") String realm) {
         this.secret = secret;
         this.resource = resource;
         this.server = server;
         this.realm = realm;
-        this.expiration = new AtomicReference<>();
+        this.expiration = null;
     }
 
     /**
@@ -73,22 +72,22 @@ public class KeycloakServices {
      * @return boolean
      */
     private boolean isCurrentTokenValid() {
-        return expiration.get() != null && Instant.now().isBefore(expiration.get().minus(1, ChronoUnit.SECONDS));
+        return expiration != null && Instant.now().isBefore(expiration.minus(1, ChronoUnit.SECONDS));
     }
 
-    public synchronized String getFreshToken() {
+    public String getFreshToken() {
         log.atTrace().log(() -> "Check if token is valid with expiration at " + expirationAsString());
         if (!this.isCurrentTokenValid()) {
             log.debug("Start refreshing token");
             token = getKeycloakAccessToken();
-            this.expiration.set(expirationFrom(token));
+            this.expiration = expirationFrom(token);
             log.atTrace().log(() -> "New token valid until " + expirationAsString());
         }
         return token;
     }
 
     private String expirationAsString() {
-        Instant expirationInstant = expiration.get();
+        Instant expirationInstant = expiration;
         return expirationInstant == null ? null : LocalDateTime.ofInstant(expirationInstant, ZoneId.systemDefault()).toString();
     }
 
