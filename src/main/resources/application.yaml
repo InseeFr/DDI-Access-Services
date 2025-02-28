@@ -47,6 +47,7 @@ fr:
           resource: xxxxx
           server: "https://keycloak.xxx.fr/"
           realm: xxxx
+          scopes: "message.read,message.write"
         cors:
           allowedOrigin: "*"
       springdoc:
@@ -71,6 +72,17 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: "${fr.insee.rmes.metadata.keycloak.server}/.../protocol/openid-connect/certs"
+    client:
+      registration:
+        colectica-client: #Same value as the constant fr.insee.rmes.config.keycloak.KeycloakServices.CLIENT_REGISTRATION_ID
+          provider: ddi-as-provider
+          client-id: ${fr.insee.rmes.metadata.keycloak.resource}
+          client-secret: ${fr.insee.rmes.metadata.keycloak.secret}
+          authorization-grant-type: authorization_code
+          scope: ${fr.insee.rmes.metadata.keycloak.scopes}
+      provider:
+        ddi-as-provider: # same value as the key spring.security.client.registration.colectica-client.provider
+          issuer-uri: "${fr.insee.rmes.metadata.keycloak.server}/${fr.insee.rmes.metadata.keycloak.realm}/.../protocol/openid-connect/certs"
 
 springdoc:
   swagger-ui:
@@ -87,12 +99,6 @@ logging:
       max-file-size: 1MB
   file:
     name: XXXX
-
-auth:
-  api:
-    url: XXX
-  username: XXX
-  password: XXX
 
 item:
   api:

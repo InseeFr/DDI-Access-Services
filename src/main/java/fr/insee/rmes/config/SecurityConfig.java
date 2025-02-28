@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
@@ -20,9 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
@@ -73,7 +74,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated());
         http
                 .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .oauth2Client(Customizer.withDefaults());
 
         return http.build();
     }
@@ -115,7 +117,7 @@ public class SecurityConfig {
                 List<String> roles = (List<String>) claims.getOrDefault(claimPath[claimPath.length - 1], List.of());
                 //if we need to add customs roles to every connected user we could define this variable (static or from properties)
                 //roles.addAll(defaultRolesForUsers);
-                return Collections.unmodifiableCollection(roles.stream().map(s -> new GrantedAuthority() {
+                return roles.stream().map(s -> new GrantedAuthority() {
                     @Override
                     public String getAuthority() {
                         return ROLE_PREFIX + s;
@@ -125,7 +127,7 @@ public class SecurityConfig {
                     public String toString() {
                         return getAuthority();
                     }
-                }).toList());
+                }).collect(Collectors.toList());
             } catch (ClassCastException e) {
                 return List.of();
             }
