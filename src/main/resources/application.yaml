@@ -46,7 +46,6 @@ fr:
           secret: xxxxx
           resource: xxxxx
           server: "https://keycloak.xxx.fr/"
-          realm: xxxx
           scopes: "message.read,message.write"
         cors:
           allowedOrigin: "*"
@@ -72,17 +71,17 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: "${fr.insee.rmes.metadata.keycloak.server}/.../protocol/openid-connect/certs"
-    client:
-      registration:
-        colectica-client: #Same value as the constant fr.insee.rmes.config.keycloak.KeycloakServices.CLIENT_REGISTRATION_ID
-          provider: ddi-as-provider
-          client-id: ${fr.insee.rmes.metadata.keycloak.resource}
-          client-secret: ${fr.insee.rmes.metadata.keycloak.secret}
-          authorization-grant-type: authorization_code
-          scope: ${fr.insee.rmes.metadata.keycloak.scopes}
-      provider:
-        ddi-as-provider: # same value as the key spring.security.client.registration.colectica-client.provider
-          issuer-uri: "${fr.insee.rmes.metadata.keycloak.server}/${fr.insee.rmes.metadata.keycloak.realm}/.../protocol/openid-connect/certs"
+      client:
+        registration:
+          colectica-client: #Same value as the constant fr.insee.rmes.config.keycloak.KeycloakServices.CLIENT_REGISTRATION_ID
+            provider: ddi-as-provider
+            client-id: ${fr.insee.rmes.metadata.keycloak.resource}
+            client-secret: ${fr.insee.rmes.metadata.keycloak.secret}
+            authorization-grant-type: client_credentials
+            scope: ${fr.insee.rmes.metadata.keycloak.scopes}
+        provider:
+          ddi-as-provider: # same value as the key spring.security.client.registration.colectica-client.provider
+            issuer-uri: "${fr.insee.rmes.metadata.keycloak.server}/..."
 
 springdoc:
   swagger-ui:
@@ -98,7 +97,7 @@ logging:
     rollingpolicy:
       max-file-size: 1MB
   file:
-    name: XXXX
+    path: @project.build.directory@/ddi-as.log
 
 item:
   api:
