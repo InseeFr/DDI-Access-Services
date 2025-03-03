@@ -65,6 +65,7 @@ spring:
       enabled: true
       max-request-size: 50MB
   profiles:
+    active: prod
   security:
     oauth2:
       resourceserver:
