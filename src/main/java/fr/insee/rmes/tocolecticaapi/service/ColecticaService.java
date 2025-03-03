@@ -1,68 +1,33 @@
 package fr.insee.rmes.tocolecticaapi.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
+import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.models.TransactionType;
-import fr.insee.rmes.exceptions.RmesExceptionIO;
-import org.json.simple.parser.ParseException;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
+import org.json.JSONArray;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 public interface ColecticaService {
-    ResponseEntity<String> findFragmentByUuid(String uuid) throws ExceptionColecticaUnreachable, IOException;
+    String findFragmentByUuid(String uuid);
 
-    String sendDeleteColectica(String uuid, TransactionType transactionType) throws JsonProcessingException, ExceptionColecticaUnreachable, RmesExceptionIO, ParseException;
-    ResponseEntity<String> findInstanceByUuid(String uuid) throws RmesExceptionIO, ParseException;
-    String findFragmentByUuidWithChildren(String uuid) throws Exception;
-    ResponseEntity<String> filteredSearchText(String index, String texte);
+    void sendDeleteColectica(String uuid, TransactionType transactionType) throws JsonProcessingException, ExceptionColecticaUnreachable, RmesException;
+    String searchColecticaInstanceByUuid(String uuid) throws RmesException;
+    JSONArray findFragmentByUuidWithChildren(String uuid) throws RmesException;
+    String filteredSearchText(String index, String texte) throws RmesException;
 
 
-    ResponseEntity<String> searchTexteByType(String index, String texte, DDIItemType type);
-    ResponseEntity<String> searchByType(String index, DDIItemType type);
-    ResponseEntity<List<Map<String,String>>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws Exception;
+    String searchTexteByType(String index, String texte, DDIItemType type) throws RmesException;
+    String searchByType(String index, DDIItemType type) throws RmesException;
+    List<Map<String,String>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws JsonProcessingException;
 
-    String convertXmlToJson(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException, RmesExceptionIO, ParseException;
-    String replaceXmlParameters(String inputXml, DDIItemType type, String label, int version, String name, String idepUtilisateur);
+    String getRessourcePackage(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException;
 
-    ResponseEntity<String> getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable, ParseException;
+    String getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable;
 
-    ResponseEntity<String> sendUpdateColectica(String ddiUpdatingInJson, TransactionType transactionType) throws IOException;
+    void sendUpdateColectica(String ddiUpdatingInJson, TransactionType transactionType) throws RmesException;
 
-    ResponseEntity<String> transformFile(
-            MultipartFile file,
-            String idValue,
-            String nomenclatureName,
-            String suggesterDescription,
-            String version,
-            String idepUtilisateur,
-            String timbre
-    );
-    ResponseEntity<String> transformFileForComplexList(
-            MultipartFile file,
-            String idValue,
-            String nomenclatureName,
-            String suggesterDescription,
-            String version,
-            String idepUtilisateur,
-            String timbre,
-            String principale,
-            List <String> secondaire,
-            List <String> labelSecondaire
-    );
-
-    ResponseEntity<Resource> getCodeBookExport(String ddiFile, File dicoVar, String acceptHeader) throws RmesException;
-
-    ResponseEntity<Resource> getCodeBookExportV2(String ddiFile, String xslPatternFile) throws RmesException, Exception;
-
-    ResponseEntity<?> getCodeBookCheck(MultipartFile isCodeBook) throws RmesException, Exception;
-
-    ResponseEntity<String> uploadItem(MultipartFile file) throws IOException, ExceptionColecticaUnreachable;
 }

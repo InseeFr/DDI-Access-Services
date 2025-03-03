@@ -1,0 +1,99 @@
+fr:
+  insee:
+    rmes:
+      ddias:
+        version: "@project.version@"
+        filenames:
+          maxlength: 50
+      security:
+        enabled: false
+        whitelist-matchers: "/swagger-ui/index.html,/v3/api-docs/**"
+        token:
+          oidc-claim-role: XXX
+          oidc-claim-username: XXX
+      role:
+        administrateur: XXX
+        gestionnaire:
+          colectica: XXX
+      search:
+        root:
+          sub-group:
+            ids: "6baffbbc-86d5-4982-b6a4-7b035f7043ad, 2bfe02de-0044-4a94-b516-b166d9499971"
+          resource-package:
+            ids: "d574ed7e-2a7c-491f-b25c-f84141d4e96e"
+      elasticsearch:
+        url: "https://urlElastic"
+        index:
+          name: xxxx
+        host: urlElastic
+        port: 80
+        apiId: id
+        apikey: cle
+      api:
+        remote:
+          metadata:
+            MetadataService:
+              impl: MetadataServiceImpl
+            url: "http://ddiApi"
+            agency: xxxx
+            key: xxxx
+            user: xxxxx
+        host: localhost:8080
+        name: "/ddi-access-services/api"
+        scheme: http
+      metadata:
+        keycloak:
+          secret: xxxxx
+          resource: xxxxx
+          server: "https://keycloak.xxx.fr/"
+          realm: xxxx
+        cors:
+          allowedOrigin: "*"
+      springdoc:
+        issuer-url-authorization: "${fr.insee.rmes.metadata.keycloak.server}/.../protocol/openid-connect/auth"
+        issuer-url-refresh: "${fr.insee.rmes.metadata.keycloak.server}/.../protocol/openid-connect/token"
+        issuer-url-token: "${fr.insee.rmes.metadata.keycloak.server}/.../protocol/openid-connect/token"
+        issuer-description: Keycloak
+        contact-name: xxxxx
+        contact-email: "un-email-fonctionnel@xxx.fr"
+        contact-url: "https://www.insee.fr/fr/accueil"
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      enabled: true
+      max-request-size: 50MB
+  profiles:
+    active: dev
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "${fr.insee.rmes.metadata.keycloak.server}/.../protocol/openid-connect/certs"
+
+springdoc:
+  swagger-ui:
+    path: /
+    enabled: true
+    syntax-highlight:
+      activated: false
+    oauth:
+      clientId: localhost-frontend
+
+logging:
+  logback:
+    rollingpolicy:
+      max-file-size: 1MB
+  file:
+    name: XXXX
+
+auth:
+  api:
+    url: XXX
+  username: XXX
+  password: XXX
+
+item:
+  api:
+    url: "${fr.insee.rmes.api.remote.metadata.url}/api/v1/item/"

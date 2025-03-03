@@ -1,11 +1,18 @@
 package fr.insee.rmes.exceptions;
 
-public class XsltTransformationException extends RuntimeException {
-    public XsltTransformationException(String message) {
-        super(message);
-    }
+import net.sf.saxon.s9api.SaxonApiException;
 
-    public XsltTransformationException(String message, Throwable cause) {
+import java.util.Optional;
+
+public class XsltTransformationException extends Exception {
+
+    public XsltTransformationException(String message, SaxonApiException cause) {
         super(message, cause);
     }
+
+    public Optional<String> getXmlErrorMessage(){
+        var cause = getCause();
+        return cause != null ? Optional.of(cause.getMessage()) : Optional.empty();
+    }
+
 }

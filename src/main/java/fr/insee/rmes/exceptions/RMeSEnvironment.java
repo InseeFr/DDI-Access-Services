@@ -5,13 +5,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,17 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/env")
 @Tag(name = "RMeS Environment")
+@Slf4j
 public class RMeSEnvironment {
 
-    private static final Logger log = LogManager.getLogger(fr.insee.rmes.exceptions.RMeSEnvironment.class);
+    private final Environment env;
 
-    @Autowired
-    Environment env;
+    public RMeSEnvironment(Environment env) {
+        this.env = env;
+    }
 
 
-
-    @GetMapping
-    @Produces(MediaType.APPLICATION_JSON)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "Get DDI Access Services environment",
             description = "This will return a safe (no secrets) projection of the current backend environment"
@@ -39,7 +36,7 @@ public class RMeSEnvironment {
             @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
-    public String getEnvironment() throws Exception {
+    public String getEnvironment() {
         try {
             JSONObject envRep = new JSONObject();
             envRep.put("Swagger Host", env.getProperty("fr.insee.rmes.api.host"));

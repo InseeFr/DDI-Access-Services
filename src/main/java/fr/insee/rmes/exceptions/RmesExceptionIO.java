@@ -1,15 +1,12 @@
 package fr.insee.rmes.exceptions;
 
-import java.io.IOException;
+import lombok.Getter;
 
-public class RmesExceptionIO extends IOException {
+@Getter
+public class RmesExceptionIO extends RuntimeException {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5786486664894878082L;
-    private int status;
-    private String details;
+    private final int status;
+    private final String details;
 
     /**
      *

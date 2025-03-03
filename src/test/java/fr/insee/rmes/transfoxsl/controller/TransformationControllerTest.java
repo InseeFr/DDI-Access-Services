@@ -1,40 +1,50 @@
 package fr.insee.rmes.transfoxsl.controller;
 
-import fr.insee.rmes.exceptions.VtlTransformationException;
+import fr.insee.rmes.config.InseeSecurityTokenProperties;
+import fr.insee.rmes.config.SecurityConfig;
+import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import fr.insee.rmes.transfoxsl.utils.MultipartFileUtils;
+import fr.insee.rmes.utils.export.XDocReport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @WebMvcTest(TransformationController.class)
+@Import(SecurityConfig.class)
+@EnableConfigurationProperties(InseeSecurityTokenProperties.class)
 @ActiveProfiles("dev")
 class TransformationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private XsltTransformationService xsltTransformationService;
 
-    @MockBean
+    @MockitoBean
     private MultipartFileUtils multipartFileUtils;
+
+    @MockitoBean
+    private XDocReport xDocReport;
 
     @Test
     @WithMockUser // Simule un utilisateur authentifié
@@ -46,11 +56,11 @@ class TransformationControllerTest {
         when(multipartFileUtils.convertToInputStream(mockFile)).thenReturn(new ByteArrayInputStream("<xml></xml>".getBytes()));
 
         // Mocking transformation steps
-        List<String> intermediateOutput = List.of("<intermediate>XML</intermediate>");
-        List<String> finalOutput = List.of("VTL rule 1", "VTL rule 2");
+        byte[] intermediateOutput = "<intermediate>XML</intermediate>".getBytes();
+        byte[] finalOutput = "VTL rule 1\nVTL rule 2".getBytes();
 
-        when(xsltTransformationService.transform(any(), anyString(), anyBoolean())).thenReturn(intermediateOutput);
-        when(xsltTransformationService.transform(any(), anyString(), anyBoolean())).thenReturn(finalOutput);
+        when(xsltTransformationService.transformToXml(any(), anyString())).thenReturn(intermediateOutput);
+        when(xsltTransformationService.transformToRawText(any(), anyString())).thenReturn(finalOutput);
 
         // Perform the request and verify the response
         mockMvc.perform(MockMvcRequestBuilders.multipart("/xsl/ddi2vtl")
@@ -70,8 +80,8 @@ class TransformationControllerTest {
         when(multipartFileUtils.convertToInputStream(any())).thenReturn(new ByteArrayInputStream("<xml></xml>".getBytes()));
 
         // Simulate transformation failure with the correct exception
-        when(xsltTransformationService.transform(any(), anyString(), anyBoolean()))
-                .thenThrow(new VtlTransformationException("Transformation failed during the XSLT processing."));
+        when(xsltTransformationService.transformToXml(any(), anyString()))
+                .thenThrow(new XsltTransformationException("Transformation failed during the XSLT processing.", null));
 
         // Perform the request and expect the server error
         mockMvc.perform(MockMvcRequestBuilders.multipart("/xsl/ddi2vtl")
@@ -81,31 +91,32 @@ class TransformationControllerTest {
     }
 
     @Test
-    @WithMockUser  // Simule un utilisateur authentifié
-    void ddi2vtlJson_ShouldReturnJson_WhenTransformationIsSuccessful() throws Exception {
+    @WithMockUser() // Simule un utilisateur authentifié
+    void dataRelationShiptoJson_ShouldReturnJson_WhenTransformationIsSuccessful() throws Exception {
         // Mocking MultipartFile and transformation service
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.xml", "application/xml", "<xml></xml>".getBytes());
 
         // Mocking conversion to InputStream
         when(multipartFileUtils.convertToInputStream(mockFile)).thenReturn(new ByteArrayInputStream("<xml></xml>".getBytes()));
 
-        // Mocking transformation steps
-        List<String> intermediateOutput = List.of("<intermediate>XML</intermediate>");
-        List<String> finalOutput = List.of("VTL rule 1", "VTL rule 2");
+        // Mocking transformation result
+        byte[] intermediateOutput = "[{\"VTL\":\"rule 1\", \"VTL2\":\"rule 2\"}]".getBytes();
 
-        when(xsltTransformationService.transform(any(InputStream.class), anyString(), anyBoolean()))
+        when(xsltTransformationService.transformToRawText(any(InputStream.class), anyString()))
                 .thenReturn(intermediateOutput);
-        when(xsltTransformationService.transform(any(InputStream.class), anyString(), anyBoolean()))
-                .thenReturn(finalOutput);
+
+        // Expected formatted JSON output (as an object)
+        String expectedJson = "[{\n  \"VTL\" : \"rule 1\",\n  \"VTL2\" : \"rule 2\"\n}]";
 
         // Perform the request with CSRF token and verify the JSON response
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/xsl//ddi2vtlJson")
-                        .file(mockFile)
-                        .with(csrf()))  // Add CSRF token to the request
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/xsl/dataRelationShiptoJson")
+                        .file(mockFile))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON)) // Verify JSON content type
-                .andExpect(content().json("[\"VTL rule 1\", \"VTL rule 2\"]"));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJson));
     }
+
+
 
     @Test
     @WithMockUser
@@ -117,12 +128,12 @@ class TransformationControllerTest {
         when(multipartFileUtils.convertToInputStream(mockFile)).thenReturn(new ByteArrayInputStream("<xml></xml>".getBytes()));
 
         // Mocking transformation steps
-        List<String> intermediateOutput = List.of("<intermediate>XML</intermediate>");
-        List<String> finalOutput = List.of("VTL rule 1", "VTL rule 2");
+       byte[] intermediateOutput = "<intermediate>XML</intermediate>".getBytes();
+       byte[] finalOutput = "VTL rule 1\nVTL rule 2".getBytes();
 
-        when(xsltTransformationService.transform(any(InputStream.class), anyString(), anyBoolean()))
+        when(xsltTransformationService.transformToXml(any(InputStream.class), anyString()))
                 .thenReturn(intermediateOutput);
-        when(xsltTransformationService.transform(any(InputStream.class), anyString(), anyBoolean()))
+        when(xsltTransformationService.transformToRawText(any(InputStream.class), anyString()))
                 .thenReturn(finalOutput);
 
         // Perform the request and verify the plain text response

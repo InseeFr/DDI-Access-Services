@@ -1,0 +1,810 @@
+[{"id": "urn:ddi:fr.insee:fcc416b8-2ea0-4df4-8420-4f7f3d761168:1", "nom": "indivi17", "label":
+[
+  {
+    "contenu": "", "langue": "fr"},
+  {
+    "contenu": "",
+    "langue": "en"
+  }
+],
+  "variables":
+  [{"id": "urn:ddi:fr.insee:8ec8f1bc-ff67-45ee-a78b-c31951a78cb3:1", "nom": "noindiv", "label": [
+    {
+      "contenu": "Identifiant individu",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "1", "representation": "texte"},{"id": "urn:ddi:fr.insee:6758fc71-dc86-4edb-8c14-0f14362b3dee:1", "nom": "ident17", "label": [
+    {
+      "contenu": "Identifiant du ménage",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "2", "representation": "texte"},{"id": "urn:ddi:fr.insee:4d63151e-3bb5-444b-b3f1-9771507e0ea0:1", "nom": "noi", "label": [
+    {
+      "contenu": "Numéro individuel Enquête Emploi",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "3", "representation": "texte"},{"id": "urn:ddi:fr.insee:ab13bec9-0495-426d-a582-4b087a7b6ea5:1", "nom": "cs8cor", "label": [
+    {
+      "contenu": "CS en 8 postes avec correction ERFS",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "4", "representation": "codes", "controles":
+  {
+    "codes": [
+      { "code": "1" , "label": [{
+        "langue": "fr",
+        "contenu": "Agriculteurs exploitants"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "2" , "label": [{
+        "langue": "fr",
+        "contenu": "Artisans, commerçants et chefs d'entreprise"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "3" , "label": [{
+        "langue": "fr",
+        "contenu": "Cadres et professions intellectuelles supérieures"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "4" , "label": [{
+        "langue": "fr",
+        "contenu": "Professions intermédiaires"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "5" , "label": [{
+        "langue": "fr",
+        "contenu": "Employés"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "6" , "label": [{
+        "langue": "fr",
+        "contenu": "Ouvriers"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "7" , "label": [{
+        "langue": "fr",
+        "contenu": "Retraités"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "8" , "label": [{
+        "langue": "fr",
+        "contenu": "Autres inactifs"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ]}},{"id": "urn:ddi:fr.insee:0369bc65-682c-4b63-9d09-9b339ec49dd2:1", "nom": "quelfic", "label": [
+    {
+      "contenu": "Origine de l'observation",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "5", "representation": "codes", "controles":
+  {
+    "codes": [
+      { "code": "EE&FIP" , "label": [{
+        "langue": "fr",
+        "contenu": "L’individu a été enquêté à l’enquête Emploi, et au moins une déclaration fiscale le concernant a été retrouvée"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "EE_CAF" , "label": [{
+        "langue": "fr",
+        "contenu": "L’individu d’un ménage considéré comme répondant ERFS ne se retrouve dans aucune déclaration fiscale, mais ses revenus ont pu être estimés à partir d’un appariement réussi avec le fichier CNAF"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "EE" , "label": [{
+        "langue": "fr",
+        "contenu": "L'individu d’un ménage considéré comme répondant ERFS ne se retrouve dans aucune des déclarations fiscales associées au ménage, ses revenus individuels seront donc entièrement imputés"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "EE_NRT" , "label": [{
+        "langue": "fr",
+        "contenu": "Etudiants de moins de 26 ans formant un ménage à part dans l’Enquête Emploi et dont on n'a retrouvé aucune trace dans les fichiers fiscaux (non-réponse totale), vraisemblablement parce qu’ils étaient rattachés au foyer fiscal de leur(s) parent(s)"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ]}},{"id": "urn:ddi:fr.insee:5d269749-dd06-4af9-a91e-8972a2b2ba82:1", "nom": "persfip", "label": [
+    {
+      "contenu": "Identifiant individuel (2042) : indique si l'individu est le déclarant ou quel est son lien avec le déclarant",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "6", "representation": "codes", "controles":
+  {
+    "codes": [
+      { "code": "vous" , "label": [{
+        "langue": "fr",
+        "contenu": "L'individu est le déclarant"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "conj" , "label": [{
+        "langue": "fr",
+        "contenu": "Conjoint"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "pac" , "label": [{
+        "langue": "fr",
+        "contenu": "Personne à charge"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ]}},{"id": "urn:ddi:fr.insee:8abdcea6-ce62-46a4-b0d8-31a7d9bde324:1", "nom": "persfipd", "label": [
+    {
+      "contenu": "Identifiant individuel détaillé (2042) : indique où rechercher les revenus de l’individu sur la déclaration fiscale",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "7", "representation": "codes", "controles":
+  {
+    "codes": [
+      { "code": "mad" , "label": [{
+        "langue": "fr",
+        "contenu": "Madame"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "mon" , "label": [{
+        "langue": "fr",
+        "contenu": "Monsieur"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "vopa" , "label": [{
+        "langue": "fr",
+        "contenu": "Individus atteignant l'âge de 18 ans l’année de référence, pouvant avoir une double déclaration (seule et sur celle de leurs parents)"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ]}},{"id": "urn:ddi:fr.insee:f76704e8-1df8-45fb-9c0c-3dac8b29b372:1", "nom": "zsali", "label": [
+    {
+      "contenu": "Salaires au sens strict (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "8", "representation": "numerique"},{"id": "urn:ddi:fr.insee:63056208-ea5d-40b4-afba-4e4439f13b9f:1", "nom": "zchoi", "label": [
+    {
+      "contenu": "Allocation chômage et préretraite (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "9", "representation": "numerique"},{"id": "urn:ddi:fr.insee:19e06933-0e02-44e8-9a9b-875c1b7581b2:1", "nom": "ztsai", "label": [
+    {
+      "contenu": "Traitements et salaires (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "10", "representation": "numerique"},{"id": "urn:ddi:fr.insee:3783b748-2f6e-4143-88a9-5d454f432d9a:1", "nom": "zrsti", "label": [
+    {
+      "contenu": "Retraites au sens strict (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "11", "representation": "numerique"},{"id": "urn:ddi:fr.insee:87e85c5d-6380-4423-be51-b4c9f3736e55:1", "nom": "zpii", "label": [
+    {
+      "contenu": "Pensions d'invalidité (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "12", "representation": "numerique"},{"id": "urn:ddi:fr.insee:00b3f378-535f-4770-961d-4822aebf36b0:1", "nom": "zalri", "label": [
+    {
+      "contenu": "Pensions alimentaires reçues (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "13", "representation": "numerique"},{"id": "urn:ddi:fr.insee:42ae6bd5-804a-4182-b68e-70ff83193ba7:1", "nom": "zreti", "label": [
+    {
+      "contenu": "Retraites et pensions (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "14", "representation": "numerique"},{"id": "urn:ddi:fr.insee:96d279f5-cef3-40e6-b519-b9dc7bfd42f7:1", "nom": "zrtoi", "label": [
+    {
+      "contenu": "Rentes viagères à titre onéreux (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "15", "representation": "numerique"},{"id": "urn:ddi:fr.insee:b399dde0-790b-4a57-b530-354664ba7ba1:1", "nom": "zperi", "label": [
+    {
+      "contenu": "Pensions, retraites, rentes (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "16", "representation": "numerique"},{"id": "urn:ddi:fr.insee:f08de465-fb1b-42c3-be4f-34e0390e216e:1", "nom": "zragi", "label": [
+    {
+      "contenu": "Revenus agricoles (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "17", "representation": "numerique"},{"id": "urn:ddi:fr.insee:dd2b743d-82a6-450f-8274-e5dbccc02946:1", "nom": "zrici", "label": [
+    {
+      "contenu": "Revenus industriels et commerciaux (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "18", "representation": "numerique"},{"id": "urn:ddi:fr.insee:d1fd0fe7-458d-43f0-b336-3fd24e12cb70:1", "nom": "zrnci", "label": [
+    {
+      "contenu": "Revenus non commerciaux (individu)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "19", "representation": "numerique"},{"id": "urn:ddi:fr.insee:22d6b5f9-ded9-4da1-a4bf-38c4e6ea6f3f:1", "nom": "zsalo", "label": [
+    {
+      "contenu": "Salaires au sens strict (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "20", "representation": "numerique"},{"id": "urn:ddi:fr.insee:397b2d4d-19e7-4e79-bad8-7c229988e887:1", "nom": "zchoo", "label": [
+    {
+      "contenu": "Allocation chômage et préretraite (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "21", "representation": "numerique"},{"id": "urn:ddi:fr.insee:a36675ec-ba11-4425-b74e-172fed36be6b:1", "nom": "ztsao", "label": [
+    {
+      "contenu": "Traitements et salaires (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "22", "representation": "numerique"},{"id": "urn:ddi:fr.insee:d2ce4d15-6e37-4ea6-a180-01db98beb530:1", "nom": "zrsto", "label": [
+    {
+      "contenu": "Retraites au sens strict (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "23", "representation": "numerique"},{"id": "urn:ddi:fr.insee:4f2e87c9-c9b5-4637-95d3-94641b141e48:1", "nom": "zpio", "label": [
+    {
+      "contenu": "Pensions d'invalidité (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "24", "representation": "numerique"},{"id": "urn:ddi:fr.insee:7991a4e1-bfe1-4c83-a6d9-57dd6e455ab3:1", "nom": "zalro", "label": [
+    {
+      "contenu": "Pensions alimentaires reçues (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "25", "representation": "numerique"},{"id": "urn:ddi:fr.insee:d8f3410e-e828-4454-9cbd-084b0f2b30e6:1", "nom": "zreto", "label": [
+    {
+      "contenu": "Retraites et pensions (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "26", "representation": "numerique"},{"id": "urn:ddi:fr.insee:a5d806bc-a8ee-4d06-a38e-db1ffb603d2c:1", "nom": "zrtoo", "label": [
+    {
+      "contenu": "Rentes viagères à titre onéreux (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "27", "representation": "numerique"},{"id": "urn:ddi:fr.insee:f5d573dd-00c0-4d05-a7ed-45d6e4beb41e:1", "nom": "zpero", "label": [
+    {
+      "contenu": "Pensions, retraites, rentes (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "28", "representation": "numerique"},{"id": "urn:ddi:fr.insee:22d270e6-eb42-4ddf-b0de-55e2652a7de6:1", "nom": "zrago", "label": [
+    {
+      "contenu": "Revenus agricoles (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "29", "representation": "numerique"},{"id": "urn:ddi:fr.insee:63274f17-4fce-4b3d-b065-64e521831b14:1", "nom": "zrico", "label": [
+    {
+      "contenu": "Revenus industriels et commerciaux (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "30", "representation": "numerique"},{"id": "urn:ddi:fr.insee:649d1170-d501-4e8a-a95c-c37af565bb1f:1", "nom": "zrnco", "label": [
+    {
+      "contenu": "Revenus non commerciaux (origine)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "31", "representation": "numerique"},{"id": "urn:ddi:fr.insee:2b168ae2-3391-4688-b1f6-510bb2ce1a38:1", "nom": "declar1", "label": [
+    {
+      "contenu": "Description résumée : déclaration n°1",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "32", "representation": "texte"},{"id": "urn:ddi:fr.insee:f2952d87-a888-434e-adb1-0ca8fe145b6b:1", "nom": "declar2", "label": [
+    {
+      "contenu": "Description résumée : déclaration n°2",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "33", "representation": "texte"},{"id": "urn:ddi:fr.insee:44b36f21-f401-4b35-a537-cadc1b526ffe:1", "nom": "csgsald", "label": [
+    {
+      "contenu": "CSG déductible sur salaires",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "34", "representation": "numerique"},{"id": "urn:ddi:fr.insee:630c67cc-4f16-4148-bb26-94b87d84fa48:1", "nom": "csgsali", "label": [
+    {
+      "contenu": "CSG imposable sur salaires",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "35", "representation": "numerique"},{"id": "urn:ddi:fr.insee:feba9ab5-8938-4b8b-aba8-ca689e78949f:1", "nom": "crdssal", "label": [
+    {
+      "contenu": "CRDS sur salaires",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "36", "representation": "numerique"},{"id": "urn:ddi:fr.insee:8b357a51-6c7d-4d22-badc-8dd7198f0bbc:1", "nom": "csgchod", "label": [
+    {
+      "contenu": "CSG déductible sur allocations chômage",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "37", "representation": "numerique"},{"id": "urn:ddi:fr.insee:b966cdc3-d1b8-40ab-8e76-3b8d335f0d73:1", "nom": "csgchoi", "label": [
+    {
+      "contenu": "CSG imposable sur allocations chômage",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "38", "representation": "numerique"},{"id": "urn:ddi:fr.insee:4bc65274-25e0-4a9f-824f-c86762788614:1", "nom": "crdscho", "label": [
+    {
+      "contenu": "CRDS sur allocations chômage",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "39", "representation": "numerique"},{"id": "urn:ddi:fr.insee:59ccfb28-6023-4384-8e1f-056c56922c47:1", "nom": "csgrstd", "label": [
+    {
+      "contenu": "CSG déductible sur retraites",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "40", "representation": "numerique"},{"id": "urn:ddi:fr.insee:b8f75a18-0856-424e-a6c1-6bafc9ddbf34:1", "nom": "csgrsti", "label": [
+    {
+      "contenu": "CSG imposable sur retraites",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "41", "representation": "numerique"},{"id": "urn:ddi:fr.insee:efe9b759-5926-423a-823d-4a5b9bf84736:1", "nom": "crdsrst", "label": [
+    {
+      "contenu": "CRDS sur retraites",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "42", "representation": "numerique"},{"id": "urn:ddi:fr.insee:c4993982-f996-4e3e-8565-3e1f3a79fad8:1", "nom": "csgpid", "label": [
+    {
+      "contenu": "CSG imposable sur pensions d'invalidité",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "43", "representation": "numerique"},{"id": "urn:ddi:fr.insee:4a08bed8-1dde-4957-8014-788c1a6436bb:1", "nom": "csgpii", "label": [
+    {
+      "contenu": "CSG déductible sur pensions d'invalidité",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "44", "representation": "numerique"},{"id": "urn:ddi:fr.insee:b6d2773c-67b0-435e-9ffe-13b3c083548a:1", "nom": "crdspi", "label": [
+    {
+      "contenu": "CRDS sur pensions d'invalidité",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "45", "representation": "numerique"},{"id": "urn:ddi:fr.insee:f49137c2-8cee-45c2-b3bd-8d3da380dd47:1", "nom": "csgragd", "label": [
+    {
+      "contenu": "CSG déductible sur RAG",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "46", "representation": "numerique"},{"id": "urn:ddi:fr.insee:509c63a6-02ad-49f6-bf27-a1b011662d08:1", "nom": "csgragi", "label": [
+    {
+      "contenu": "CSG imposable sur RAG",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "47", "representation": "numerique"},{"id": "urn:ddi:fr.insee:6eef0c5d-5ad6-4ac6-a8b9-ddd8c7b082de:1", "nom": "crdsrag", "label": [
+    {
+      "contenu": "CRDS sur RAG",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "48", "representation": "numerique"},{"id": "urn:ddi:fr.insee:a49541ee-eea0-4f3f-af3d-36d24e90b81f:1", "nom": "csgricd", "label": [
+    {
+      "contenu": "CSG déductible sur RIC",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "49", "representation": "numerique"},{"id": "urn:ddi:fr.insee:c2e92b35-4372-46c6-9931-453c240aeada:1", "nom": "csgrici", "label": [
+    {
+      "contenu": "CSG imposable sur RIC",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "50", "representation": "numerique"},{"id": "urn:ddi:fr.insee:1d930e75-9aac-4938-8f13-0adbe490f2a3:1", "nom": "crdsric", "label": [
+    {
+      "contenu": "CRDS sur RIC",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "51", "representation": "numerique"},{"id": "urn:ddi:fr.insee:12e924d4-4d9b-40a1-89af-d1b0520540de:1", "nom": "csgrncd", "label": [
+    {
+      "contenu": "CSG déductible sur RNC",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "52", "representation": "numerique"},{"id": "urn:ddi:fr.insee:2ad09d76-ee1c-4280-9d69-059f3a0324b5:1", "nom": "csgrnci", "label": [
+    {
+      "contenu": "CSG imposable sur RNC",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "53", "representation": "numerique"},{"id": "urn:ddi:fr.insee:d2a61c5b-6e39-471e-816c-33759dd71ae7:1", "nom": "crdsrnc", "label": [
+    {
+      "contenu": "CRDS sur RNC",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "54", "representation": "numerique"},{"id": "urn:ddi:fr.insee:f68b0a26-6a19-4bc1-b50f-8abad2c5e81b:1", "nom": "wprm", "label": [
+    {
+      "contenu": "Poids final ERFS",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "55", "representation": "numerique"},{"id": "urn:ddi:fr.insee:9343c28a-3382-4a68-b3a5-78bb9b460062:1", "nom": "logt", "label": [
+    {
+      "contenu": "Statut d'occupation corrigé",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "56", "representation": "texte"},{"id": "urn:ddi:fr.insee:af48a15d-baf1-4ff2-aee5-ae0602b355ce:1", "nom": "nb_UCI", "label": [
+    {
+      "contenu": "Nombre d'Unités de Consommation du ménage",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "57", "representation": "numerique"},{"id": "urn:ddi:fr.insee:b261c008-ac55-4dd4-8be9-2c3e96c9e02f:1", "nom": "m_minvm", "label": [
+    {
+      "contenu": "Minimum vieillesse du ménage",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "58", "representation": "numerique"},{"id": "urn:ddi:fr.insee:f6895b5d-febe-4a7f-b745-03c2b00ac593:1", "nom": "acteu5", "label": [
+    {
+      "contenu": "Activité au sens BIT recalculée (5 postes)",
+      "langue": "fr"
+    },
+    {
+      "contenu": "",
+      "langue": "en"
+    }
+  ], "ordre": "59", "representation": "codes", "controles":
+  {
+    "codes": [
+      { "code": "1" , "label": [{
+        "langue": "fr",
+        "contenu": "Salarié"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "2" , "label": [{
+        "langue": "fr",
+        "contenu": "Indépendant"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "3" , "label": [{
+        "langue": "fr",
+        "contenu": "Chômeur"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "4" , "label": [{
+        "langue": "fr",
+        "contenu": "Retraité"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ,{ "code": "5" , "label": [{
+        "langue": "fr",
+        "contenu": "Autre inactif"
+      },
+        {
+          "langue": "en",
+          "contenu": ""
+        }
+      ]
+      }
+
+    ]}}]}]
