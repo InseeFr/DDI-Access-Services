@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ddi:FragmentInstance xmlns:r="ddi:reusable:3_3" xmlns:ddi="ddi:instance:3_3">
+    <ddi:TopLevelReference>
+        <r:Agency>fr.insee</r:Agency>
+        <r:ID>16a35b68-4479-4282-95ed-ff7d151746e4</r:ID>
+        <r:Version>2</r:Version>
+        <r:TypeOfObject>PhysicalInstance</r:TypeOfObject>
+    </ddi:TopLevelReference>
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <PhysicalInstance isUniversallyUnique="true" versionDate="2024-06-03T14:29:23.4049817Z" xmlns="ddi:physicalinstance:3_3">
+            <r:URN>urn:ddi:fr.insee:16a35b68-4479-4282-95ed-ff7d151746e4:2</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>16a35b68-4479-4282-95ed-ff7d151746e4</r:ID>
+            <r:Version>2</r:Version>
+            <r:VersionResponsibility>AD\ACY5R8</r:VersionResponsibility>
+            <r:VersionRationale>
+                <r:RationaleDescription>
+                    <r:String xml:lang="fr-FR">publication teo2 avec physical Instance</r:String>
+                </r:RationaleDescription>
+            </r:VersionRationale>
+            <r:Citation>
+                <r:Title>
+                    <r:String xml:lang="fr-FR">Fichier thl-CASD</r:String>
+                </r:Title>
+            </r:Citation>
+            <r:DataRelationshipReference>
+                <r:Agency>fr.insee</r:Agency>
+                <r:ID>77dfee13-1a96-43c1-b1ef-7b78b45be55d</r:ID>
+                <r:Version>2</r:Version>
+                <r:TypeOfObject>DataRelationship</r:TypeOfObject>
+            </r:DataRelationshipReference>
+        </PhysicalInstance>
+    </Fragment>
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <DataRelationship isUniversallyUnique="true" versionDate="2024-06-03T14:29:23.4049817Z" xmlns="ddi:logicalproduct:3_3">
+            <r:URN>urn:ddi:fr.insee:77dfee13-1a96-43c1-b1ef-7b78b45be55d:2</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>77dfee13-1a96-43c1-b1ef-7b78b45be55d</r:ID>
+            <r:Version>2</r:Version>
+            <r:VersionResponsibility>AD\ACY5R8</r:VersionResponsibility>
+            <r:VersionRationale>
+                <r:RationaleDescription>
+                    <r:String xml:lang="fr-FR">publication teo2 avec physical Instance</r:String>
+                </r:RationaleDescription>
+            </r:VersionRationale>
+            <DataRelationshipName>
+                <r:String xml:lang="fr-FR">Dessin de fichier thl-CASD</r:String>
+            </DataRelationshipName>
+            <LogicalRecord isUniversallyUnique="true">
+                <r:URN>urn:ddi:fr.insee:8398b3dd-d7c1-4779-9ecb-0b085d8433fe:2</r:URN>
+                <r:Agency>fr.insee</r:Agency>
+                <r:ID>8398b3dd-d7c1-4779-9ecb-0b085d8433fe</r:ID>
+                <r:Version>2</r:Version>
+                <LogicalRecordName>
+                    <r:String xml:lang="fr-FR">Dessin de fichier thl-CASD</r:String>
+                </LogicalRecordName>
+                <VariablesInRecord>
+                    <VariableUsedReference>
+                        <r:Agency>fr.insee</r:Agency>
+                        <r:ID>aa090e13-252a-4da7-b776-8f8e505be6d9</r:ID>
+                        <r:Version>1</r:Version>
+                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                    </VariableUsedReference>
+                    <VariableUsedReference>
+                        <r:Agency>fr.insee</r:Agency>
+                        <r:ID>7f2ae666-2208-46ce-bb1d-fd3fda8c6667</r:ID>
+                        <r:Version>1</r:Version>
+                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                    </VariableUsedReference>
+                </VariablesInRecord>
+            </LogicalRecord>
+        </DataRelationship>
+    </Fragment>
+
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <Variable isUniversallyUnique="true" versionDate="2024-06-03T13:35:37.9342777Z" xmlns="ddi:logicalproduct:3_3">
+            <r:URN>urn:ddi:fr.insee:aa090e13-252a-4da7-b776-8f8e505be6d9:1</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>aa090e13-252a-4da7-b776-8f8e505be6d9</r:ID>
+            <r:Version>1</r:Version>
+            <VariableName>
+                <r:String xml:lang="fr-FR">ACTOCCUPE</r:String>
+            </VariableName>
+            <r:Label>
+                <r:Content xml:lang="fr-FR">Actif occupé</r:Content>
+            </r:Label>
+            <r:Description>
+                <r:Content xml:lang="fr-FR">Nature : Contrôle</r:Content>
+            </r:Description>
+            <r:RepresentedVariableReference>
+                <r:Agency>fr.insee</r:Agency>
+                <r:ID>dd218170-6a82-4db7-ba9c-23ad53700f61</r:ID>
+                <r:Version>1</r:Version>
+                <r:TypeOfObject>RepresentedVariable</r:TypeOfObject>
+            </r:RepresentedVariableReference>
+            <VariableRepresentation>
+                <r:CodeRepresentation blankIsMissingValue="false">
+                    <r:CodeListReference>
+                        <r:Agency>fr.insee</r:Agency>
+                        <r:ID>57c49a53-905f-4759-8feb-06651f1e0eaf</r:ID>
+                        <r:Version>1</r:Version>
+                        <r:TypeOfObject>CodeList</r:TypeOfObject>
+                    </r:CodeListReference>
+                </r:CodeRepresentation>
+            </VariableRepresentation>
+        </Variable>
+    </Fragment>
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <CodeList isUniversallyUnique="true" versionDate="2023-07-04T09:19:29.3053289Z" xmlns="ddi:logicalproduct:3_3">
+            <r:URN>urn:ddi:fr.insee:57c49a53-905f-4759-8feb-06651f1e0eaf:1</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>57c49a53-905f-4759-8feb-06651f1e0eaf</r:ID>
+            <r:Version>1</r:Version>
+            <Code isUniversallyUnique="true">
+                <r:URN>urn:ddi:fr.insee:7a576a7a-a230-44d7-92be-395a80ae0fb5:1</r:URN>
+                <r:Agency>fr.insee</r:Agency>
+                <r:ID>7a576a7a-a230-44d7-92be-395a80ae0fb5</r:ID>
+                <r:Version>1</r:Version>
+                <r:CategoryReference>
+                    <r:Agency>fr.insee</r:Agency>
+                    <r:ID>017ff7c4-99a2-4885-a231-67f10484e0ba</r:ID>
+                    <r:Version>1</r:Version>
+                    <r:TypeOfObject>Category</r:TypeOfObject>
+                </r:CategoryReference>
+                <r:Value>0</r:Value>
+            </Code>
+            <Code isUniversallyUnique="true">
+                <r:URN>urn:ddi:fr.insee:ebf128ec-54d8-4db0-8765-83f961faa5d2:1</r:URN>
+                <r:Agency>fr.insee</r:Agency>
+                <r:ID>ebf128ec-54d8-4db0-8765-83f961faa5d2</r:ID>
+                <r:Version>1</r:Version>
+                <r:CategoryReference>
+                    <r:Agency>fr.insee</r:Agency>
+                    <r:ID>900b2c41-17ed-4a78-9e2f-0615d58e1060</r:ID>
+                    <r:Version>1</r:Version>
+                    <r:TypeOfObject>Category</r:TypeOfObject>
+                </r:CategoryReference>
+                <r:Value>1</r:Value>
+            </Code>
+        </CodeList>
+    </Fragment>
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <Category isUniversallyUnique="true" versionDate="2023-07-04T09:19:29.3073232Z" isMissing="false" xmlns="ddi:logicalproduct:3_3">
+            <r:URN>urn:ddi:fr.insee:900b2c41-17ed-4a78-9e2f-0615d58e1060:1</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>900b2c41-17ed-4a78-9e2f-0615d58e1060</r:ID>
+            <r:Version>1</r:Version>
+            <r:Label>
+                <r:Content xml:lang="fr-FR">Actif occupé</r:Content>
+            </r:Label>
+        </Category>
+    </Fragment>
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <Category isUniversallyUnique="true" versionDate="2023-07-04T09:19:29.3073232Z" isMissing="false" xmlns="ddi:logicalproduct:3_3">
+            <r:URN>urn:ddi:fr.insee:017ff7c4-99a2-4885-a231-67f10484e0ba:1</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>017ff7c4-99a2-4885-a231-67f10484e0ba</r:ID>
+            <r:Version>1</r:Version>
+            <r:Label>
+                <r:Content xml:lang="fr-FR">Inactif ou actif non occupé</r:Content>
+            </r:Label>
+        </Category>
+    </Fragment>
+
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <RepresentedVariable isUniversallyUnique="true" versionDate="2023-07-04T09:19:29.3043312Z" xmlns="ddi:logicalproduct:3_3">
+            <r:URN>urn:ddi:fr.insee:dd218170-6a82-4db7-ba9c-23ad53700f61:1</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>dd218170-6a82-4db7-ba9c-23ad53700f61</r:ID>
+            <r:Version>1</r:Version>
+            <RepresentedVariableName>
+                <r:String xml:lang="fr-FR">ACTOCCUPE</r:String>
+            </RepresentedVariableName>
+            <r:Label>
+                <r:Content xml:lang="fr-FR">Actif occupé</r:Content>
+            </r:Label>
+            <r:Description>
+                <r:Content xml:lang="fr-FR">Nature : Contrôle</r:Content>
+            </r:Description>
+            <r:CodeRepresentation blankIsMissingValue="false">
+                <r:CodeListReference>
+                    <r:Agency>fr.insee</r:Agency>
+                    <r:ID>57c49a53-905f-4759-8feb-06651f1e0eaf</r:ID>
+                    <r:Version>1</r:Version>
+                    <r:TypeOfObject>CodeList</r:TypeOfObject>
+                </r:CodeListReference>
+            </r:CodeRepresentation>
+        </RepresentedVariable>
+    </Fragment>
+
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <Variable isUniversallyUnique="true" versionDate="2024-06-03T13:35:37.9342777Z" xmlns="ddi:logicalproduct:3_3">
+            <r:URN>urn:ddi:fr.insee:7f2ae666-2208-46ce-bb1d-fd3fda8c6667:1</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>7f2ae666-2208-46ce-bb1d-fd3fda8c6667</r:ID>
+            <r:Version>1</r:Version>
+            <VariableName>
+                <r:String xml:lang="fr-FR">AG</r:String>
+            </VariableName>
+            <r:Label>
+                <r:Content xml:lang="fr-FR">Age au 31 décembre de l'année de l'enquête</r:Content>
+            </r:Label>
+            <r:Description>
+                <r:Content xml:lang="fr-FR">Nature : Contrôle</r:Content>
+            </r:Description>
+            <r:RepresentedVariableReference>
+                <r:Agency>fr.insee</r:Agency>
+                <r:ID>bf4fea39-aef1-45ed-83ec-494415d43ad0</r:ID>
+                <r:Version>1</r:Version>
+                <r:TypeOfObject>RepresentedVariable</r:TypeOfObject>
+            </r:RepresentedVariableReference>
+            <VariableRepresentation>
+                <r:NumericRepresentation blankIsMissingValue="false" />
+            </VariableRepresentation>
+        </Variable>
+    </Fragment>
+
+    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+        <RepresentedVariable isUniversallyUnique="true" versionDate="2023-07-04T09:19:29.3043312Z" xmlns="ddi:logicalproduct:3_3">
+            <r:URN>urn:ddi:fr.insee:bf4fea39-aef1-45ed-83ec-494415d43ad0:1</r:URN>
+            <r:Agency>fr.insee</r:Agency>
+            <r:ID>bf4fea39-aef1-45ed-83ec-494415d43ad0</r:ID>
+            <r:Version>1</r:Version>
+            <RepresentedVariableName>
+                <r:String xml:lang="fr-FR">AG</r:String>
+            </RepresentedVariableName>
+            <r:Label>
+                <r:Content xml:lang="fr-FR">Age au 31 décembre de l'année de l'enquête</r:Content>
+            </r:Label>
+            <r:Description>
+                <r:Content xml:lang="fr-FR">Nature : Contrôle</r:Content>
+            </r:Description>
+            <r:NumericRepresentation blankIsMissingValue="false" />
+        </RepresentedVariable>
+    </Fragment>
+</ddi:FragmentInstance>
