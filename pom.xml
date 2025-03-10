@@ -23,6 +23,9 @@
         <java-jwt.version>4.5.0</java-jwt.version>
         <json.version>20250107</json.version>
         <jacoco.version>0.8.12</jacoco.version>
+        <sonar.organization>inseefr</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.projectKey>InseeFr_DDI-Access-Services</sonar.projectKey>
     </properties>
     <dependencies>
 
