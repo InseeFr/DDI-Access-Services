@@ -7,6 +7,7 @@ import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(GetItem.class)
+@WebMvcTest(value=GetItem.class, excludeAutoConfiguration = OAuth2ClientAutoConfiguration.class)
 @Import(value = {DdiFragmentServiceImpl.class, SecurityConfig.class, XsltTransformationService.class})
 @EnableConfigurationProperties(InseeSecurityTokenProperties.class)
 @ActiveProfiles("dev")
