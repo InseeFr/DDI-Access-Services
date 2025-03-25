@@ -1,0 +1,793 @@
+2025-03-25T08:30:50.454+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ===============================================================================================
+2025-03-25T08:30:50.466+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    :                                 Valeurs des properties                                         
+2025-03-25T08:30:50.467+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ===============================================================================================
+2025-03-25T08:30:50.469+01:00  WARN 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ConfigurationPropertySourcesPropertySource {name='configurationProperties'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:30:50.472+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.config.additional-location = optional:jimfs://secrets/K:/secret.properties
+2025-03-25T08:30:50.472+01:00  WARN 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : StubPropertySource {name='servletConfigInitParams'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:30:50.474+01:00  WARN 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : StubPropertySource {name='servletContextInitParams'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:30:50.474+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.version = 21
+2025-03-25T08:30:50.475+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.cpu.isalist = amd64
+2025-03-25T08:30:50.475+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.jnu.encoding = Cp1252
+2025-03-25T08:30:50.475+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.class.path = C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services\target\classes;C:\Users\C3JGPV\.m2\repository\com\auth0\java-jwt\4.5.0\java-jwt-4.5.0.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.18.2\jackson-core-2.18.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.18.2\jackson-databind-2.18.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-xml\2.18.2\jackson-dataformat-xml-2.18.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.18.2\jackson-annotations-2.18.2.jar;C:\Users\C3JGPV\.m2\repository\org\codehaus\woodstox\stax2-api\4.2.2\stax2-api-4.2.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\woodstox\woodstox-core\7.0.0\woodstox-core-7.0.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.document.odt\2.1.0\fr.opensagres.xdocreport.document.odt-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.document\2.1.0\fr.opensagres.xdocreport.document-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.core\2.1.0\fr.opensagres.xdocreport.core-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.converter\2.1.0\fr.opensagres.xdocreport.converter-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.template.freemarker\2.1.0\fr.opensagres.xdocreport.template.freemarker-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.template\2.1.0\fr.opensagres.xdocreport.template-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\org\freemarker\freemarker\2.3.33\freemarker-2.3.33.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-security\3.4.1\spring-boot-starter-security-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter\3.4.1\spring-boot-starter-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot\3.4.1\spring-boot-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.4.1\spring-boot-autoconfigure-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.4.1\spring-boot-starter-logging-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\ch\qos\logback\logback-classic\1.5.12\logback-classic-1.5.12.jar;C:\Users\C3JGPV\.m2\repository\ch\qos\logback\logback-core\1.5.12\logback-core-1.5.12.jar;C:\Users\C3JGPV\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.24.3\log4j-to-slf4j-2.24.3.jar;C:\Users\C3JGPV\.m2\repository\org\apache\logging\log4j\log4j-api\2.24.3\log4j-api-2.24.3.jar;C:\Users\C3JGPV\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\C3JGPV\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\C3JGPV\.m2\repository\org\yaml\snakeyaml\2.3\snakeyaml-2.3.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-aop\6.2.1\spring-aop-6.2.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-beans\6.2.1\spring-beans-6.2.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-config\6.4.2\spring-security-config-6.4.2.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-context\6.2.1\spring-context-6.2.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-web\6.4.2\spring-security-web-6.4.2.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-expression\6.2.1\spring-expression-6.2.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.4.1\spring-boot-starter-web-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.4.1\spring-boot-starter-json-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.18.2\jackson-datatype-jdk8-2.18.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.18.2\jackson-datatype-jsr310-2.18.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.18.2\jackson-module-parameter-names-2.18.2.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.4.1\spring-boot-starter-tomcat-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.34\tomcat-embed-core-10.1.34.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.34\tomcat-embed-el-10.1.34.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.34\tomcat-embed-websocket-10.1.34.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-web\6.2.1\spring-web-6.2.1.jar;C:\Users\C3JGPV\.m2\repository\io\micrometer\micrometer-observation\1.14.2\micrometer-observation-1.14.2.jar;C:\Users\C3JGPV\.m2\repository\io\micrometer\micrometer-commons\1.14.2\micrometer-commons-1.14.2.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-webmvc\6.2.1\spring-webmvc-6.2.1.jar;C:\Users\C3JGPV\.m2\repository\org\projectlombok\lombok\1.18.36\lombok-1.18.36.jar;C:\Users\C3JGPV\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\C3JGPV\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\C3JGPV\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-core\6.2.1\spring-core-6.2.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-jcl\6.2.1\spring-jcl-6.2.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-core\6.4.2\spring-security-core-6.4.2.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-crypto\6.4.2\spring-security-crypto-6.4.2.jar;C:\Users\C3JGPV\.m2\repository\org\json\json\20250107\json-20250107.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.8.5\springdoc-openapi-starter-webmvc-ui-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.8.5\springdoc-openapi-starter-webmvc-api-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.8.5\springdoc-openapi-starter-common-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.28\swagger-core-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\org\apache\commons\commons-lang3\3.17.0\commons-lang3-3.17.0.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.28\swagger-annotations-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.28\swagger-models-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.18.2\jackson-dataformat-yaml-2.18.2.jar;C:\Users\C3JGPV\.m2\repository\org\webjars\swagger-ui\5.18.3\swagger-ui-5.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\webjars\webjars-locator-lite\1.0.1\webjars-locator-lite-1.0.1.jar;C:\Users\C3JGPV\.m2\repository\org\jspecify\jspecify\1.0.0\jspecify-1.0.0.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-oauth2-resource-server\3.4.1\spring-boot-starter-oauth2-resource-server-3.4.1.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-resource-server\6.4.2\spring-security-oauth2-resource-server-6.4.2.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-core\6.4.2\spring-security-oauth2-core-6.4.2.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-jose\6.4.2\spring-security-oauth2-jose-6.4.2.jar;C:\Users\C3JGPV\.m2\repository\com\nimbusds\nimbus-jose-jwt\9.37.3\nimbus-jose-jwt-9.37.3.jar;C:\Users\C3JGPV\.m2\repository\com\github\stephenc\jcip\jcip-annotations\1.0-1\jcip-annotations-1.0-1.jar;C:\Users\C3JGPV\.m2\repository\net\sf\saxon\Saxon-HE\12.5\Saxon-HE-12.5.jar;C:\Users\C3JGPV\.m2\repository\org\xmlresolver\xmlresolver\5.2.2\xmlresolver-5.2.2.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\client5\httpclient5\5.4.1\httpclient5-5.4.1.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\core5\httpcore5-h2\5.3.1\httpcore5-h2-5.3.1.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\core5\httpcore5\5.3.1\httpcore5-5.3.1.jar;C:\Users\C3JGPV\.m2\repository\org\xmlresolver\xmlresolver\5.2.2\xmlresolver-5.2.2-data.jar
+2025-03-25T08:30:50.476+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE = 1048576
+2025-03-25T08:30:50.476+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.vendor = Oracle Corporation
+2025-03-25T08:30:50.477+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.arch.data.model = 64
+2025-03-25T08:30:50.478+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.variant = 
+2025-03-25T08:30:50.479+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor.url = https://java.oracle.com/
+2025-03-25T08:30:50.479+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.timezone = Europe/Paris
+2025-03-25T08:30:50.480+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.version = 21
+2025-03-25T08:30:50.480+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.name = Windows 11
+2025-03-25T08:30:50.481+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.java.launcher = SUN_STANDARD
+2025-03-25T08:30:50.481+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.country = FR
+2025-03-25T08:30:50.482+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.boot.library.path = C:\Users\C3JGPV\.jdks\openjdk-21.0.2\bin
+2025-03-25T08:30:50.482+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.java.command = fr.insee.rmes.RmesApplication --spring.config.additional-location=optional:jimfs://secrets/K:/secret.properties
+2025-03-25T08:30:50.484+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : jdk.debug = release
+2025-03-25T08:30:50.484+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.cpu.endian = little
+2025-03-25T08:30:50.485+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.home = C:\Users\C3JGPV
+2025-03-25T08:30:50.485+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.security.jgss.native = true
+2025-03-25T08:30:50.486+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.language = fr
+2025-03-25T08:30:50.486+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.stderr.encoding = UTF-8
+2025-03-25T08:30:50.487+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.vendor = Oracle Corporation
+2025-03-25T08:30:50.487+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.version.date = 2024-01-16
+2025-03-25T08:30:50.488+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.home = C:\Users\C3JGPV\.jdks\openjdk-21.0.2
+2025-03-25T08:30:50.488+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.security.krb5.conf = krb5.conf
+2025-03-25T08:30:50.489+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : file.separator = \
+2025-03-25T08:30:50.489+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.compressedOopsMode = Zero based
+2025-03-25T08:30:50.489+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.stdout.encoding = UTF-8
+2025-03-25T08:30:50.490+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : line.separator = 
+
+2025-03-25T08:30:50.490+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.vendor = Oracle Corporation
+2025-03-25T08:30:50.491+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.name = Java Platform API Specification
+2025-03-25T08:30:50.491+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : FILE_LOG_CHARSET = UTF-8
+2025-03-25T08:30:50.491+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.awt.headless = true
+2025-03-25T08:30:50.491+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.script = 
+2025-03-25T08:30:50.492+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.protocol.handler.pkgs = com.google.common
+2025-03-25T08:30:50.492+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.management.compiler = HotSpot 64-Bit Tiered Compilers
+2025-03-25T08:30:50.492+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.runtime.version = 21.0.2+13-58
+2025-03-25T08:30:50.493+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.name = C3JGPV
+2025-03-25T08:30:50.493+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : stdout.encoding = UTF-8
+2025-03-25T08:30:50.494+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : path.separator = ;
+2025-03-25T08:30:50.496+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.version = 10.0
+2025-03-25T08:30:50.497+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.runtime.name = OpenJDK Runtime Environment
+2025-03-25T08:30:50.497+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : file.encoding = UTF-8
+2025-03-25T08:30:50.498+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.name = OpenJDK 64-Bit Server VM
+2025-03-25T08:30:50.498+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOG_FILE = XXXX
+2025-03-25T08:30:50.499+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.security.auth.login.config = spnegoLogin.conf
+2025-03-25T08:30:50.500+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor.url.bug = https://bugreport.java.com/bugreport/
+2025-03-25T08:30:50.500+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.io.tmpdir = C:\Users\C3JGPV\AppData\Local\Temp\
+2025-03-25T08:30:50.501+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.version = 21.0.2
+2025-03-25T08:30:50.501+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.dir = C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services
+2025-03-25T08:30:50.502+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.arch = amd64
+2025-03-25T08:30:50.502+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.name = Java Virtual Machine Specification
+2025-03-25T08:30:50.503+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : PID = 2580
+2025-03-25T08:30:50.504+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.os.patch.level = 
+2025-03-25T08:30:50.504+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : CONSOLE_LOG_CHARSET = UTF-8
+2025-03-25T08:30:50.505+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : native.encoding = Cp1252
+2025-03-25T08:30:50.505+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.library.path = C:\Users\C3JGPV\.jdks\openjdk-21.0.2\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Eclipse Adoptium\21.0.6\bin;C:\WINDOWS\CCM\;C:\Perl64\site\bin;C:\Perl64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\RedHat\Podman;C:\Program Files\RedHat\Podman\;C:\Program Files\dotnet\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\;C:\INSEE\python\Scripts\;C:\INSEE\python\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Launcher\;C:\Users\C3JGPV\AppData\Local\Microsoft\WindowsApps;C:\Users\C3JGPV\AppData\Local\Programs\Git\cmd;C:\Users\C3JGPV\AppData\Local\GitHubDesktop\bin;C:\INSEE\Microsoft VS Code\bin;C:\INSEE\node\node-v16.13.0-win-x64;C:\INSEE\maven\apache-maven-3.8.4\bin;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;C:\Program Files\RedHat\Podman;C:\INSEE\postgresql-14.11-1-windows-x64-binaries\pgsql\bin;C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;;C:\INSEE\kubectl;C:\INSEE\trivy\trivy_0.58.1_windows-64bit;C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;;.
+2025-03-25T08:30:50.506+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.info = mixed mode, sharing
+2025-03-25T08:30:50.506+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : stderr.encoding = UTF-8
+2025-03-25T08:30:50.507+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor = Oracle Corporation
+2025-03-25T08:30:50.507+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.version = 21.0.2+13-58
+2025-03-25T08:30:50.508+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.rmi.server.randomIDs = true
+2025-03-25T08:30:50.508+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.io.unicode.encoding = UnicodeLittle
+2025-03-25T08:30:50.509+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.class.version = 65.0
+2025-03-25T08:30:50.510+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDOMAIN_ROAMINGPROFILE = AD
+2025-03-25T08:30:50.510+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_LEVEL = 6
+2025-03-25T08:30:50.511+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : https_proxy = http://proxy-rie.http.insee.fr:8080
+2025-03-25T08:30:50.511+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : SESSIONNAME = Console
+2025-03-25T08:30:50.512+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ALLUSERSPROFILE = C:\ProgramData
+2025-03-25T08:30:50.513+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_ARCHITECTURE = AMD64
+2025-03-25T08:30:50.513+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : PSModulePath = C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+2025-03-25T08:30:50.514+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : SystemDrive = C:
+2025-03-25T08:30:50.514+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : DEFLOGDIR = C:\ProgramData\McAfee\Endpoint Security\Logs
+2025-03-25T08:30:50.515+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERNAME = C3JGPV
+2025-03-25T08:30:50.515+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDNSDOMAIN = AD.INSEE.INTRA
+2025-03-25T08:30:50.516+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramFiles(x86) = C:\Program Files (x86)
+2025-03-25T08:30:50.516+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+2025-03-25T08:30:50.517+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : DriverData = C:\Windows\System32\Drivers\DriverData
+2025-03-25T08:30:50.517+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : IntelliJ IDEA Community Edition = C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;
+2025-03-25T08:30:50.518+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMESHARE = \\pd_aus_ESP_Z\ESPERT_Z\C3JGPV
+2025-03-25T08:30:50.518+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramData = C:\ProgramData
+2025-03-25T08:30:50.519+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramW6432 = C:\Program Files
+2025-03-25T08:30:50.519+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMEPATH = \
+2025-03-25T08:30:50.520+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 142 Stepping 12, GenuineIntel
+2025-03-25T08:30:50.520+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramFiles = C:\Program Files
+2025-03-25T08:30:50.520+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : PUBLIC = C:\Users\Public
+2025-03-25T08:30:50.521+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : windir = C:\WINDOWS
+2025-03-25T08:30:50.522+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : =:: = ::\
+2025-03-25T08:30:50.523+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ZES_ENABLE_SYSMAN = 1
+2025-03-25T08:30:50.523+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOCALAPPDATA = C:\Users\C3JGPV\AppData\Local
+2025-03-25T08:30:50.524+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : IntelliJ IDEA = C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;
+2025-03-25T08:30:50.524+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDOMAIN = AD
+2025-03-25T08:30:50.524+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOGONSERVER = \\S20W801
+2025-03-25T08:30:50.525+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : JAVA_HOME = C:\INSEE\OpenJDK21\jdk-21.0.6+7
+2025-03-25T08:30:50.525+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : OneDrive = C:\Users\C3JGPV\OneDrive
+2025-03-25T08:30:50.526+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : APPDATA = C:\Users\C3JGPV\AppData\Roaming
+2025-03-25T08:30:50.526+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramFiles = C:\Program Files\Common Files
+2025-03-25T08:30:50.527+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : Path = C:\Program Files\Eclipse Adoptium\21.0.6\bin;C:\WINDOWS\CCM\;C:\Perl64\site\bin;C:\Perl64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\RedHat\Podman;C:\Program Files\RedHat\Podman\;C:\Program Files\dotnet\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\;C:\INSEE\python\Scripts\;C:\INSEE\python\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Launcher\;C:\Users\C3JGPV\AppData\Local\Microsoft\WindowsApps;C:\Users\C3JGPV\AppData\Local\Programs\Git\cmd;C:\Users\C3JGPV\AppData\Local\GitHubDesktop\bin;C:\INSEE\Microsoft VS Code\bin;C:\INSEE\node\node-v16.13.0-win-x64;C:\INSEE\maven\apache-maven-3.8.4\bin;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;C:\Program Files\RedHat\Podman;C:\INSEE\postgresql-14.11-1-windows-x64-binaries\pgsql\bin;C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;;C:\INSEE\kubectl;C:\INSEE\trivy\trivy_0.58.1_windows-64bit;C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;
+2025-03-25T08:30:50.527+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : http_proxy = http://proxy-rie.http.insee.fr:8080
+2025-03-25T08:30:50.528+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : no_proxy = 
+insee.test,insee.fr,insee.eu,insee.intra,localhost
+2025-03-25T08:30:50.528+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : OS = Windows_NT
+2025-03-25T08:30:50.529+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : COMPUTERNAME = P100058600
+2025-03-25T08:30:50.529+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_REVISION = 8e0c
+2025-03-25T08:30:50.530+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramW6432 = C:\Program Files\Common Files
+2025-03-25T08:30:50.530+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ComSpec = C:\WINDOWS\system32\cmd.exe
+2025-03-25T08:30:50.530+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : UATDATA = C:\WINDOWS\CCM\UATData\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77
+2025-03-25T08:30:50.531+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : SystemRoot = C:\WINDOWS
+2025-03-25T08:30:50.531+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : TEMP = C:\Users\C3JGPV\AppData\Local\Temp
+2025-03-25T08:30:50.532+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMEDRIVE = Z:
+2025-03-25T08:30:50.532+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERPROFILE = C:\Users\C3JGPV
+2025-03-25T08:30:50.534+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : TMP = C:\Users\C3JGPV\AppData\Local\Temp
+2025-03-25T08:30:50.534+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramFiles(x86) = C:\Program Files (x86)\Common Files
+2025-03-25T08:30:50.534+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : EFC_7188 = 1
+2025-03-25T08:30:50.535+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : NUMBER_OF_PROCESSORS = 8
+2025-03-25T08:30:50.535+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOME = C:\Users\C3JGPV
+2025-03-25T08:30:50.536+01:00  WARN 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : RandomValuePropertySource {name='random'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:30:50.537+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.application.pid = 2580
+2025-03-25T08:30:50.539+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.security.oauth2.resourceserver.jwt.jwk-set-uri = https://auth.insee.test/auth/realms/agents-insee-interne/protocol/openid-connect/certs
+2025-03-25T08:30:50.541+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.agency = fr.insee
+2025-03-25T08:30:50.541+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : server.forward-headers-strategy = NATIVE
+2025-03-25T08:30:50.542+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : server.servlet.contextPath = /
+2025-03-25T08:30:50.543+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.role.gestionnaire.colectica = Gestionnaire_RMESGOPS
+2025-03-25T08:30:50.544+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.enabled = true
+2025-03-25T08:30:50.545+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.path = /
+2025-03-25T08:30:50.546+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.syntax-highlight.activated = false
+2025-03-25T08:30:50.547+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.user = rmeswdai-service@insee.fr
+2025-03-25T08:30:50.548+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.apikey = c3F6Y0E0b0JzWDgtemFjWkV0NEQ6U3NvaDRGZjFUQ2Uza3BxVmt0YUdZQQ==
+2025-03-25T08:30:50.548+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.url = https://indexation-metadonnees.developpement3.insee.fr
+2025-03-25T08:30:50.549+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.token.oidc-claim-username = ******
+2025-03-25T08:30:50.549+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.secret = ******
+2025-03-25T08:30:50.550+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.host = metadata.developpement2.insee.fr
+2025-03-25T08:30:50.551+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.security.oauth2.client.provider.ddi-as-provider.issuer-uri = https://auth.insee.test/auth/realms/agents-insee-interne
+2025-03-25T08:30:50.551+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.whitelist-matchers = /swagger-ui/index.html,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html,/actuator/**,/error,/,/swagger-ui-ddia-as.html
+2025-03-25T08:30:50.552+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.oauth.clientId = rmeswdai-service
+2025-03-25T08:30:50.553+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.max-file-size = 100MB
+2025-03-25T08:30:50.554+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.profiles.active = prod
+2025-03-25T08:30:50.554+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.realm = agents-insee-interne
+2025-03-25T08:30:50.555+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.scopes = openid,email
+2025-03-25T08:30:50.556+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.server = https://auth.insee.test/auth
+2025-03-25T08:30:50.556+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.token.oidc-claim-role = ******
+2025-03-25T08:30:50.557+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.resource = rmeswdai-service
+2025-03-25T08:30:50.558+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.url = https://metadonnees-operations.developpement3.insee.fr
+2025-03-25T08:30:50.558+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.role.administrateur = Administrateur_RMESGOPS
+2025-03-25T08:30:50.559+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.ddias.version = 2.1.2
+2025-03-25T08:30:50.559+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.ddias.filenames.maxlength = 50
+2025-03-25T08:30:50.561+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.enabled = false
+2025-03-25T08:30:50.561+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.search.root.sub-group.ids = 6baffbbc-86d5-4982-b6a4-7b035f7043ad, 2bfe02de-0044-4a94-b516-b166d9499971
+2025-03-25T08:30:50.561+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.search.root.resource-package.ids = d574ed7e-2a7c-491f-b25c-f84141d4e96e
+2025-03-25T08:30:50.562+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.index.name = xxxx
+2025-03-25T08:30:50.562+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.host = urlElastic
+2025-03-25T08:30:50.563+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.port = 80
+2025-03-25T08:30:50.563+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.apiId = id
+2025-03-25T08:30:50.564+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.MetadataService.impl = MetadataServiceImpl
+2025-03-25T08:30:50.564+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.key = xxxx
+2025-03-25T08:30:50.565+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.name = /ddi-access-services/api
+2025-03-25T08:30:50.566+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.scheme = http
+2025-03-25T08:30:50.566+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.cors.allowedOrigin = *
+2025-03-25T08:30:50.567+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-authorization = https://auth.insee.test/auth/.../protocol/openid-connect/auth
+2025-03-25T08:30:50.568+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-refresh = https://auth.insee.test/auth/.../protocol/openid-connect/token
+2025-03-25T08:30:50.568+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-token = ******
+2025-03-25T08:30:50.569+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-description = Keycloak
+2025-03-25T08:30:50.569+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-name = xxxxx
+2025-03-25T08:30:50.570+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-email = un-email-fonctionnel@xxx.fr
+2025-03-25T08:30:50.570+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-url = https://www.insee.fr/fr/accueil
+2025-03-25T08:30:50.572+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.enabled = true
+2025-03-25T08:30:50.572+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.max-request-size = 50MB
+2025-03-25T08:30:50.573+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : logging.logback.rollingpolicy.max-file-size = 1MB
+2025-03-25T08:30:50.574+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : logging.file.name = XXXX
+2025-03-25T08:30:50.574+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.api.url = XXX
+2025-03-25T08:30:50.576+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.username = XXX
+2025-03-25T08:30:50.576+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.password = ******
+2025-03-25T08:30:50.577+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : item.api.url = https://metadonnees-operations.developpement3.insee.fr/api/v1/item/
+2025-03-25T08:30:50.577+01:00  INFO 2580 --- [main] fr.insee.rmes.config.PropertiesLogger    : ============================================================================
+2025-03-25T08:30:50.755+01:00  INFO 2580 --- [main] fr.insee.rmes.RmesApplication            : Starting RmesApplication using Java 21.0.2 with PID 2580 (C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services\target\classes started by C3JGPV in C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services)
+2025-03-25T08:30:50.757+01:00  INFO 2580 --- [main] fr.insee.rmes.RmesApplication            : The following 1 profile is active: "prod"
+2025-03-25T08:30:54.242+01:00  INFO 2580 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-25T08:30:54.283+01:00  INFO 2580 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-25T08:30:54.284+01:00  INFO 2580 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-03-25T08:30:54.461+01:00  INFO 2580 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-25T08:30:54.462+01:00  INFO 2580 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3578 ms
+2025-03-25T08:30:56.823+01:00  INFO 2580 --- [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-03-25T08:30:57.668+01:00  INFO 2580 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-03-25T08:30:57.695+01:00  INFO 2580 --- [main] fr.insee.rmes.RmesApplication            : Started RmesApplication in 8.384 seconds (process running for 13.069)
+2025-03-25T08:34:20.605+01:00  INFO 2580 --- [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-03-25T08:34:20.621+01:00  INFO 2580 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-03-25T08:34:27.830+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ===============================================================================================
+2025-03-25T08:34:27.838+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    :                                 Valeurs des properties                                         
+2025-03-25T08:34:27.839+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ===============================================================================================
+2025-03-25T08:34:27.841+01:00  WARN 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ConfigurationPropertySourcesPropertySource {name='configurationProperties'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:34:27.842+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.config.additional-location = optional:jimfs://secrets/K:/secret.properties
+2025-03-25T08:34:27.843+01:00  WARN 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : StubPropertySource {name='servletConfigInitParams'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:34:27.843+01:00  WARN 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : StubPropertySource {name='servletContextInitParams'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:34:27.844+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.version = 21
+2025-03-25T08:34:27.844+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.cpu.isalist = amd64
+2025-03-25T08:34:27.844+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.jnu.encoding = Cp1252
+2025-03-25T08:34:27.846+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.class.path = C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services\target\classes;C:\Users\C3JGPV\.m2\repository\com\auth0\java-jwt\4.5.0\java-jwt-4.5.0.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.18.3\jackson-core-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.18.3\jackson-databind-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.18.3\jackson-annotations-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\codehaus\woodstox\stax2-api\4.2.2\stax2-api-4.2.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\woodstox\woodstox-core\7.0.0\woodstox-core-7.0.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.document.odt\2.1.0\fr.opensagres.xdocreport.document.odt-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.document\2.1.0\fr.opensagres.xdocreport.document-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.core\2.1.0\fr.opensagres.xdocreport.core-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.converter\2.1.0\fr.opensagres.xdocreport.converter-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.template.freemarker\2.1.0\fr.opensagres.xdocreport.template.freemarker-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.template\2.1.0\fr.opensagres.xdocreport.template-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\org\freemarker\freemarker\2.3.34\freemarker-2.3.34.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-security\3.4.4\spring-boot-starter-security-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter\3.4.4\spring-boot-starter-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot\3.4.4\spring-boot-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.4.4\spring-boot-autoconfigure-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.4.4\spring-boot-starter-logging-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\ch\qos\logback\logback-classic\1.5.18\logback-classic-1.5.18.jar;C:\Users\C3JGPV\.m2\repository\ch\qos\logback\logback-core\1.5.18\logback-core-1.5.18.jar;C:\Users\C3JGPV\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.24.3\log4j-to-slf4j-2.24.3.jar;C:\Users\C3JGPV\.m2\repository\org\apache\logging\log4j\log4j-api\2.24.3\log4j-api-2.24.3.jar;C:\Users\C3JGPV\.m2\repository\org\slf4j\jul-to-slf4j\2.0.17\jul-to-slf4j-2.0.17.jar;C:\Users\C3JGPV\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\C3JGPV\.m2\repository\org\yaml\snakeyaml\2.3\snakeyaml-2.3.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-aop\6.2.5\spring-aop-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-beans\6.2.5\spring-beans-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-config\6.4.4\spring-security-config-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-context\6.2.5\spring-context-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-web\6.4.4\spring-security-web-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-expression\6.2.5\spring-expression-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.4.4\spring-boot-starter-web-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.4.4\spring-boot-starter-json-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.18.3\jackson-datatype-jdk8-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.18.3\jackson-datatype-jsr310-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.18.3\jackson-module-parameter-names-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.4.4\spring-boot-starter-tomcat-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.39\tomcat-embed-core-10.1.39.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.39\tomcat-embed-el-10.1.39.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.39\tomcat-embed-websocket-10.1.39.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-web\6.2.5\spring-web-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\io\micrometer\micrometer-observation\1.14.5\micrometer-observation-1.14.5.jar;C:\Users\C3JGPV\.m2\repository\io\micrometer\micrometer-commons\1.14.5\micrometer-commons-1.14.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-webmvc\6.2.5\spring-webmvc-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\projectlombok\lombok\1.18.36\lombok-1.18.36.jar;C:\Users\C3JGPV\.m2\repository\org\slf4j\slf4j-api\2.0.17\slf4j-api-2.0.17.jar;C:\Users\C3JGPV\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\C3JGPV\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-core\6.2.5\spring-core-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-jcl\6.2.5\spring-jcl-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-core\6.4.4\spring-security-core-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-crypto\6.4.4\spring-security-crypto-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\json\json\20250107\json-20250107.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.8.5\springdoc-openapi-starter-webmvc-ui-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.8.5\springdoc-openapi-starter-webmvc-api-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.8.5\springdoc-openapi-starter-common-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.28\swagger-core-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\org\apache\commons\commons-lang3\3.17.0\commons-lang3-3.17.0.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.28\swagger-annotations-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.28\swagger-models-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.18.3\jackson-dataformat-yaml-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\webjars\swagger-ui\5.18.3\swagger-ui-5.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\webjars\webjars-locator-lite\1.0.1\webjars-locator-lite-1.0.1.jar;C:\Users\C3JGPV\.m2\repository\org\jspecify\jspecify\1.0.0\jspecify-1.0.0.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-oauth2-resource-server\3.4.4\spring-boot-starter-oauth2-resource-server-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-resource-server\6.4.4\spring-security-oauth2-resource-server-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-core\6.4.4\spring-security-oauth2-core-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-jose\6.4.4\spring-security-oauth2-jose-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\com\nimbusds\nimbus-jose-jwt\9.37.3\nimbus-jose-jwt-9.37.3.jar;C:\Users\C3JGPV\.m2\repository\com\github\stephenc\jcip\jcip-annotations\1.0-1\jcip-annotations-1.0-1.jar;C:\Users\C3JGPV\.m2\repository\net\sf\saxon\Saxon-HE\12.5\Saxon-HE-12.5.jar;C:\Users\C3JGPV\.m2\repository\org\xmlresolver\xmlresolver\5.2.2\xmlresolver-5.2.2.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\client5\httpclient5\5.4.2\httpclient5-5.4.2.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\core5\httpcore5-h2\5.3.3\httpcore5-h2-5.3.3.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\core5\httpcore5\5.3.3\httpcore5-5.3.3.jar;C:\Users\C3JGPV\.m2\repository\org\xmlresolver\xmlresolver\5.2.2\xmlresolver-5.2.2-data.jar
+2025-03-25T08:34:27.847+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE = 1048576
+2025-03-25T08:34:27.847+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.vendor = Oracle Corporation
+2025-03-25T08:34:27.847+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.arch.data.model = 64
+2025-03-25T08:34:27.848+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.variant = 
+2025-03-25T08:34:27.848+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor.url = https://java.oracle.com/
+2025-03-25T08:34:27.849+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.timezone = Europe/Paris
+2025-03-25T08:34:27.849+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.version = 21
+2025-03-25T08:34:27.849+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.name = Windows 11
+2025-03-25T08:34:27.850+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.java.launcher = SUN_STANDARD
+2025-03-25T08:34:27.850+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.country = FR
+2025-03-25T08:34:27.850+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.boot.library.path = C:\Users\C3JGPV\.jdks\openjdk-21.0.2\bin
+2025-03-25T08:34:27.851+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.java.command = fr.insee.rmes.RmesApplication --spring.config.additional-location=optional:jimfs://secrets/K:/secret.properties
+2025-03-25T08:34:27.851+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : jdk.debug = release
+2025-03-25T08:34:27.851+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.cpu.endian = little
+2025-03-25T08:34:27.852+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.home = C:\Users\C3JGPV
+2025-03-25T08:34:27.852+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.security.jgss.native = true
+2025-03-25T08:34:27.852+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.language = fr
+2025-03-25T08:34:27.852+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.stderr.encoding = UTF-8
+2025-03-25T08:34:27.854+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.vendor = Oracle Corporation
+2025-03-25T08:34:27.854+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.version.date = 2024-01-16
+2025-03-25T08:34:27.855+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.home = C:\Users\C3JGPV\.jdks\openjdk-21.0.2
+2025-03-25T08:34:27.855+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.security.krb5.conf = krb5.conf
+2025-03-25T08:34:27.855+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : file.separator = \
+2025-03-25T08:34:27.856+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.compressedOopsMode = Zero based
+2025-03-25T08:34:27.856+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.stdout.encoding = UTF-8
+2025-03-25T08:34:27.856+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : line.separator = 
+
+2025-03-25T08:34:27.857+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.vendor = Oracle Corporation
+2025-03-25T08:34:27.857+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.name = Java Platform API Specification
+2025-03-25T08:34:27.857+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : FILE_LOG_CHARSET = UTF-8
+2025-03-25T08:34:27.858+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.awt.headless = true
+2025-03-25T08:34:27.858+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.script = 
+2025-03-25T08:34:27.859+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.protocol.handler.pkgs = com.google.common
+2025-03-25T08:34:27.859+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.management.compiler = HotSpot 64-Bit Tiered Compilers
+2025-03-25T08:34:27.860+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.runtime.version = 21.0.2+13-58
+2025-03-25T08:34:27.860+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.name = C3JGPV
+2025-03-25T08:34:27.860+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : stdout.encoding = UTF-8
+2025-03-25T08:34:27.861+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : path.separator = ;
+2025-03-25T08:34:27.861+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.version = 10.0
+2025-03-25T08:34:27.861+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.runtime.name = OpenJDK Runtime Environment
+2025-03-25T08:34:27.862+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : file.encoding = UTF-8
+2025-03-25T08:34:27.862+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.name = OpenJDK 64-Bit Server VM
+2025-03-25T08:34:27.863+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOG_FILE = XXXX
+2025-03-25T08:34:27.863+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.security.auth.login.config = spnegoLogin.conf
+2025-03-25T08:34:27.864+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor.url.bug = https://bugreport.java.com/bugreport/
+2025-03-25T08:34:27.864+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.io.tmpdir = C:\Users\C3JGPV\AppData\Local\Temp\
+2025-03-25T08:34:27.864+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.version = 21.0.2
+2025-03-25T08:34:27.865+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.dir = C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services
+2025-03-25T08:34:27.865+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.arch = amd64
+2025-03-25T08:34:27.865+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.name = Java Virtual Machine Specification
+2025-03-25T08:34:27.866+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : PID = 4808
+2025-03-25T08:34:27.866+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.os.patch.level = 
+2025-03-25T08:34:27.866+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : CONSOLE_LOG_CHARSET = UTF-8
+2025-03-25T08:34:27.867+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : native.encoding = Cp1252
+2025-03-25T08:34:27.868+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.library.path = C:\Users\C3JGPV\.jdks\openjdk-21.0.2\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Eclipse Adoptium\21.0.6\bin;C:\WINDOWS\CCM\;C:\Perl64\site\bin;C:\Perl64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\RedHat\Podman;C:\Program Files\RedHat\Podman\;C:\Program Files\dotnet\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\;C:\INSEE\python\Scripts\;C:\INSEE\python\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Launcher\;C:\Users\C3JGPV\AppData\Local\Microsoft\WindowsApps;C:\Users\C3JGPV\AppData\Local\Programs\Git\cmd;C:\Users\C3JGPV\AppData\Local\GitHubDesktop\bin;C:\INSEE\Microsoft VS Code\bin;C:\INSEE\node\node-v16.13.0-win-x64;C:\INSEE\maven\apache-maven-3.8.4\bin;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;C:\Program Files\RedHat\Podman;C:\INSEE\postgresql-14.11-1-windows-x64-binaries\pgsql\bin;C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;;C:\INSEE\kubectl;C:\INSEE\trivy\trivy_0.58.1_windows-64bit;C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;;.
+2025-03-25T08:34:27.868+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.info = mixed mode, sharing
+2025-03-25T08:34:27.869+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : stderr.encoding = UTF-8
+2025-03-25T08:34:27.869+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor = Oracle Corporation
+2025-03-25T08:34:27.869+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.version = 21.0.2+13-58
+2025-03-25T08:34:27.870+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.rmi.server.randomIDs = true
+2025-03-25T08:34:27.870+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.io.unicode.encoding = UnicodeLittle
+2025-03-25T08:34:27.870+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.class.version = 65.0
+2025-03-25T08:34:27.870+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDOMAIN_ROAMINGPROFILE = AD
+2025-03-25T08:34:27.871+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_LEVEL = 6
+2025-03-25T08:34:27.871+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : https_proxy = http://proxy-rie.http.insee.fr:8080
+2025-03-25T08:34:27.871+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : SESSIONNAME = Console
+2025-03-25T08:34:27.872+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ALLUSERSPROFILE = C:\ProgramData
+2025-03-25T08:34:27.872+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_ARCHITECTURE = AMD64
+2025-03-25T08:34:27.872+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : PSModulePath = C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+2025-03-25T08:34:27.873+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : SystemDrive = C:
+2025-03-25T08:34:27.873+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : DEFLOGDIR = C:\ProgramData\McAfee\Endpoint Security\Logs
+2025-03-25T08:34:27.873+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERNAME = C3JGPV
+2025-03-25T08:34:27.874+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDNSDOMAIN = AD.INSEE.INTRA
+2025-03-25T08:34:27.874+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramFiles(x86) = C:\Program Files (x86)
+2025-03-25T08:34:27.874+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+2025-03-25T08:34:27.875+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : DriverData = C:\Windows\System32\Drivers\DriverData
+2025-03-25T08:34:27.875+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : IntelliJ IDEA Community Edition = C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;
+2025-03-25T08:34:27.875+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMESHARE = \\pd_aus_ESP_Z\ESPERT_Z\C3JGPV
+2025-03-25T08:34:27.876+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramData = C:\ProgramData
+2025-03-25T08:34:27.876+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramW6432 = C:\Program Files
+2025-03-25T08:34:27.877+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMEPATH = \
+2025-03-25T08:34:27.877+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 142 Stepping 12, GenuineIntel
+2025-03-25T08:34:27.877+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramFiles = C:\Program Files
+2025-03-25T08:34:27.877+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : PUBLIC = C:\Users\Public
+2025-03-25T08:34:27.879+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : windir = C:\WINDOWS
+2025-03-25T08:34:27.880+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : =:: = ::\
+2025-03-25T08:34:27.881+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ZES_ENABLE_SYSMAN = 1
+2025-03-25T08:34:27.881+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOCALAPPDATA = C:\Users\C3JGPV\AppData\Local
+2025-03-25T08:34:27.881+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : IntelliJ IDEA = C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;
+2025-03-25T08:34:27.882+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDOMAIN = AD
+2025-03-25T08:34:27.882+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOGONSERVER = \\S20W801
+2025-03-25T08:34:27.882+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : JAVA_HOME = C:\INSEE\OpenJDK21\jdk-21.0.6+7
+2025-03-25T08:34:27.882+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : OneDrive = C:\Users\C3JGPV\OneDrive
+2025-03-25T08:34:27.883+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : APPDATA = C:\Users\C3JGPV\AppData\Roaming
+2025-03-25T08:34:27.883+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramFiles = C:\Program Files\Common Files
+2025-03-25T08:34:27.883+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : Path = C:\Program Files\Eclipse Adoptium\21.0.6\bin;C:\WINDOWS\CCM\;C:\Perl64\site\bin;C:\Perl64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\RedHat\Podman;C:\Program Files\RedHat\Podman\;C:\Program Files\dotnet\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\;C:\INSEE\python\Scripts\;C:\INSEE\python\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Launcher\;C:\Users\C3JGPV\AppData\Local\Microsoft\WindowsApps;C:\Users\C3JGPV\AppData\Local\Programs\Git\cmd;C:\Users\C3JGPV\AppData\Local\GitHubDesktop\bin;C:\INSEE\Microsoft VS Code\bin;C:\INSEE\node\node-v16.13.0-win-x64;C:\INSEE\maven\apache-maven-3.8.4\bin;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;C:\Program Files\RedHat\Podman;C:\INSEE\postgresql-14.11-1-windows-x64-binaries\pgsql\bin;C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;;C:\INSEE\kubectl;C:\INSEE\trivy\trivy_0.58.1_windows-64bit;C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;
+2025-03-25T08:34:27.883+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : http_proxy = http://proxy-rie.http.insee.fr:8080
+2025-03-25T08:34:27.884+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : no_proxy = 
+insee.test,insee.fr,insee.eu,insee.intra,localhost
+2025-03-25T08:34:27.884+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : OS = Windows_NT
+2025-03-25T08:34:27.884+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : COMPUTERNAME = P100058600
+2025-03-25T08:34:27.884+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_REVISION = 8e0c
+2025-03-25T08:34:27.885+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramW6432 = C:\Program Files\Common Files
+2025-03-25T08:34:27.885+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ComSpec = C:\WINDOWS\system32\cmd.exe
+2025-03-25T08:34:27.885+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : UATDATA = C:\WINDOWS\CCM\UATData\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77
+2025-03-25T08:34:27.886+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : SystemRoot = C:\WINDOWS
+2025-03-25T08:34:27.886+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : TEMP = C:\Users\C3JGPV\AppData\Local\Temp
+2025-03-25T08:34:27.886+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMEDRIVE = Z:
+2025-03-25T08:34:27.887+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERPROFILE = C:\Users\C3JGPV
+2025-03-25T08:34:27.887+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : TMP = C:\Users\C3JGPV\AppData\Local\Temp
+2025-03-25T08:34:27.887+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramFiles(x86) = C:\Program Files (x86)\Common Files
+2025-03-25T08:34:27.887+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : EFC_7188 = 1
+2025-03-25T08:34:27.887+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : NUMBER_OF_PROCESSORS = 8
+2025-03-25T08:34:27.888+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOME = C:\Users\C3JGPV
+2025-03-25T08:34:27.888+01:00  WARN 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : RandomValuePropertySource {name='random'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:34:27.888+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.application.pid = 4808
+2025-03-25T08:34:27.891+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.security.oauth2.resourceserver.jwt.jwk-set-uri = https://auth.insee.test/auth/realms/agents-insee-interne/protocol/openid-connect/certs
+2025-03-25T08:34:27.892+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.agency = fr.insee
+2025-03-25T08:34:27.892+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : server.forward-headers-strategy = NATIVE
+2025-03-25T08:34:27.893+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : server.servlet.contextPath = /
+2025-03-25T08:34:27.893+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.role.gestionnaire.colectica = Gestionnaire_RMESGOPS
+2025-03-25T08:34:27.894+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.enabled = true
+2025-03-25T08:34:27.894+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.path = /
+2025-03-25T08:34:27.895+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.syntax-highlight.activated = false
+2025-03-25T08:34:27.895+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.user = rmeswdai-service@insee.fr
+2025-03-25T08:34:27.896+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.apikey = c3F6Y0E0b0JzWDgtemFjWkV0NEQ6U3NvaDRGZjFUQ2Uza3BxVmt0YUdZQQ==
+2025-03-25T08:34:27.896+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.url = https://indexation-metadonnees.developpement3.insee.fr
+2025-03-25T08:34:27.896+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.token.oidc-claim-username = ******
+2025-03-25T08:34:27.896+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.secret = ******
+2025-03-25T08:34:27.897+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.host = metadata.developpement2.insee.fr
+2025-03-25T08:34:27.897+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.security.oauth2.client.provider.ddi-as-provider.issuer-uri = https://auth.insee.test/auth/realms/agents-insee-interne
+2025-03-25T08:34:27.898+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.whitelist-matchers = /swagger-ui/index.html,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html,/actuator/**,/error,/,/swagger-ui-ddia-as.html
+2025-03-25T08:34:27.898+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.oauth.clientId = rmeswdai-service
+2025-03-25T08:34:27.899+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.max-file-size = 100MB
+2025-03-25T08:34:27.899+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.profiles.active = prod
+2025-03-25T08:34:27.900+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.realm = agents-insee-interne
+2025-03-25T08:34:27.900+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.scopes = openid,email
+2025-03-25T08:34:27.900+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.server = https://auth.insee.test/auth
+2025-03-25T08:34:27.900+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.token.oidc-claim-role = ******
+2025-03-25T08:34:27.902+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.resource = rmeswdai-service
+2025-03-25T08:34:27.902+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.url = https://metadonnees-operations.developpement3.insee.fr
+2025-03-25T08:34:27.902+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.role.administrateur = Administrateur_RMESGOPS
+2025-03-25T08:34:27.903+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.ddias.version = 2.1.3
+2025-03-25T08:34:27.903+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.ddias.filenames.maxlength = 50
+2025-03-25T08:34:27.904+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.enabled = false
+2025-03-25T08:34:27.904+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.search.root.sub-group.ids = 6baffbbc-86d5-4982-b6a4-7b035f7043ad, 2bfe02de-0044-4a94-b516-b166d9499971
+2025-03-25T08:34:27.904+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.search.root.resource-package.ids = d574ed7e-2a7c-491f-b25c-f84141d4e96e
+2025-03-25T08:34:27.905+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.index.name = xxxx
+2025-03-25T08:34:27.905+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.host = urlElastic
+2025-03-25T08:34:27.906+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.port = 80
+2025-03-25T08:34:27.906+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.apiId = id
+2025-03-25T08:34:27.907+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.MetadataService.impl = MetadataServiceImpl
+2025-03-25T08:34:27.907+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.key = xxxx
+2025-03-25T08:34:27.908+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.name = /ddi-access-services/api
+2025-03-25T08:34:27.908+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.scheme = http
+2025-03-25T08:34:27.909+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.cors.allowedOrigin = *
+2025-03-25T08:34:27.910+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-authorization = https://auth.insee.test/auth/.../protocol/openid-connect/auth
+2025-03-25T08:34:27.911+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-refresh = https://auth.insee.test/auth/.../protocol/openid-connect/token
+2025-03-25T08:34:27.911+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-token = ******
+2025-03-25T08:34:27.912+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-description = Keycloak
+2025-03-25T08:34:27.913+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-name = xxxxx
+2025-03-25T08:34:27.913+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-email = un-email-fonctionnel@xxx.fr
+2025-03-25T08:34:27.914+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-url = https://www.insee.fr/fr/accueil
+2025-03-25T08:34:27.915+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.enabled = true
+2025-03-25T08:34:27.916+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.max-request-size = 50MB
+2025-03-25T08:34:27.916+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : logging.logback.rollingpolicy.max-file-size = 1MB
+2025-03-25T08:34:27.917+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : logging.file.name = XXXX
+2025-03-25T08:34:27.917+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.api.url = XXX
+2025-03-25T08:34:27.918+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.username = XXX
+2025-03-25T08:34:27.918+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.password = ******
+2025-03-25T08:34:27.919+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : item.api.url = https://metadonnees-operations.developpement3.insee.fr/api/v1/item/
+2025-03-25T08:34:27.919+01:00  INFO 4808 --- [main] fr.insee.rmes.config.PropertiesLogger    : ============================================================================
+2025-03-25T08:34:28.110+01:00  INFO 4808 --- [main] fr.insee.rmes.RmesApplication            : Starting RmesApplication using Java 21.0.2 with PID 4808 (C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services\target\classes started by C3JGPV in C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services)
+2025-03-25T08:34:28.112+01:00  INFO 4808 --- [main] fr.insee.rmes.RmesApplication            : The following 1 profile is active: "prod"
+2025-03-25T08:34:30.354+01:00  INFO 4808 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-25T08:34:30.384+01:00  INFO 4808 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-25T08:34:30.385+01:00  INFO 4808 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-03-25T08:34:30.510+01:00  INFO 4808 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-25T08:34:30.511+01:00  INFO 4808 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2295 ms
+2025-03-25T08:34:31.785+01:00  INFO 4808 --- [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-03-25T08:34:32.086+01:00  INFO 4808 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-03-25T08:34:32.098+01:00  INFO 4808 --- [main] fr.insee.rmes.RmesApplication            : Started RmesApplication in 4.861 seconds (process running for 8.155)
+2025-03-25T08:34:42.922+01:00  INFO 4808 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-25T08:34:42.923+01:00  INFO 4808 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-03-25T08:34:42.924+01:00  INFO 4808 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-03-25T08:34:49.272+01:00  INFO 4808 --- [http-nio-8080-exec-10] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 1017 ms
+2025-03-25T08:35:18.193+01:00  INFO 4808 --- [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-03-25T08:35:18.201+01:00  INFO 4808 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-03-25T08:35:46.138+01:00  WARN 15892 --- [main] ory$DuplicateJsonObjectContextCustomizer : 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/C3JGPV/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/C3JGPV/.m2/repository/org/json/json/20250107/json-20250107.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2025-03-25T08:35:46.210+01:00  INFO 15892 --- [main] f.i.r.t.controller.GetItemTest           : Starting GetItemTest using Java 21.0.6 with PID 15892 (started by C3JGPV in C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services)
+2025-03-25T08:35:46.212+01:00  INFO 15892 --- [main] f.i.r.t.controller.GetItemTest           : The following 1 profile is active: "dev"
+2025-03-25T08:35:53.069+01:00  INFO 15892 --- [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-03-25T08:35:53.511+01:00  INFO 15892 --- [main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2025-03-25T08:35:53.514+01:00  INFO 15892 --- [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-03-25T08:35:53.518+01:00  INFO 15892 --- [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 4 ms
+2025-03-25T08:35:53.597+01:00  INFO 15892 --- [main] f.i.r.t.controller.GetItemTest           : Started GetItemTest in 8.813 seconds (process running for 12.569)
+2025-03-25T08:35:56.508+01:00  INFO 15892 --- [main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [fr.insee.rmes.transfoxsl.controller.TransformationControllerTest]: TransformationControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-03-25T08:35:56.653+01:00  INFO 15892 --- [main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration fr.insee.rmes.RmesApplication for test class fr.insee.rmes.transfoxsl.controller.TransformationControllerTest
+2025-03-25T08:35:56.774+01:00  WARN 15892 --- [main] ory$DuplicateJsonObjectContextCustomizer : 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/C3JGPV/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/C3JGPV/.m2/repository/org/json/json/20250107/json-20250107.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2025-03-25T08:35:56.779+01:00  INFO 15892 --- [main] f.i.r.t.c.TransformationControllerTest   : Starting TransformationControllerTest using Java 21.0.6 with PID 15892 (started by C3JGPV in C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services)
+2025-03-25T08:35:56.780+01:00  INFO 15892 --- [main] f.i.r.t.c.TransformationControllerTest   : The following 1 profile is active: "dev"
+2025-03-25T08:35:58.189+01:00  INFO 15892 --- [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-03-25T08:35:58.236+01:00  INFO 15892 --- [main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2025-03-25T08:35:58.236+01:00  INFO 15892 --- [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-03-25T08:35:58.238+01:00  INFO 15892 --- [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+2025-03-25T08:35:58.257+01:00  INFO 15892 --- [main] f.i.r.t.c.TransformationControllerTest   : Started TransformationControllerTest in 1.591 seconds (process running for 17.228)
+2025-03-25T08:35:58.534+01:00 ERROR 15892 --- [main] f.i.r.t.controller.RmesExceptionHandler  : Failure while processing input file or while xslt transfo {"details":"Transformation failed during the XSLT processing.","message":"Failure while processing input file or while xslt transfo"}
+
+fr.insee.rmes.exceptions.RmesException: Failure while processing input file or while xslt transfo
+	at fr.insee.rmes.transfoxsl.controller.TransformationController.ddi2vtl(TransformationController.java:115) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.39.jar:6.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.test.web.servlet.TestDispatcherServlet.service(TestDispatcherServlet.java:72) ~[spring-test-6.2.5.jar:6.2.5]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.39.jar:6.0]
+	at org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:165) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter.doFilterInternal(BearerTokenAuthenticationFilter.java:128) ~[spring-security-oauth2-resource-server-6.4.4.jar:6.4.4]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter.doFilterInternal(DefaultLogoutPageGeneratingFilter.java:58) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:220) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:206) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.ui.DefaultResourcesFilter.doFilter(DefaultResourcesFilter.java:72) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.4.4.jar:6.4.4]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:243) ~[spring-webmvc-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238) ~[spring-security-config-6.4.4.jar:6.4.4]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.5.jar:6.2.5]
+	at org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:162) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132) ~[spring-test-6.2.5.jar:6.2.5]
+	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201) ~[spring-test-6.2.5.jar:6.2.5]
+	at fr.insee.rmes.transfoxsl.controller.TransformationControllerTest.ddi2vtl_ShouldReturnServerError_WhenTransformationFails(TransformationControllerTest.java:87) ~[test-classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:767) ~[junit-platform-commons-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$8(TestMethodTestDescriptor.java:217) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.2.jar:3.5.2]
+Caused by: fr.insee.rmes.exceptions.XsltTransformationException: Transformation failed during the XSLT processing.
+	at fr.insee.rmes.transfoxsl.service.XsltTransformationService.transformToXml(XsltTransformationService.java:231) ~[classes/:na]
+	at fr.insee.rmes.transfoxsl.controller.TransformationController.ddi2vtl(TransformationController.java:99) ~[classes/:na]
+	... 159 common frames omitted
+
+2025-03-25T08:35:58.771+01:00  INFO 15892 --- [main] fr.insee.rmes.utils.XMLUtils             : unsuported feature for net.sf.saxon.TransformerFactoryImpl : Unsupported TransformerFactory feature: http://javax.xml.transform.TransformerFactory/feature/disallow-doctype-decl
+2025-03-25T08:36:39.467+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ===============================================================================================
+2025-03-25T08:36:39.475+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    :                                 Valeurs des properties                                         
+2025-03-25T08:36:39.475+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ===============================================================================================
+2025-03-25T08:36:39.477+01:00  WARN 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ConfigurationPropertySourcesPropertySource {name='configurationProperties'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:36:39.478+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.config.additional-location = optional:jimfs://secrets/K:/secret.properties
+2025-03-25T08:36:39.478+01:00  WARN 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : StubPropertySource {name='servletConfigInitParams'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:36:39.478+01:00  WARN 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : StubPropertySource {name='servletContextInitParams'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:36:39.478+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.version = 21
+2025-03-25T08:36:39.479+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.cpu.isalist = amd64
+2025-03-25T08:36:39.479+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.jnu.encoding = Cp1252
+2025-03-25T08:36:39.479+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.class.path = C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services\target\classes;C:\Users\C3JGPV\.m2\repository\com\auth0\java-jwt\4.5.0\java-jwt-4.5.0.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.18.3\jackson-core-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.18.3\jackson-databind-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.18.3\jackson-annotations-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\codehaus\woodstox\stax2-api\4.2.2\stax2-api-4.2.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\woodstox\woodstox-core\7.0.0\woodstox-core-7.0.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.document.odt\2.1.0\fr.opensagres.xdocreport.document.odt-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.document\2.1.0\fr.opensagres.xdocreport.document-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.core\2.1.0\fr.opensagres.xdocreport.core-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.converter\2.1.0\fr.opensagres.xdocreport.converter-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.template.freemarker\2.1.0\fr.opensagres.xdocreport.template.freemarker-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\fr\opensagres\xdocreport\fr.opensagres.xdocreport.template\2.1.0\fr.opensagres.xdocreport.template-2.1.0.jar;C:\Users\C3JGPV\.m2\repository\org\freemarker\freemarker\2.3.34\freemarker-2.3.34.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-security\3.4.4\spring-boot-starter-security-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter\3.4.4\spring-boot-starter-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot\3.4.4\spring-boot-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.4.4\spring-boot-autoconfigure-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.4.4\spring-boot-starter-logging-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\ch\qos\logback\logback-classic\1.5.18\logback-classic-1.5.18.jar;C:\Users\C3JGPV\.m2\repository\ch\qos\logback\logback-core\1.5.18\logback-core-1.5.18.jar;C:\Users\C3JGPV\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.24.3\log4j-to-slf4j-2.24.3.jar;C:\Users\C3JGPV\.m2\repository\org\apache\logging\log4j\log4j-api\2.24.3\log4j-api-2.24.3.jar;C:\Users\C3JGPV\.m2\repository\org\slf4j\jul-to-slf4j\2.0.17\jul-to-slf4j-2.0.17.jar;C:\Users\C3JGPV\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\C3JGPV\.m2\repository\org\yaml\snakeyaml\2.3\snakeyaml-2.3.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-aop\6.2.5\spring-aop-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-beans\6.2.5\spring-beans-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-config\6.4.4\spring-security-config-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-context\6.2.5\spring-context-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-web\6.4.4\spring-security-web-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-expression\6.2.5\spring-expression-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.4.4\spring-boot-starter-web-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.4.4\spring-boot-starter-json-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.18.3\jackson-datatype-jdk8-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.18.3\jackson-datatype-jsr310-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.18.3\jackson-module-parameter-names-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.4.4\spring-boot-starter-tomcat-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.39\tomcat-embed-core-10.1.39.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.39\tomcat-embed-el-10.1.39.jar;C:\Users\C3JGPV\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.39\tomcat-embed-websocket-10.1.39.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-web\6.2.5\spring-web-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\io\micrometer\micrometer-observation\1.14.5\micrometer-observation-1.14.5.jar;C:\Users\C3JGPV\.m2\repository\io\micrometer\micrometer-commons\1.14.5\micrometer-commons-1.14.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-webmvc\6.2.5\spring-webmvc-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\projectlombok\lombok\1.18.36\lombok-1.18.36.jar;C:\Users\C3JGPV\.m2\repository\org\slf4j\slf4j-api\2.0.17\slf4j-api-2.0.17.jar;C:\Users\C3JGPV\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\C3JGPV\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-core\6.2.5\spring-core-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\spring-jcl\6.2.5\spring-jcl-6.2.5.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-core\6.4.4\spring-security-core-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-crypto\6.4.4\spring-security-crypto-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\json\json\20250107\json-20250107.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.8.5\springdoc-openapi-starter-webmvc-ui-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.8.5\springdoc-openapi-starter-webmvc-api-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.8.5\springdoc-openapi-starter-common-2.8.5.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.28\swagger-core-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\org\apache\commons\commons-lang3\3.17.0\commons-lang3-3.17.0.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.28\swagger-annotations-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.28\swagger-models-jakarta-2.2.28.jar;C:\Users\C3JGPV\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\C3JGPV\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.18.3\jackson-dataformat-yaml-2.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\webjars\swagger-ui\5.18.3\swagger-ui-5.18.3.jar;C:\Users\C3JGPV\.m2\repository\org\webjars\webjars-locator-lite\1.0.1\webjars-locator-lite-1.0.1.jar;C:\Users\C3JGPV\.m2\repository\org\jspecify\jspecify\1.0.0\jspecify-1.0.0.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\boot\spring-boot-starter-oauth2-resource-server\3.4.4\spring-boot-starter-oauth2-resource-server-3.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-resource-server\6.4.4\spring-security-oauth2-resource-server-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-core\6.4.4\spring-security-oauth2-core-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\org\springframework\security\spring-security-oauth2-jose\6.4.4\spring-security-oauth2-jose-6.4.4.jar;C:\Users\C3JGPV\.m2\repository\com\nimbusds\nimbus-jose-jwt\9.37.3\nimbus-jose-jwt-9.37.3.jar;C:\Users\C3JGPV\.m2\repository\com\github\stephenc\jcip\jcip-annotations\1.0-1\jcip-annotations-1.0-1.jar;C:\Users\C3JGPV\.m2\repository\net\sf\saxon\Saxon-HE\12.5\Saxon-HE-12.5.jar;C:\Users\C3JGPV\.m2\repository\org\xmlresolver\xmlresolver\5.2.2\xmlresolver-5.2.2.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\client5\httpclient5\5.4.2\httpclient5-5.4.2.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\core5\httpcore5-h2\5.3.3\httpcore5-h2-5.3.3.jar;C:\Users\C3JGPV\.m2\repository\org\apache\httpcomponents\core5\httpcore5\5.3.3\httpcore5-5.3.3.jar;C:\Users\C3JGPV\.m2\repository\org\xmlresolver\xmlresolver\5.2.2\xmlresolver-5.2.2-data.jar
+2025-03-25T08:36:39.480+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE = 1048576
+2025-03-25T08:36:39.480+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.vendor = Oracle Corporation
+2025-03-25T08:36:39.480+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.arch.data.model = 64
+2025-03-25T08:36:39.481+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.variant = 
+2025-03-25T08:36:39.481+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor.url = https://java.oracle.com/
+2025-03-25T08:36:39.481+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.timezone = Europe/Paris
+2025-03-25T08:36:39.481+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.version = 21
+2025-03-25T08:36:39.482+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.name = Windows 11
+2025-03-25T08:36:39.482+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.java.launcher = SUN_STANDARD
+2025-03-25T08:36:39.482+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.country = FR
+2025-03-25T08:36:39.482+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.boot.library.path = C:\Users\C3JGPV\.jdks\openjdk-21.0.2\bin
+2025-03-25T08:36:39.482+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.java.command = fr.insee.rmes.RmesApplication --spring.config.additional-location=optional:jimfs://secrets/K:/secret.properties
+2025-03-25T08:36:39.484+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : jdk.debug = release
+2025-03-25T08:36:39.484+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.cpu.endian = little
+2025-03-25T08:36:39.484+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.home = C:\Users\C3JGPV
+2025-03-25T08:36:39.484+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.security.jgss.native = true
+2025-03-25T08:36:39.484+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.language = fr
+2025-03-25T08:36:39.485+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.stderr.encoding = UTF-8
+2025-03-25T08:36:39.485+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.vendor = Oracle Corporation
+2025-03-25T08:36:39.485+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.version.date = 2024-01-16
+2025-03-25T08:36:39.485+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.home = C:\Users\C3JGPV\.jdks\openjdk-21.0.2
+2025-03-25T08:36:39.486+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.security.krb5.conf = krb5.conf
+2025-03-25T08:36:39.486+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : file.separator = \
+2025-03-25T08:36:39.486+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.compressedOopsMode = Zero based
+2025-03-25T08:36:39.486+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.stdout.encoding = UTF-8
+2025-03-25T08:36:39.487+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : line.separator = 
+
+2025-03-25T08:36:39.487+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.vendor = Oracle Corporation
+2025-03-25T08:36:39.487+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.specification.name = Java Platform API Specification
+2025-03-25T08:36:39.487+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : FILE_LOG_CHARSET = UTF-8
+2025-03-25T08:36:39.487+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.awt.headless = true
+2025-03-25T08:36:39.488+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.script = 
+2025-03-25T08:36:39.488+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.protocol.handler.pkgs = com.google.common
+2025-03-25T08:36:39.488+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.management.compiler = HotSpot 64-Bit Tiered Compilers
+2025-03-25T08:36:39.488+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.runtime.version = 21.0.2+13-58
+2025-03-25T08:36:39.489+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.name = C3JGPV
+2025-03-25T08:36:39.489+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : stdout.encoding = UTF-8
+2025-03-25T08:36:39.489+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : path.separator = ;
+2025-03-25T08:36:39.489+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.version = 10.0
+2025-03-25T08:36:39.489+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.runtime.name = OpenJDK Runtime Environment
+2025-03-25T08:36:39.491+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : file.encoding = UTF-8
+2025-03-25T08:36:39.491+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.name = OpenJDK 64-Bit Server VM
+2025-03-25T08:36:39.491+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOG_FILE = XXXX
+2025-03-25T08:36:39.492+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.security.auth.login.config = spnegoLogin.conf
+2025-03-25T08:36:39.492+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor.url.bug = https://bugreport.java.com/bugreport/
+2025-03-25T08:36:39.492+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.io.tmpdir = C:\Users\C3JGPV\AppData\Local\Temp\
+2025-03-25T08:36:39.493+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.version = 21.0.2
+2025-03-25T08:36:39.493+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : user.dir = C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services
+2025-03-25T08:36:39.493+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : os.arch = amd64
+2025-03-25T08:36:39.493+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.specification.name = Java Virtual Machine Specification
+2025-03-25T08:36:39.494+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : PID = 14556
+2025-03-25T08:36:39.494+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.os.patch.level = 
+2025-03-25T08:36:39.494+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : CONSOLE_LOG_CHARSET = UTF-8
+2025-03-25T08:36:39.495+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : native.encoding = Cp1252
+2025-03-25T08:36:39.495+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.library.path = C:\Users\C3JGPV\.jdks\openjdk-21.0.2\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Eclipse Adoptium\21.0.6\bin;C:\WINDOWS\CCM\;C:\Perl64\site\bin;C:\Perl64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\RedHat\Podman;C:\Program Files\RedHat\Podman\;C:\Program Files\dotnet\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\;C:\INSEE\python\Scripts\;C:\INSEE\python\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Launcher\;C:\Users\C3JGPV\AppData\Local\Microsoft\WindowsApps;C:\Users\C3JGPV\AppData\Local\Programs\Git\cmd;C:\Users\C3JGPV\AppData\Local\GitHubDesktop\bin;C:\INSEE\Microsoft VS Code\bin;C:\INSEE\node\node-v16.13.0-win-x64;C:\INSEE\maven\apache-maven-3.8.4\bin;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;C:\Program Files\RedHat\Podman;C:\INSEE\postgresql-14.11-1-windows-x64-binaries\pgsql\bin;C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;;C:\INSEE\kubectl;C:\INSEE\trivy\trivy_0.58.1_windows-64bit;C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;;.
+2025-03-25T08:36:39.495+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.info = mixed mode, sharing
+2025-03-25T08:36:39.495+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : stderr.encoding = UTF-8
+2025-03-25T08:36:39.496+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vendor = Oracle Corporation
+2025-03-25T08:36:39.496+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.vm.version = 21.0.2+13-58
+2025-03-25T08:36:39.497+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.rmi.server.randomIDs = true
+2025-03-25T08:36:39.497+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : sun.io.unicode.encoding = UnicodeLittle
+2025-03-25T08:36:39.497+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : java.class.version = 65.0
+2025-03-25T08:36:39.498+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDOMAIN_ROAMINGPROFILE = AD
+2025-03-25T08:36:39.498+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_LEVEL = 6
+2025-03-25T08:36:39.498+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : https_proxy = http://proxy-rie.http.insee.fr:8080
+2025-03-25T08:36:39.498+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : SESSIONNAME = Console
+2025-03-25T08:36:39.498+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ALLUSERSPROFILE = C:\ProgramData
+2025-03-25T08:36:39.498+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_ARCHITECTURE = AMD64
+2025-03-25T08:36:39.498+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : PSModulePath = C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+2025-03-25T08:36:39.499+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : SystemDrive = C:
+2025-03-25T08:36:39.499+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : DEFLOGDIR = C:\ProgramData\McAfee\Endpoint Security\Logs
+2025-03-25T08:36:39.499+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERNAME = C3JGPV
+2025-03-25T08:36:39.499+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDNSDOMAIN = AD.INSEE.INTRA
+2025-03-25T08:36:39.500+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramFiles(x86) = C:\Program Files (x86)
+2025-03-25T08:36:39.500+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+2025-03-25T08:36:39.500+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : DriverData = C:\Windows\System32\Drivers\DriverData
+2025-03-25T08:36:39.500+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : IntelliJ IDEA Community Edition = C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;
+2025-03-25T08:36:39.500+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMESHARE = \\pd_aus_ESP_Z\ESPERT_Z\C3JGPV
+2025-03-25T08:36:39.501+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramData = C:\ProgramData
+2025-03-25T08:36:39.501+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramW6432 = C:\Program Files
+2025-03-25T08:36:39.501+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMEPATH = \
+2025-03-25T08:36:39.501+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 142 Stepping 12, GenuineIntel
+2025-03-25T08:36:39.501+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ProgramFiles = C:\Program Files
+2025-03-25T08:36:39.501+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : PUBLIC = C:\Users\Public
+2025-03-25T08:36:39.504+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : windir = C:\WINDOWS
+2025-03-25T08:36:39.504+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : =:: = ::\
+2025-03-25T08:36:39.504+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ZES_ENABLE_SYSMAN = 1
+2025-03-25T08:36:39.505+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOCALAPPDATA = C:\Users\C3JGPV\AppData\Local
+2025-03-25T08:36:39.505+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : IntelliJ IDEA = C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;
+2025-03-25T08:36:39.505+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERDOMAIN = AD
+2025-03-25T08:36:39.505+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : LOGONSERVER = \\S20W801
+2025-03-25T08:36:39.505+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : JAVA_HOME = C:\INSEE\OpenJDK21\jdk-21.0.6+7
+2025-03-25T08:36:39.506+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : OneDrive = C:\Users\C3JGPV\OneDrive
+2025-03-25T08:36:39.506+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : APPDATA = C:\Users\C3JGPV\AppData\Roaming
+2025-03-25T08:36:39.506+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramFiles = C:\Program Files\Common Files
+2025-03-25T08:36:39.506+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : Path = C:\Program Files\Eclipse Adoptium\21.0.6\bin;C:\WINDOWS\CCM\;C:\Perl64\site\bin;C:\Perl64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\RedHat\Podman;C:\Program Files\RedHat\Podman\;C:\Program Files\dotnet\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Python313\;C:\INSEE\python\Scripts\;C:\INSEE\python\;C:\Users\C3JGPV\AppData\Local\Programs\Python\Launcher\;C:\Users\C3JGPV\AppData\Local\Microsoft\WindowsApps;C:\Users\C3JGPV\AppData\Local\Programs\Git\cmd;C:\Users\C3JGPV\AppData\Local\GitHubDesktop\bin;C:\INSEE\Microsoft VS Code\bin;C:\INSEE\node\node-v16.13.0-win-x64;C:\INSEE\maven\apache-maven-3.8.4\bin;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;C:\Program Files\RedHat\Podman;C:\INSEE\postgresql-14.11-1-windows-x64-binaries\pgsql\bin;C:\INSEE\IntelliJ IDEA Community Edition 2023.3.4\bin;;C:\INSEE\kubectl;C:\INSEE\trivy\trivy_0.58.1_windows-64bit;C:\Users\C3JGPV\AppData\Local\JetBrains\IntelliJ IDEA 2024.3.2.2\bin;;C:\INSEE\OpenJDK21\jdk-21.0.6+7\bin;
+2025-03-25T08:36:39.506+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : http_proxy = http://proxy-rie.http.insee.fr:8080
+2025-03-25T08:36:39.506+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : no_proxy = 
+insee.test,insee.fr,insee.eu,insee.intra,localhost
+2025-03-25T08:36:39.507+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : OS = Windows_NT
+2025-03-25T08:36:39.507+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : COMPUTERNAME = P100058600
+2025-03-25T08:36:39.507+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : PROCESSOR_REVISION = 8e0c
+2025-03-25T08:36:39.507+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramW6432 = C:\Program Files\Common Files
+2025-03-25T08:36:39.507+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ComSpec = C:\WINDOWS\system32\cmd.exe
+2025-03-25T08:36:39.507+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : UATDATA = C:\WINDOWS\CCM\UATData\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77
+2025-03-25T08:36:39.508+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : SystemRoot = C:\WINDOWS
+2025-03-25T08:36:39.508+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : TEMP = C:\Users\C3JGPV\AppData\Local\Temp
+2025-03-25T08:36:39.508+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOMEDRIVE = Z:
+2025-03-25T08:36:39.508+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : USERPROFILE = C:\Users\C3JGPV
+2025-03-25T08:36:39.508+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : TMP = C:\Users\C3JGPV\AppData\Local\Temp
+2025-03-25T08:36:39.508+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : CommonProgramFiles(x86) = C:\Program Files (x86)\Common Files
+2025-03-25T08:36:39.509+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : EFC_7188 = 1
+2025-03-25T08:36:39.509+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : NUMBER_OF_PROCESSORS = 8
+2025-03-25T08:36:39.509+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : HOME = C:\Users\C3JGPV
+2025-03-25T08:36:39.509+01:00  WARN 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : RandomValuePropertySource {name='random'} n'est pas EnumerablePropertySource : impossible à lister
+2025-03-25T08:36:39.509+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.application.pid = 14556
+2025-03-25T08:36:39.512+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.security.oauth2.resourceserver.jwt.jwk-set-uri = https://auth.insee.test/auth/realms/agents-insee-interne/protocol/openid-connect/certs
+2025-03-25T08:36:39.513+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.agency = fr.insee
+2025-03-25T08:36:39.513+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : server.forward-headers-strategy = NATIVE
+2025-03-25T08:36:39.514+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : server.servlet.contextPath = /
+2025-03-25T08:36:39.514+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.role.gestionnaire.colectica = Gestionnaire_RMESGOPS
+2025-03-25T08:36:39.515+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.enabled = true
+2025-03-25T08:36:39.515+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.path = /
+2025-03-25T08:36:39.516+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.syntax-highlight.activated = false
+2025-03-25T08:36:39.516+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.user = rmeswdai-service@insee.fr
+2025-03-25T08:36:39.516+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.apikey = c3F6Y0E0b0JzWDgtemFjWkV0NEQ6U3NvaDRGZjFUQ2Uza3BxVmt0YUdZQQ==
+2025-03-25T08:36:39.517+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.url = https://indexation-metadonnees.developpement3.insee.fr
+2025-03-25T08:36:39.517+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.token.oidc-claim-username = ******
+2025-03-25T08:36:39.517+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.secret = ******
+2025-03-25T08:36:39.517+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.host = metadata.developpement2.insee.fr
+2025-03-25T08:36:39.518+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.security.oauth2.client.provider.ddi-as-provider.issuer-uri = https://auth.insee.test/auth/realms/agents-insee-interne
+2025-03-25T08:36:39.519+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.whitelist-matchers = /swagger-ui/index.html,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html,/actuator/**,/error,/,/swagger-ui-ddia-as.html
+2025-03-25T08:36:39.519+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : springdoc.swagger-ui.oauth.clientId = rmeswdai-service
+2025-03-25T08:36:39.519+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.max-file-size = 100MB
+2025-03-25T08:36:39.519+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.profiles.active = prod
+2025-03-25T08:36:39.520+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.realm = agents-insee-interne
+2025-03-25T08:36:39.520+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.scopes = openid,email
+2025-03-25T08:36:39.520+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.server = https://auth.insee.test/auth
+2025-03-25T08:36:39.522+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.token.oidc-claim-role = ******
+2025-03-25T08:36:39.522+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.keycloak.resource = rmeswdai-service
+2025-03-25T08:36:39.523+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.url = https://metadonnees-operations.developpement3.insee.fr
+2025-03-25T08:36:39.523+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.role.administrateur = Administrateur_RMESGOPS
+2025-03-25T08:36:39.523+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.ddias.version = 2.1.3
+2025-03-25T08:36:39.524+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.ddias.filenames.maxlength = 50
+2025-03-25T08:36:39.524+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.security.enabled = false
+2025-03-25T08:36:39.524+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.search.root.sub-group.ids = 6baffbbc-86d5-4982-b6a4-7b035f7043ad, 2bfe02de-0044-4a94-b516-b166d9499971
+2025-03-25T08:36:39.524+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.search.root.resource-package.ids = d574ed7e-2a7c-491f-b25c-f84141d4e96e
+2025-03-25T08:36:39.525+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.index.name = xxxx
+2025-03-25T08:36:39.525+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.host = urlElastic
+2025-03-25T08:36:39.525+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.port = 80
+2025-03-25T08:36:39.526+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.elasticsearch.apiId = id
+2025-03-25T08:36:39.526+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.MetadataService.impl = MetadataServiceImpl
+2025-03-25T08:36:39.526+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.remote.metadata.key = xxxx
+2025-03-25T08:36:39.526+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.name = /ddi-access-services/api
+2025-03-25T08:36:39.527+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.api.scheme = http
+2025-03-25T08:36:39.527+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.metadata.cors.allowedOrigin = *
+2025-03-25T08:36:39.527+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-authorization = https://auth.insee.test/auth/.../protocol/openid-connect/auth
+2025-03-25T08:36:39.528+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-refresh = https://auth.insee.test/auth/.../protocol/openid-connect/token
+2025-03-25T08:36:39.528+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-url-token = ******
+2025-03-25T08:36:39.529+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.issuer-description = Keycloak
+2025-03-25T08:36:39.529+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-name = xxxxx
+2025-03-25T08:36:39.530+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-email = un-email-fonctionnel@xxx.fr
+2025-03-25T08:36:39.530+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : fr.insee.rmes.springdoc.contact-url = https://www.insee.fr/fr/accueil
+2025-03-25T08:36:39.531+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.enabled = true
+2025-03-25T08:36:39.531+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : spring.servlet.multipart.max-request-size = 50MB
+2025-03-25T08:36:39.532+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : logging.logback.rollingpolicy.max-file-size = 1MB
+2025-03-25T08:36:39.532+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : logging.file.name = XXXX
+2025-03-25T08:36:39.532+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.api.url = XXX
+2025-03-25T08:36:39.534+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.username = XXX
+2025-03-25T08:36:39.534+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : auth.password = ******
+2025-03-25T08:36:39.534+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : item.api.url = https://metadonnees-operations.developpement3.insee.fr/api/v1/item/
+2025-03-25T08:36:39.534+01:00  INFO 14556 --- [main] fr.insee.rmes.config.PropertiesLogger    : ============================================================================
+2025-03-25T08:36:39.704+01:00  INFO 14556 --- [main] fr.insee.rmes.RmesApplication            : Starting RmesApplication using Java 21.0.2 with PID 14556 (C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services\target\classes started by C3JGPV in C:\Users\C3JGPV\Documents\Rmès\DEPOTS\DDI-Access-Services)
+2025-03-25T08:36:39.707+01:00  INFO 14556 --- [main] fr.insee.rmes.RmesApplication            : The following 1 profile is active: "prod"
+2025-03-25T08:36:41.981+01:00  INFO 14556 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-25T08:36:42.005+01:00  INFO 14556 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-25T08:36:42.005+01:00  INFO 14556 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-03-25T08:36:42.109+01:00  INFO 14556 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-03-25T08:36:42.109+01:00  INFO 14556 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2307 ms
+2025-03-25T08:36:43.296+01:00  INFO 14556 --- [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-03-25T08:36:43.607+01:00  INFO 14556 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-03-25T08:36:43.618+01:00  INFO 14556 --- [main] fr.insee.rmes.RmesApplication            : Started RmesApplication in 4.717 seconds (process running for 7.038)
+2025-03-25T08:36:59.698+01:00  INFO 14556 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-25T08:36:59.698+01:00  INFO 14556 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-03-25T08:36:59.699+01:00  INFO 14556 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
