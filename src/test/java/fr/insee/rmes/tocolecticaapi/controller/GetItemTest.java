@@ -39,7 +39,7 @@ class GetItemTest {
 
     @Test
     void whenGetDataRelationship_shouldReturnRightJson() throws Exception {
-        String uuid="34abf2d5-f0bb-47df-b3d2-42ff7f8f5874";
+        String uuid="16a35b68-4479-4282-95ed-ff7d151746e4";
         String version ="2";
         var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/"+version+"/dataRelationship";
         when(colecticaService.searchColecticaInstanceByUuid(uuid)).thenReturn(read("/getItemTest/physicalInstance.xml"));
