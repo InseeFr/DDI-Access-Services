@@ -55,6 +55,7 @@ public class GetItem {
             response= uuid+"/"+version;
         }
 
+        //return ResponseEntity.ok(colecticaService.searchColecticaInstanceByUuid(uuid));
         return ResponseEntity.ok(this.ddiFragmentService.extractDataRelationship(response));
     }
 

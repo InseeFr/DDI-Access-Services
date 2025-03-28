@@ -40,12 +40,13 @@ class GetItemTest {
     @Test
     void whenGetDataRelationship_shouldReturnRightJson() throws Exception {
         String uuid="34abf2d5-f0bb-47df-b3d2-42ff7f8f5874";
-        var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/dataRelationship";
+        String version ="2";
+        var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/"+version+"/dataRelationship";
         when(colecticaService.searchColecticaInstanceByUuid(uuid)).thenReturn(read("/getItemTest/physicalInstance.xml"));
         mockMvc.perform(get(dataRelationShipEndpoint).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(content().json(read("/getItemTest/34abf2d5-f0bb-47df-b3d2-42ff7f8f5874_expected.json")));
+                .andExpect(content().json(read("/getItemTest/16a35b68-4479-4282-95ed-ff7d151746e4_expected.json")));
     }
 
     private static String read(String fileName) throws Exception {
