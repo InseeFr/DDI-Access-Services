@@ -156,12 +156,12 @@ public class GetItem {
 
     @GetMapping(value = "suggesters/jsonWithChild", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get JSON for Suggester/codelist simple (id,label)", description = "Get a JSON document for suggester or codelist from Colectica repository including an item with childs.")
-    public Object getJsonWithChild(
+       public Object getJsonWithChild(
             @Parameter(
-                    description = "id de l'objet colectica",
-                    required = true,
-                    schema = @Schema(
-                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier,
+             description = "id de l'objet colectica",
+             required = true,
+             schema = @Schema(
+                    type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier,
             @RequestParam(value = "fieldIdName",defaultValue = "id") String outputField,
             @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws JsonProcessingException {
         return colecticaService.getJsonWithChild(identifier, outputField, fieldLabelName);
