@@ -49,14 +49,29 @@ public class GetItem {
             required = true,
             schema = @Schema(type = "string", example="16a35b68-4479-4282-95ed-ff7d151746e4"))
                                                                       @PathVariable String uuid,String version) throws RmesException {
-       String response = uuid;
+        String response = uuid;
 
-       if(version.matches("\\d+")){
-           response= uuid+"/"+version;
-       }
+        if(version.matches("\\d+")){
+            response= uuid+"/"+version;
+        }
 
         return ResponseEntity.ok(this.ddiFragmentService.extractDataRelationship(response));
     }
+
+
+    @GetMapping(value = "ddiFragment/uuid", produces = MediaType.APPLICATION_XML_VALUE)
+    @Operation(summary = "Get Fragment by uuid", description = "Get an XML document for a ddi:Fragment from Colectica repository.")
+    public ResponseEntity<String> findFragmentByUuidColectica(
+            @Parameter(
+                    description = "id de l'objet colectica sous la forme uuid/version",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93")) String uuid) {
+        return ResponseEntity.ok(colecticaService.findFragmentByUuid(uuid));
+
+    }
+
+
 
     @GetMapping(value = "FragmentInstance/uuid/withChildren", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get Fragments by uuid", description = "Get an XML document for a Fragment:Instance from Colectica repository.")
@@ -70,21 +85,21 @@ public class GetItem {
 
     }
 
-        @GetMapping("/filtered-search/texte")
-        @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
-        public ResponseEntity<String> filteredSearchText(
-                @Parameter(
-                        description = "nom par défaut de l'index colectica",
-                        required = true,
-                        schema = @Schema(
-                                type = "string", example="portal*"))
-             String index ,
-                @Parameter(
-                        description = "texte à rechercher. le * sert de wildcard",
-                        required = true,
-                        schema = @Schema(
-                                type = "string", example="sugg*")) String texte) throws RmesException {
-            return ResponseEntity.ok(colecticaService.filteredSearchText(index, texte));
+    @GetMapping("/filtered-search/texte")
+    @Operation(summary = "Get list of match in elasticsearch database", description = "Get a JSON ")
+    public ResponseEntity<String> filteredSearchText(
+            @Parameter(
+                    description = "nom par défaut de l'index colectica",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="portal*"))
+            String index ,
+            @Parameter(
+                    description = "texte à rechercher. le * sert de wildcard",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="sugg*")) String texte) throws RmesException {
+        return ResponseEntity.ok(colecticaService.filteredSearchText(index, texte));
     }
 
     @GetMapping("/filtered-search/texteByType")
@@ -141,12 +156,12 @@ public class GetItem {
 
     @GetMapping(value = "suggesters/jsonWithChild", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get JSON for Suggester/codelist simple (id,label)", description = "Get a JSON document for suggester or codelist from Colectica repository including an item with childs.")
-       public Object getJsonWithChild(
+    public Object getJsonWithChild(
             @Parameter(
-            description = "id de l'objet colectica",
-            required = true,
-            schema = @Schema(
-                    type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier,
+                    description = "id de l'objet colectica",
+                    required = true,
+                    schema = @Schema(
+                            type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier,
             @RequestParam(value = "fieldIdName",defaultValue = "id") String outputField,
             @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws JsonProcessingException {
         return colecticaService.getJsonWithChild(identifier, outputField, fieldLabelName);
