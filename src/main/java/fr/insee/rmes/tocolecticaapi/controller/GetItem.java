@@ -48,7 +48,7 @@ public class GetItem {
             description = "id du fragment DDI sous la forme uuid",
             required = true,
             schema = @Schema(type = "string", example="16a35b68-4479-4282-95ed-ff7d151746e4"))
-                                                                      @PathVariable String uuid, String version) throws RmesException {
+                                                                      @PathVariable String uuid, @PathVariable String version) throws RmesException {
 
         String response = uuid;
 
