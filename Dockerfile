@@ -1,13 +1,22 @@
-FROM maven:3.9.6-eclipse-temurin-21-alpine as mvn
-WORKDIR /DDI-Access-Services
-COPY ./ /DDI-Access-Services/
-RUN mvn -B -f /DDI-Access-Services/pom.xml package
+FROM eclipse-temurin:21-jdk-jammy as builder
 
-MAINTAINER hugobouttes
+WORKDIR /opt/app
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+COPY ./src ./src
+RUN chmod +x mvnw
+RUN ./mvnw clean install -DskipTests=true
 
-FROM eclipse-temurin:21-alpine
-COPY --from=mvn DDI-Access-Services/target/*.jar app.jar
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /opt/app
+
+RUN addgroup -g 10000 javagroup
+RUN adduser -D -s / -u 10000 javauser -G javagroup
+RUN chown -R 10000:10000 /opt/app/
+
+USER 10000
+COPY --from=builder /opt/app/target/*.jar /opt/app/ddi-as.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-Xms256M","-Xmx1024M","-jar","/app.jar"]
+ENTRYPOINT ["java", "-jar",  "/opt/app/ddi-as.jar"]
