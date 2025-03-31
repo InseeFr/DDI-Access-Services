@@ -7,4 +7,7 @@ MAINTAINER hugobouttes
 
 FROM eclipse-temurin:21-alpine
 COPY --from=mvn DDI-Access-Services/target/*.jar app.jar
+
+EXPOSE 8080
+
 ENTRYPOINT ["java","-Xms256M","-Xmx1024M","-jar","/app.jar"]
