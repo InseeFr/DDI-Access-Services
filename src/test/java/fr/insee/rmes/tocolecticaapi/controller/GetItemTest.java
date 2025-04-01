@@ -14,12 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -38,16 +36,28 @@ class GetItemTest {
     private ColecticaService colecticaService;
 
     @Test
-    void whenWrongVersionNumbersForGetDataRelationship_shouldReturnRightJson() throws Exception {
+    void whenGetDataRelationshipWithUuid_shouldReturnRightJson() throws Exception {
         String uuid="34abf2d5-f0bb-47df-b3d2-42ff7f8f5874";
-        String version="randomLetters";
-        var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/"+version+"/dataRelationship";
+        var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/dataRelationship";
         when(colecticaService.searchColecticaInstanceByUuid(uuid)).thenReturn(read("/getItemTest/physicalInstance.xml"));
-        mockMvc.perform(get(dataRelationShipEndpoint).param("uuid",uuid).param("version",version).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(dataRelationShipEndpoint).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().json(read("/getItemTest/34abf2d5-f0bb-47df-b3d2-42ff7f8f5874_expected.json")));
     }
+
+    @Test
+    void whenGetDataRelationshipWithUuidAndVersion_shouldReturnRightJson() throws Exception {
+        String uuid="34abf2d5-f0bb-47df-b3d2-42ff7f8f5874";
+        int version = 2;
+        var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/"+version+"/dataRelationship";
+        when(colecticaService.searchColecticaInstanceByUuid(uuid+"/"+version)).thenReturn(read("/getItemTest/physicalInstance.xml"));
+        mockMvc.perform(get(dataRelationShipEndpoint).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().json(read("/getItemTest/34abf2d5-f0bb-47df-b3d2-42ff7f8f5874_expected.json")));
+    }
+
 
     private static String read(String fileName) throws Exception {
         Path path = Path.of(GetItemTest.class.getResource(fileName).toURI());
