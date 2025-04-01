@@ -49,7 +49,9 @@ public class GetItem {
             required = true,
             schema = @Schema(type = "string", example="16a35b68-4479-4282-95ed-ff7d151746e4"))
                                                                       @PathVariable String uuid, @PathVariable int version) throws RmesException {
-        return ResponseEntity.ok(this.ddiFragmentService.extractDataRelationship(uuid+"/"+String.valueOf(version)));
+        String response =uuid+"/"+String.valueOf(version);
+       
+        return ResponseEntity.ok(this.ddiFragmentService.extractDataRelationship(response));
     }
 
 
