@@ -18,5 +18,5 @@ class ClasspathUriResolverTest {
         sources.add(classpathUriResolver.resolve("..test","anyString"));
         sources.add(classpathUriResolver.resolve("test","anyString"));
         assertTrue(sources.getFirst()!=null && sources.get(1)!=null && sources.get(2)!=null);
-    }
+    } 
 }
