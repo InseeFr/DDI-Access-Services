@@ -27,6 +27,6 @@ class HttpUtilsTest {
         byte[] filteredContentWithoutBom= HttpUtilsTest.class.getResourceAsStream("/utf8-bom/fichierSansBom.xml").readAllBytes();
         boolean hasBomFilteredContentWithBom = filteredContentWithBom.length > 2 && filteredContentWithBom[0] == (byte) 0xEF && filteredContentWithBom[1] == (byte) 0xBB && filteredContentWithBom[2] == (byte) 0xBF;
         boolean hasBomFilteredContentWithoutBom = filteredContentWithoutBom.length > 2 && filteredContentWithoutBom[0] == (byte) 0xEF && filteredContentWithoutBom[1] == (byte) 0xBB && filteredContentWithoutBom[2] == (byte) 0xBF;
-        assertTrue(hasBomFilteredContentWithBom & !hasBomFilteredContentWithoutBom );
+        assertTrue(hasBomFilteredContentWithBom && !hasBomFilteredContentWithoutBom );
     }
 }
