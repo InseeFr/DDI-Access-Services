@@ -36,7 +36,7 @@ class HttpUtilsTest {
     }
 
     @Test
-    void shouldGenerateHttpHeadersWithCorrectsComponents() throws IOException {
+    void shouldGenerateHttpHeadersWithCorrectsComponents(){
         HttpHeaders httpHeaders = HttpUtils.generateHttpHeaders("MyProject", FileExtension.ODT_EXTENSION, 32);
 
         MediaType mediaTypeExpected = new MediaType("application", "vnd.oasis.opendocument.text");
