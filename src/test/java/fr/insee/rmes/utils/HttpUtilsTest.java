@@ -25,7 +25,7 @@ class HttpUtilsTest {
 
 
     @Test
-    void shouldTestIfObjectsHaveBom() throws IOException{
+    void shouldTestIfObjectsHaveBom() {
         byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         List<byte[]> bytes = List.of("project".getBytes(StandardCharsets.ISO_8859_1),"Léopold".getBytes(StandardCharsets.UTF_8),bom);
         List<Boolean> hasBom = new ArrayList<>();
