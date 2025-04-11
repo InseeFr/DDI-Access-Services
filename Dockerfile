@@ -7,7 +7,7 @@ COPY ./src ./src
 RUN chmod +x mvnw
 RUN ./mvnw clean install -DskipTests=true
 
-FROM eclipse-temurin:21-jre-ubi9-minimal
+FROM eclipse-temurin:21-jre-jammy
 
 RUN groupadd -g 10000 javagroup
 RUN useradd -u 10000 -g javagroup -s /usr/sbin/nologin javauser
