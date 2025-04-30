@@ -1,8 +1,11 @@
 name: DDI Access Services CI
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   check-version:
