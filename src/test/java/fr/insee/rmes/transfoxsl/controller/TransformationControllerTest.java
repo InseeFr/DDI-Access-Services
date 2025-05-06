@@ -8,6 +8,7 @@ import fr.insee.rmes.transfoxsl.utils.MultipartFileUtils;
 import fr.insee.rmes.utils.export.XDocReport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-@WebMvcTest(TransformationController.class)
+@WebMvcTest(value = TransformationController.class, excludeAutoConfiguration = OAuth2ClientAutoConfiguration.class)
 @Import(SecurityConfig.class)
 @EnableConfigurationProperties(InseeSecurityTokenProperties.class)
 @ActiveProfiles("dev")

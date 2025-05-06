@@ -20,9 +20,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
@@ -49,6 +49,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @SuppressWarnings("java:S4502")
     @Profile("prod")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -115,7 +116,7 @@ public class SecurityConfig {
                 List<String> roles = (List<String>) claims.getOrDefault(claimPath[claimPath.length - 1], List.of());
                 //if we need to add customs roles to every connected user we could define this variable (static or from properties)
                 //roles.addAll(defaultRolesForUsers);
-                return Collections.unmodifiableCollection(roles.stream().map(s -> new GrantedAuthority() {
+                return roles.stream().map(s -> new GrantedAuthority() {
                     @Override
                     public String getAuthority() {
                         return ROLE_PREFIX + s;
@@ -125,7 +126,7 @@ public class SecurityConfig {
                     public String toString() {
                         return getAuthority();
                     }
-                }).toList());
+                }).collect(Collectors.toList());
             } catch (ClassCastException e) {
                 return List.of();
             }

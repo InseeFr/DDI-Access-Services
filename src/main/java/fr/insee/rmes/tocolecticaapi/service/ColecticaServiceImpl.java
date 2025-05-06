@@ -66,7 +66,7 @@ public record ColecticaServiceImpl(ElasticService elasticService,
     private static final String TRANSACTIONID = "{\"TransactionId\":";
 
     @Autowired
-    public ColecticaServiceImpl(KeycloakServices kc,
+    public ColecticaServiceImpl(KeycloakServices keycloakServices,
                                 ElasticService elasticService,
                                 ExportUtils exportUtils,
                                 DDIDerefencer ddiDerefencer,
@@ -74,10 +74,10 @@ public record ColecticaServiceImpl(ElasticService elasticService,
                                     String serviceUrl,
                                 @Value("${fr.insee.rmes.api.remote.metadata.agency}")
                                     String agency){
-        this(elasticService, initRestClient(kc, serviceUrl), exportUtils, ddiDerefencer, agency);
+        this(elasticService, initRestClient(keycloakServices, serviceUrl), exportUtils, ddiDerefencer, agency);
     }
 
-    private static RestClient initRestClient(KeycloakServices kc, String serviceUrl) {
+    private static RestClient initRestClient(KeycloakServices keycloakServices, String serviceUrl) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(100_000); // Temps de connexion en millisecondes
         factory.setReadTimeout(100_000); // Temps de lecture en millisecondes
@@ -86,9 +86,7 @@ public record ColecticaServiceImpl(ElasticService elasticService,
                 .requestFactory(factory)
                 .baseUrl(URI.create(serviceUrl + "/").resolve("api/v1/"))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
-                .defaultRequest(requestHeadersSpec -> requestHeadersSpec.header(HttpHeaders.AUTHORIZATION,
-                        "Bearer " + kc.getFreshToken())
-                )
+                .apply(keycloakServices.configureOidcClientAutoAuthentication())
                 .build();
     }
 
