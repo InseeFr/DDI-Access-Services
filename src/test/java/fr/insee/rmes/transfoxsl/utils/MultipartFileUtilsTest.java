@@ -5,15 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -45,4 +42,17 @@ class MultipartFileUtilsTest {
                 .lines().collect(Collectors.joining("\n"));
         assertEquals("<xml></xml>", content);
     }
+
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenConvertToInputStream() throws Exception {
+        MultipartFileUtils multipartFileUtilsExample = new MultipartFileUtils();
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> multipartFileUtilsExample.convertToInputStream(null));
+        assertEquals("MultipartFile cannot be null",exception.getMessage());
+    }
+
+
+
+
+
+
 }
