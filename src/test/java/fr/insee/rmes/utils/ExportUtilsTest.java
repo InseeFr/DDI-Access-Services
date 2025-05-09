@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ExportUtilsTest {
 
     @Test
-    void shouldThrowRmesExceptionWhenExportAsODT() throws RmesException {
+    void shouldThrowRmesExceptionWhenExportAsODT(){
         Map<String, byte[]> xmlParameters = new HashMap<>();
         xmlParameters.put("sequence", HexFormat.of().parseHex("e04fd020ea3a6910a2d808002b30309d"));
         ExportUtils exportUtils = new ExportUtils();
@@ -20,7 +20,7 @@ class ExportUtilsTest {
     }
 
     @Test
-    void shouldThrowRmesExceptionWhenExportAsODS()  {
+    void shouldThrowRmesExceptionWhenExportAsODS(){
         Map<String, byte[]> xmlParameters = new HashMap<>();
         xmlParameters.put("sequence", HexFormat.of().parseHex("e04fd020ea3a6910a2d808002b30309d"));
         ExportUtils exportUtils = new ExportUtils();
