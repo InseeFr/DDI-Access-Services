@@ -44,7 +44,7 @@ class MultipartFileUtilsTest {
     }
 
     @Test
-    void shouldThrowIllegalArgumentExceptionWhenConvertToInputStream() throws Exception {
+    void shouldThrowIllegalArgumentExceptionWhenConvertToInputStream() {
         MultipartFileUtils multipartFileUtilsExample = new MultipartFileUtils();
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> multipartFileUtilsExample.convertToInputStream(null));
         assertEquals("MultipartFile cannot be null",exception.getMessage());
