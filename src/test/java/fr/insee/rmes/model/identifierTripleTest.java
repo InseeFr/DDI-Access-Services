@@ -3,7 +3,7 @@ package fr.insee.rmes.model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-class identifierTripleTest {
+class IdentifierTripleTest {
 
     @Test
     void shouldTestToString() {

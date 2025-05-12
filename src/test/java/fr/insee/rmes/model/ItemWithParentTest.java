@@ -10,11 +10,9 @@ class ItemWithParentTest {
     @Mock
     ColecticaItem colecticaItem;
     Node itemNode;
-    ColecticaItem parent;
     Node parentNode;
     ColecticaItem ressourcePackage;
     Node ressourcePackageNode;
-    DDIItemType typeParent;
 
 
     @Test
