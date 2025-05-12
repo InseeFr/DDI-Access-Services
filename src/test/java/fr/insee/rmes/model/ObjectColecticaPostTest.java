@@ -28,7 +28,7 @@ class ObjectColecticaPostTest {
 
 
     @Test
-    void shouldJsonToString() throws JsonProcessingException {
+    void shouldTestToJSON() throws JsonProcessingException {
 
         TargetItem targetItem = new TargetItem();
         targetItem.setIdentifier("exampleOfTargetItem");
