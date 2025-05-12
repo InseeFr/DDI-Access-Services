@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ColecticaItemPostRefTest {
 
     @Test
-    void testToString() {
+    void shouldTestToString()  {
 
         ColecticaItemPostRef colecticaItemPostRef = new ColecticaItemPostRef();
         colecticaItemPostRef.setItem("item");
