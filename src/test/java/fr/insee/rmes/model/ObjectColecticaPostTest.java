@@ -41,7 +41,7 @@ class ObjectColecticaPostTest {
 
         String expected="{\"ItemTypes\":[\"cat\",\"dog\"],\"TargetItem\":{\"AgencyId\":null,\"Identifier\":\"exampleOfTargetItem\",\"Version\":null},\"UseDistinctResultItem\":true,\"UseDistinctTargetItem\":true}";
 
-        assertEquals(expected,objectColecticaPost.toJson().toString());
+        assertEquals(expected,objectColecticaPost.toJson());
     }
 
 }
