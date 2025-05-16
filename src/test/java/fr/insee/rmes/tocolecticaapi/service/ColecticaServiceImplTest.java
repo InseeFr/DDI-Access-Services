@@ -29,7 +29,7 @@ class ColecticaServiceImplTest {
     RestClient restClient;
     ExportUtils exportUtils;
     DDIDerefencer ddiDerefencer;
-    String agency;
+    String agencyExample;
 
 
     @Test
@@ -91,7 +91,7 @@ class ColecticaServiceImplTest {
     @ParameterizedTest
     @ValueSource(strings = { "example-of-string !", ")à)ç)àçà)ç)","784854$" })
     void shouldReturnRmesExceptionWhenSearchColecticaInstanceByUuid(String uuid)  {
-        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticService,restClient,exportUtils, ddiDerefencer, agency);
+        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticService,restClient,exportUtils, ddiDerefencer, agencyExample);
         RmesException exception = assertThrows(RmesException.class, () -> colecticaService.searchColecticaInstanceByUuid(uuid));
         assertTrue(exception.getDetails().contains("ne respecte pas le pattern d'un uuid\",\"message\":\"UUID invalide\""));
     }
