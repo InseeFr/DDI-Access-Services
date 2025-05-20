@@ -1,8 +1,13 @@
 package fr.insee.rmes.tocolecticaapi.service;
 
+import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.RmesExceptionIO;
-import org.junit.jupiter.api.Assertions;
+import fr.insee.rmes.transfoxsl.service.internal.DDIDerefencer;
+import fr.insee.rmes.utils.ExportUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,15 +16,21 @@ import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestClient;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
-
 import java.io.IOException;
 import java.net.URI;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 class ColecticaServiceImplTest {
+
+    @Mock
+    ElasticService elasticService;
+    RestClient restClient;
+    ExportUtils exportUtils;
+    DDIDerefencer ddiDerefencer;
+    String agencyExample;
+
 
     @Test
     void getResponseEntity_NotOkStatus() {
@@ -34,7 +45,7 @@ class ColecticaServiceImplTest {
         customizer.getServer().expect(MockRestRequestMatchers.requestTo(baseUrl+"item/"+agency+"/"+ uuid)).andRespond(MockRestResponseCreators.withResourceNotFound());
 
         ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(null,  builder.build(), null, null, agency);
-        var expectedException= Assertions.assertThrows(RmesExceptionIO.class, ()-> colecticaService.findFragmentByUuid(uuid));
+        var expectedException= assertThrows(RmesExceptionIO.class, ()-> colecticaService.findFragmentByUuid(uuid));
         assertThat(expectedException.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(expectedException.getMessage()).isEqualTo("Bad request or inexisting resource");
     }
@@ -75,6 +86,14 @@ class ColecticaServiceImplTest {
                 .build();
         assertFalse(diff.hasDifferences(), diff.toString());
 
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "example-of-string !", ")à)ç)àçà)ç)","784854$" })
+    void shouldReturnRmesExceptionWhenSearchColecticaInstanceByUuid(String uuid)  {
+        ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(elasticService,restClient,exportUtils, ddiDerefencer, agencyExample);
+        RmesException exception = assertThrows(RmesException.class, () -> colecticaService.searchColecticaInstanceByUuid(uuid));
+        assertTrue(exception.getDetails().contains("ne respecte pas le pattern d'un uuid\",\"message\":\"UUID invalide\""));
     }
 
 }
