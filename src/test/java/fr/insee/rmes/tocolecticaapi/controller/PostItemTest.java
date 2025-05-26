@@ -27,7 +27,7 @@ class PostItemTest {
 
 
     @Test
-    void shouldReturnResponseEntityWhenByType() throws ExceptionColecticaUnreachable, IOException, RmesException {
+    void shouldReturnResponseEntityWhenByType() throws ExceptionColecticaUnreachable, IOException {
         when(colecticaService.getByType(DDIItemType.CODE_LIST)).thenReturn("result");
         PostItem postItem = new PostItem(colecticaService);
         String actual = postItem.byType(DDIItemType.CODE_LIST).toString();
