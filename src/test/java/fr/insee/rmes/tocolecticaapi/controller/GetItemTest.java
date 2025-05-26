@@ -50,7 +50,7 @@ class GetItemTest {
     ColecticaService colecticaServiceOther;
 
     @Test
-    void whenGetDataRelationship_shouldReturnRightJson() throws Exception {
+    void whenGetDataRelationshipWithUuid_shouldReturnRightJson() throws Exception {
         String uuid="34abf2d5-f0bb-47df-b3d2-42ff7f8f5874";
         var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/dataRelationship";
         when(colecticaService.searchColecticaInstanceByUuid(uuid)).thenReturn(read("/getItemTest/physicalInstance.xml"));
@@ -60,12 +60,26 @@ class GetItemTest {
                 .andExpect(content().json(read("/getItemTest/34abf2d5-f0bb-47df-b3d2-42ff7f8f5874_expected.json")));
     }
 
+    @Test
+    void whenGetDataRelationshipWithUuidAndVersion_shouldReturnRightJson() throws Exception {
+        String uuid="34abf2d5-f0bb-47df-b3d2-42ff7f8f5874";
+        int version = 2;
+        var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/"+version+"/dataRelationship";
+        when(colecticaService.searchColecticaInstanceByUuid(uuid+"/"+version)).thenReturn(read("/getItemTest/physicalInstance.xml"));
+        mockMvc.perform(get(dataRelationShipEndpoint).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().json(read("/getItemTest/34abf2d5-f0bb-47df-b3d2-42ff7f8f5874_expected.json")));
+    }
+
+
     private static String read(String fileName) throws Exception {
         Path path = Path.of(GetItemTest.class.getResource(fileName).toURI());
         try (Stream<String> lines = Files.lines(path)){
             return lines.collect(Collectors.joining());
         }
     }
+
 
 
     @Test
