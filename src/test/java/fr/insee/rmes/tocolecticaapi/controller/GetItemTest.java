@@ -142,7 +142,7 @@ class GetItemTest {
     void shouldReturnResponseWhenGetResourcePackage() throws ExceptionColecticaUnreachable, JsonProcessingException {
         when(colecticaServiceOther.getRessourcePackage("16a35b68-4479-4282-95ed-ff7d151746e4")).thenReturn("mocked message");
         GetItem getItem = new GetItem(colecticaServiceOther,ddiFragmentService);
-        String actual = getItem.getRessourcePackage("16a35b68-4479-4282-95ed-ff7d151746e4").toString();
+        String actual = getItem.getRessourcePackage("16a35b68-4479-4282-95ed-ff7d151746e4");
         Assertions.assertEquals("mocked message",actual);
     }
 
