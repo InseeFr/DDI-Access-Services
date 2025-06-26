@@ -26,7 +26,8 @@ class ControllerUtilsTest {
 
         assertTrue(identicalPrefix && containsSymbol && containsSlash);
     }
-  
+
+    @Test
     void shouldReturnXmlToResponseEntity() {
         String sentence = "This\\\"is an \"ï»¿\"example.";
         String actual = ControllerUtils.xmltoResponseEntity(sentence).toString();
