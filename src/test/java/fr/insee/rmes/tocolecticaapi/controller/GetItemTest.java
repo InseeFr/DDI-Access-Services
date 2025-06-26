@@ -2,10 +2,15 @@ package fr.insee.rmes.tocolecticaapi.controller;
 
 import fr.insee.rmes.config.InseeSecurityTokenProperties;
 import fr.insee.rmes.config.SecurityConfig;
+import fr.insee.rmes.exceptions.RmesException;
+import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.fragments.DdiFragmentServiceImpl;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -58,6 +64,14 @@ class GetItemTest {
                 .andExpect(content().json(read("/getItemTest/34abf2d5-f0bb-47df-b3d2-42ff7f8f5874_expected.json")));
     }
 
+    @Mock
+    GetItem g;
+
+    @ParameterizedTest
+    @ValueSource(strings = { "2", "---","","mockedExample","****" })
+     void shouldReturnNullObjectWhenFilteredSearchTextByType(String s) throws RmesException {
+        assertNull(g.filteredSearchTextByType(s,"texte", DDIItemType.CODE_LIST));
+    }
 
     private static String read(String fileName) throws Exception {
         Path path = Path.of(GetItemTest.class.getResource(fileName).toURI());
