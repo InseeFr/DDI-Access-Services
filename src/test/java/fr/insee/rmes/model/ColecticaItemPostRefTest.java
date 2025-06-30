@@ -2,13 +2,15 @@ package fr.insee.rmes.model;
 
 import fr.insee.rmes.utils.ddi.ItemFormat;
 import org.junit.jupiter.api.Test;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ColecticaItemPostRefTest {
 
     @Test
-    void shouldTestToString()  {
+    void shouldReturnAttributesWhenColecticaItemPostRef()  {
 
+        List<ColecticaItemRef.Unformatted> notes = List.of(new ColecticaItemRef.Unformatted(),new ColecticaItemRef.Unformatted());
         ColecticaItemPostRef colecticaItemPostRef = new ColecticaItemPostRef();
         colecticaItemPostRef.setItem("item");
         colecticaItemPostRef.setItemType("itemType");
@@ -18,6 +20,7 @@ class ColecticaItemPostRefTest {
         colecticaItemPostRef.setPublished(true);
         colecticaItemPostRef.setAgencyId("agencyId");
         colecticaItemPostRef.setIdentifier("identifier");
+        colecticaItemPostRef.setNotes(notes);
 
         ColecticaItemPostRef colecticaItemPostRefOther = new ColecticaItemPostRef("identifier","version");
 
@@ -28,7 +31,8 @@ class ColecticaItemPostRefTest {
                 colecticaItemPostRef.toString().contains(colecticaItemPostRef.getIdentifier()) &&
                 colecticaItemPostRefOther.toString().contains(String.valueOf(colecticaItemPostRefOther.getItemFormat())) &&
                 colecticaItemPostRefOther.toString().contains(String.valueOf(colecticaItemPostRefOther.isDeprecated())) &&
-                colecticaItemPostRefOther.toString().contains(String.valueOf(colecticaItemPostRefOther.isPublished()))
+                colecticaItemPostRefOther.toString().contains(String.valueOf(colecticaItemPostRefOther.isPublished())) &&
+                colecticaItemPostRef.getNotes()!=null
                 );
     }
 }
