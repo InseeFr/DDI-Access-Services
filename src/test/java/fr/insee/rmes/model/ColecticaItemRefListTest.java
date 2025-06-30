@@ -1,7 +1,5 @@
 package fr.insee.rmes.model;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,24 +7,20 @@ import static org.junit.jupiter.api.Assertions.*;
 class ColecticaItemRefListTest {
 
     @Test
-    void shouldTestToString() throws JSONException {
+    void shouldReturnValuesWhenToString()  {
 
-        ColecticaItemPostRef elementA = new ColecticaItemPostRef();
-        elementA.setIdentifier("identifierA");
+        ColecticaItemRefList firstColecticaItemRefList = new ColecticaItemRefList();
 
-        ColecticaItemPostRef elementB = new ColecticaItemPostRef();
-        elementB.setIdentifier("identifierB");
+        ColecticaItemRef firstColecticaItemRef = new ColecticaItemRef("mockedIdenfifier",5,"mockedAgency");
+        ColecticaItemRef secondColecticaItemRef = new ColecticaItemRef("mockedIdenfifier",7,"mockedAgency");
+        List<ColecticaItemRef> list = List.of(firstColecticaItemRef,secondColecticaItemRef);
 
-        List<ColecticaItemPostRef> items = List.of(elementA,elementB);
+        ColecticaItemRefList secondColecticaItemRefList = new ColecticaItemRefList(list);
 
-        JSONObject jsonObject = new JSONObject().put("creator","unknown");
+        boolean isFirstColecticaIdentifierNull = firstColecticaItemRefList.identifiers==null;
+        boolean secondColecticaSizeValue = secondColecticaItemRefList.toString().contains(String.valueOf(list.size()));
 
-        ColecticaItemPostRefList colecticaItemPostRefList = new ColecticaItemPostRefList();
-        colecticaItemPostRefList.setOptions(jsonObject);
-        colecticaItemPostRefList.setItems(items);
+        assertTrue(isFirstColecticaIdentifierNull && secondColecticaSizeValue);
 
-        assertTrue(colecticaItemPostRefList.toString().contains(String.valueOf(colecticaItemPostRefList.getItems())) &&
-                colecticaItemPostRefList.toString().contains(String.valueOf(colecticaItemPostRefList.getOptions()))
-        );
     }
 }
