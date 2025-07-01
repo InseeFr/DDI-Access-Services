@@ -30,7 +30,8 @@ class SubGroupTest {
                 subGroup.toString().contains(String.valueOf(subGroup.getCitation())) &&
                 subGroup.toString().contains(subGroup.getAgencyId())&&
                 subGroup.toString().contains(subGroup.getVersion())&&
-                subGroup.toString().contains(subGroup.getIdentifier())
+                subGroup.toString().contains(subGroup.getIdentifier()) &&
+                        subGroup.getStudyUnits()==studyUnits
         );
 
     }
