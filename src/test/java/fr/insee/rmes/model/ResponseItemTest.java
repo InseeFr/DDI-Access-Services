@@ -34,15 +34,10 @@ class ResponseItemTest {
         boolean isSameStudyUnitId= !Objects.equals(firstResponseItem.getStudyUnitId(), secondResponseItem.getStudyUnitId());
         boolean isSameDataCollectionId= !Objects.equals(firstResponseItem.getDataCollectionId(), secondResponseItem.getDataCollectionId());
         boolean isSameResourcePackageId= !Objects.equals(firstResponseItem.getResourcePackageId(), secondResponseItem.getResourcePackageId());
+        boolean isToStringExpected = Objects.equals(firstResponseItem.toString(), "mockedID-mockedLabel-");
 
-        assertTrue(isSameName && isSameID && isSameLabel && isSameParent && isSameChildren && isSameGroupID && isSameSubGroupId && isSameStudyUnitId && isSameDataCollectionId && isSameResourcePackageId);
+        assertTrue(isSameName && isSameID && isSameLabel && isSameParent && isSameChildren && isSameGroupID && isSameSubGroupId && isSameStudyUnitId && isSameDataCollectionId && isSameResourcePackageId && isToStringExpected);
 
     }
 
 }
-
-
-
-
-
-
