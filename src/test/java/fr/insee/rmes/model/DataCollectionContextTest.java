@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DataCollectionContextTest {
 
     @Test
-    public void shouldReturnAttributesWhenDataCollectionContext(){
+    void shouldReturnAttributesWhenDataCollectionContext(){
         DataCollectionContext dataCollectionContext = new DataCollectionContext();
         dataCollectionContext.setDataCollectionId("mockedDataCollectionId");
         dataCollectionContext.setSerieId("mockedSerieId");
