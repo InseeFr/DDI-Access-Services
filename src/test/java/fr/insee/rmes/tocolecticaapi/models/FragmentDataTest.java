@@ -40,7 +40,7 @@ class FragmentDataTest {
 
     }
 
-
+    @Test
     void shouldReturnBooleanWhenTestEquals() {
         FragmentData fragmentData = new FragmentData("identifier", "agencyId", "version");
         FragmentData mockFragmentDataOne = new FragmentData("identifier", "agencyId", "version");
