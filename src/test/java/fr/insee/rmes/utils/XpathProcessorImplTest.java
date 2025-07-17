@@ -50,10 +50,10 @@ class XpathProcessorImplTest {
     }
 
     @Test
-    void shouldReturnStringWhenQueryText() throws Exception {
-        var actual = xpathProcessor.queryString(mockedXmlOrFragment,mockedXpathExpression);
-        String expectedClass ="java.lang.String";
-        assertEquals(expectedClass, actual.getClass().getName());
+    void shouldReturnSameValuesWhenQueryTextAndQueryString() throws Exception {
+        var actualQueryString = xpathProcessor.queryString(mockedXmlOrFragment,mockedXpathExpression);
+        var actualQueryText = xpathProcessor.queryText(mockedXmlOrFragment,mockedXpathExpression);
+        assertEquals( actualQueryString,actualQueryText);
     }
 
     @Test
