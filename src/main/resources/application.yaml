@@ -86,7 +86,7 @@ logging:
     rollingpolicy:
       max-file-size: 1MB
   file:
-    name: XXXX
+    name: output.log
 
 auth:
   api:
