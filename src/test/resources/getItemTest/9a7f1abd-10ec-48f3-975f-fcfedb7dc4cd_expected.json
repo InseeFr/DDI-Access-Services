@@ -1,0 +1,90 @@
+[
+  {
+    "id": "urn:ddi:fr.insee:d8283793-e88d-4cc7-a697-2951054e9a3a:1",
+    "version": "1",
+    "versionDate": "2024-06-03T14:29:23.4049817Z",
+    "nom": "Dessin de fichier thl-CASD",
+    "label": [
+      {
+        "contenu": "",
+        "langue": "fr"
+      },
+      {
+        "contenu": "",
+        "langue": "en"
+      }
+    ],
+    "variables": [
+      {
+        "id": "urn:ddi:fr.insee:3f61240b-b035-4349-ab3d-6392dad0fc7d:1",
+        "nom": "ACTOCCUPE",
+        "label": [
+          {
+            "contenu": "Actif occupé",
+            "langue": "fr"
+          },
+          {
+            "contenu": "",
+            "langue": "en"
+          }
+        ],
+        "ordre": "1",
+        "role": "Mesure",
+        "variablegeographique": "",
+        "representation": {
+          "type": "codes"
+        },
+        "controles": {
+          "codes": [
+            {
+              "code": "0",
+              "label": [
+                {
+                  "langue": "fr",
+                  "contenu": "Inactif ou actif non occupé"
+                },
+                {
+                  "langue": "en",
+                  "contenu": ""
+                }
+              ]
+            },
+            {
+              "code": "1",
+              "label": [
+                {
+                  "langue": "fr",
+                  "contenu": "Actif occupé"
+                },
+                {
+                  "langue": "en",
+                  "contenu": ""
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "urn:ddi:fr.insee:86e0ad08-9685-48d2-a7af-bec3b8adf247:1",
+        "nom": "AG",
+        "label": [
+          {
+            "contenu": "Age au 31 décembre de l'année de l'enquête",
+            "langue": "fr"
+          },
+          {
+            "contenu": "",
+            "langue": "en"
+          }
+        ],
+        "ordre": "2",
+        "role": "Mesure",
+        "variablegeographique": "",
+        "representation": {
+          "type": "Integer"
+        }
+      }
+    ]
+  }
+]

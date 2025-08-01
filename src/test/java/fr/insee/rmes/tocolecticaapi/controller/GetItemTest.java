@@ -35,27 +35,41 @@ class GetItemTest {
     @MockitoBean
     private ColecticaService colecticaService;
 
+    /***
+     * This test will :
+     * - use the method which generates the json from the DDI (colecticaService.searchColecticaInstanceByUuid()). This
+     * method will use a hard coded DDI file /getItemTest/physicalInstance.xml.
+     * - check that the json generated is conform with the expected json
+     * @throws Exception
+     */
     @Test
     void whenGetDataRelationshipWithUuid_shouldReturnRightJson() throws Exception {
-        String uuid="34abf2d5-f0bb-47df-b3d2-42ff7f8f5874";
+        String uuid="9a7f1abd-10ec-48f3-975f-fcfedb7dc4cd";
         var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/dataRelationship";
         when(colecticaService.searchColecticaInstanceByUuid(uuid)).thenReturn(read("/getItemTest/physicalInstance.xml"));
         mockMvc.perform(get(dataRelationShipEndpoint).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(content().json(read("/getItemTest/34abf2d5-f0bb-47df-b3d2-42ff7f8f5874_expected.json")));
+                .andExpect(content().json(read("/getItemTest/9a7f1abd-10ec-48f3-975f-fcfedb7dc4cd_expected.json")));
     }
 
+    /***
+     * This test will :
+     * - use the method which generates the json from the DDI (colecticaService.searchColecticaInstanceByUuid()). This
+     * method will use a hard coded DDI file /getItemTest/physicalInstance.xml.
+     * - check that the json generated is conform with the expected json
+     * @throws Exception
+     */
     @Test
     void whenGetDataRelationshipWithUuidAndVersion_shouldReturnRightJson() throws Exception {
-        String uuid="34abf2d5-f0bb-47df-b3d2-42ff7f8f5874";
+        String uuid="9a7f1abd-10ec-48f3-975f-fcfedb7dc4cd9a7f1abd-10ec-48f3-975f-fcfedb7dc4cd";
         int version = 2;
         var dataRelationShipEndpoint="/Item/ddiFragment/"+uuid+"/"+version+"/dataRelationship";
         when(colecticaService.searchColecticaInstanceByUuid(uuid+"/"+version)).thenReturn(read("/getItemTest/physicalInstance.xml"));
         mockMvc.perform(get(dataRelationShipEndpoint).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(content().json(read("/getItemTest/34abf2d5-f0bb-47df-b3d2-42ff7f8f5874_expected.json")));
+                .andExpect(content().json(read("/getItemTest/9a7f1abd-10ec-48f3-975f-fcfedb7dc4cd_expected.json")));
     }
 
 
