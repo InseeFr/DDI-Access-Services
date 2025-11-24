@@ -2,6 +2,8 @@ package fr.insee.rmes.tocolecticaapi.models;
 
 import org.junit.jupiter.api.Test;
 import java.util.List;
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class FragmentDataTest {
@@ -40,7 +42,7 @@ class FragmentDataTest {
 
     }
 
-
+    @Test
     void shouldReturnBooleanWhenTestEquals() {
         FragmentData fragmentData = new FragmentData("identifier", "agencyId", "version");
         FragmentData mockFragmentDataOne = new FragmentData("identifier", "agencyId", "version");
@@ -52,4 +54,18 @@ class FragmentDataTest {
         boolean isEqualMockString = fragmentData.equals(mockString);
         assertTrue( isEqualFragmentData && isEqualMockFragmentDataOne && !isEqualMockFragmentDataTwo && !isEqualMockString);
     }
+
+    @Test
+    void shouldReturnAttributesWhenFragmentData() {
+        FragmentData fragmentData = new FragmentData("mockedIdentifier", "mockedAgencyId", "mockedVersion");
+        FragmentData fragmentDataOther = new FragmentData();
+        fragmentDataOther.setIdentifier("mockedIdentifier");
+        fragmentDataOther.setAgencyId("mockedAgencyId");
+        fragmentDataOther.setVersion("mockedVersion");
+        boolean isSameIdentifier = Objects.equals(fragmentData.getIdentifier(), fragmentDataOther.getIdentifier());
+        boolean isSameAgencyID = Objects.equals(fragmentData.getAgencyId(), fragmentDataOther.getAgencyId());
+        boolean isSameVersion = Objects.equals(fragmentData.getVersion(), fragmentDataOther.getVersion());
+        assertTrue(isSameAgencyID && isSameIdentifier && isSameVersion);
+    }
+
 }

@@ -14,7 +14,7 @@ class UnitTest {
 
         assertTrue(unit.toString().contains(unit.getUri()) &&
                 unit.toString().contains((unit.getLabel()))
-                
+
         );
     }
 }
