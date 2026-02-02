@@ -35,6 +35,8 @@
             <version>3.27.7</version>
             <scope>test</scope>
         </dependency>
+        <!-- Fin des dépendances à supprimer pour la maj -->
+
         <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
         <dependency>
             <groupId>com.auth0</groupId>
