@@ -28,7 +28,13 @@
         <sonar.projectKey>InseeFr_DDI-Access-Services</sonar.projectKey>
     </properties>
     <dependencies>
-
+        <!-- A supprimer après une mise à jour de spring boot > 3.5.10 -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.27.7</version>
+            <scope>test</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
         <dependency>
             <groupId>com.auth0</groupId>
