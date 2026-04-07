@@ -1,11 +1,12 @@
 package fr.insee.rmes.tocolecticaapi.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import fr.insee.rmes.config.keycloak.KeycloakServices;
 import fr.insee.rmes.exceptions.RmesBadRequestException;
 import fr.insee.rmes.exceptions.RmesException;
@@ -274,15 +275,14 @@ public record ColecticaServiceImpl(ElasticService elasticService,
             }
 
             return filteredHitsArray.toString();
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RmesException(HttpStatus.INTERNAL_SERVER_ERROR, "Error `" + e.getMessage() + "` while processing json", json);
         }
     }
 
     @Override
-    public List<Map<String, String>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws JsonProcessingException {
+    public List<Map<String, String>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws JacksonException {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         JsonNode jsonNode = objectMapper.readTree(findJsonsetByIdentifier(identifier));
         JsonNode codesNode = jsonNode.get("Codes");
 
@@ -304,7 +304,7 @@ public record ColecticaServiceImpl(ElasticService elasticService,
     }
 
     @Override
-    public String getRessourcePackage(String uuid) throws JsonProcessingException {
+    public String getRessourcePackage(String uuid) throws JacksonException {
         ObjectMapper mapper = new ObjectMapper();
         RessourcePackage ressourcePackage = mapper.readValue(findJsonsetByIdentifier(uuid),
                 RessourcePackage.class);

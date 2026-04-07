@@ -1,6 +1,6 @@
 package fr.insee.rmes.tocolecticaapi.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.model.DDIItemType;
@@ -169,13 +169,13 @@ public class GetItem {
                     schema = @Schema(
                             type = "string", example="d6c08ec1-c4d2-4b9a-b358-b23aa4e0af93"))  String identifier,
             @RequestParam(value = "fieldIdName",defaultValue = "id") String outputField,
-            @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws JsonProcessingException {
+            @RequestParam(value="fieldLabelName",defaultValue = "label") String fieldLabelName) throws JacksonException {
         return colecticaService.getJsonWithChild(identifier, outputField, fieldLabelName);
     }
 
     @GetMapping(value = "/RessourcePackageToJson", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getRessourcePackage(
-            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException {
+            @RequestParam(name = "uuid", required = true) String uuid) throws ExceptionColecticaUnreachable, JacksonException {
         return colecticaService.getRessourcePackage(uuid);
     }
 

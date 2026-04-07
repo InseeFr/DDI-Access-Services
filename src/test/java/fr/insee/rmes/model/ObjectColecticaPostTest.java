@@ -1,6 +1,6 @@
 package fr.insee.rmes.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +28,7 @@ class ObjectColecticaPostTest {
 
 
     @Test
-    void shouldTestToJSON() throws JsonProcessingException {
+    void shouldTestToJSON() throws JacksonException {
 
         TargetItem targetItem = new TargetItem();
         targetItem.setIdentifier("exampleOfTargetItem");

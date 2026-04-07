@@ -1,6 +1,6 @@
 package fr.insee.rmes.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +22,7 @@ class RelationshipTest {
 
 
     @Test
-    void shouldTestToJson() throws JsonProcessingException {
+    void shouldTestToJson() throws JacksonException {
 
         identifierTriple identifierTriple = new identifierTriple();
         identifierTriple.setIdentifier("identifierTriple");

@@ -1,6 +1,6 @@
 package fr.insee.rmes.tocolecticaapi.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import fr.insee.rmes.exceptions.ExceptionColecticaUnreachable;
 import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.model.DDIItemType;
@@ -14,7 +14,7 @@ import java.util.Map;
 public interface ColecticaService {
     String findFragmentByUuid(String uuid);
 
-    void sendDeleteColectica(String uuid, TransactionType transactionType) throws JsonProcessingException, ExceptionColecticaUnreachable, RmesException;
+    void sendDeleteColectica(String uuid, TransactionType transactionType) throws JacksonException, ExceptionColecticaUnreachable, RmesException;
     String searchColecticaInstanceByUuid(String uuid) throws RmesException;
     JSONArray findFragmentByUuidWithChildren(String uuid) throws RmesException;
     String filteredSearchText(String index, String texte) throws RmesException;
@@ -22,9 +22,9 @@ public interface ColecticaService {
 
     String searchTexteByType(String index, String texte, DDIItemType type) throws RmesException;
     String searchByType(String index, DDIItemType type) throws RmesException;
-    List<Map<String,String>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws JsonProcessingException;
+    List<Map<String,String>> getJsonWithChild(String identifier, String outputField, String fieldLabelName) throws JacksonException;
 
-    String getRessourcePackage(String uuid) throws ExceptionColecticaUnreachable, JsonProcessingException;
+    String getRessourcePackage(String uuid) throws ExceptionColecticaUnreachable, JacksonException;
 
     String getByType(DDIItemType type) throws IOException, ExceptionColecticaUnreachable;
 

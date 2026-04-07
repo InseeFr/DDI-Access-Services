@@ -3,13 +3,11 @@ package fr.insee.rmes.config.keycloak;
 import com.auth0.jwt.JWT;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -28,6 +26,8 @@ public class KeycloakServices {
 
     final String realm;
 
+    private final RestClient restClient;
+
     private String token;
 
     private Instant expiration;
@@ -38,6 +38,7 @@ public class KeycloakServices {
         this.server = server;
         this.realm = realm;
         this.expiration = null;
+        this.restClient = RestClient.create();
     }
 
     /**
@@ -46,24 +47,22 @@ public class KeycloakServices {
      * @return jeton
      */
     private String getKeycloakAccessToken() {
-
-        RestTemplate keycloakClient = new RestTemplate();
         String keycloakUrl = server + "/realms/" + realm + "/protocol/openid-connect/token";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "client_credentials");
         body.add("client_id", resource);
         body.add("client_secret", secret);
-        HttpEntity<Object> entity = new HttpEntity<>(body, headers);
 
-        Token accessToken = keycloakClient.postForObject(keycloakUrl, entity, Token.class);
+        Token accessToken = restClient.post()
+                .uri(keycloakUrl)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(body)
+                .retrieve()
+                .body(Token.class);
 
         log.trace("Keycloak token provided");
         return accessToken.accessToken();
-
     }
 
     /**

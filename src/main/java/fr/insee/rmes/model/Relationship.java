@@ -1,8 +1,8 @@
 package fr.insee.rmes.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class Relationship {
 
@@ -38,7 +38,7 @@ public class Relationship {
 		this.typeItem = typeItem;
 	}
 
-	public String toJson() throws JsonProcessingException {
+	public String toJson() throws JacksonException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		return objectMapper.writeValueAsString(this);
 	}
