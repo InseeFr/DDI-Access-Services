@@ -23,8 +23,6 @@
         <java-jwt.version>4.5.0</java-jwt.version>
         <json.version>20250517</json.version>
         <jacoco.version>0.8.13</jacoco.version>
-        <!-- A supprimer quand Springboot version > 4.1.0-M2 -->
-        <!-- fin suppression -->
         <sonar.organization>inseefr</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>InseeFr_DDI-Access-Services</sonar.projectKey>
