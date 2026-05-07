@@ -82,7 +82,7 @@ class XpathProcessorImplTest {
     @Test
     void shouldReturnSAXParseExceptionWhenWrongXmlEntered() {
         SAXParseException exception = assertThrows(SAXParseException.class, () -> xpathProcessor.toDocument("Fake mocked Xml Or Fragment"));
-        assertEquals("Contenu non autorisé dans le prologue.",exception.getMessage());
+        assertEquals("Content is not allowed in prolog.",exception.getMessage());
     }
 
 }
