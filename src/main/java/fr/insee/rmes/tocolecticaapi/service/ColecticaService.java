@@ -6,7 +6,6 @@ import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.model.DDIItemType;
 import fr.insee.rmes.tocolecticaapi.models.TransactionType;
 import org.json.JSONArray;
-import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
 import java.util.List;

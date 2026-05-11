@@ -48,7 +48,7 @@ public class SecurityConfig {
 
     @Bean
     @Profile("prod")
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 //disable sessions (stateless)
@@ -77,7 +77,7 @@ public class SecurityConfig {
     }
     @Bean
     @Profile("dev")
-    public SecurityFilterChain filterChainNoSecurity(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChainNoSecurity(HttpSecurity http) {
         //Allow frames to be able tu use the H2 web console
         http.headers(headers -> headers
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin

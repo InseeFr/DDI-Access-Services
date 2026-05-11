@@ -35,7 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import tools.jackson.core.JacksonException;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -254,9 +253,9 @@ public record ColecticaServiceImpl(ElasticService elasticService,
             for (JsonNode hit : hitsArray) {
                 JsonNode source = hit.path("_source");
 
-                String name = source.path("name_fr-FR").asText();
-                String label = source.path("label_fr-FR").asText();
-                String version = source.path("itemVersion").asText();  // Récupérer la version
+                String name = source.path("name_fr-FR").asString();
+                String label = source.path("label_fr-FR").asString();
+                String version = source.path("itemVersion").asString();  // Récupérer la version
 
                 // Filtrer les éléments avec name ou label non vide
                 if (!name.isEmpty() || !label.isEmpty()) {
@@ -265,7 +264,7 @@ public record ColecticaServiceImpl(ElasticService elasticService,
                     filteredSource.put("label", label);
                     filteredSource.put("version", version);  // Ajouter la version à l'objet JSON
 
-                    String versionlessId = source.path("versionlessId").asText();
+                    String versionlessId = source.path("versionlessId").asString();
                     if (versionlessId.startsWith("fr.insee:")) {
                         versionlessId = versionlessId.substring("fr.insee:".length());
                     }
@@ -292,8 +291,8 @@ public record ColecticaServiceImpl(ElasticService elasticService,
 
         List<Map<String, String>> idLabelPairs = new ArrayList<>();
         for (JsonNode codeNode : codesNode) {
-            String id = codeNode.get("Value").asText();
-            String label = codeNode.get("Category").get("Label").get("fr-FR").asText();
+            String id = codeNode.get("Value").asString();
+            String label = codeNode.get("Category").get("Label").get("fr-FR").asString();
 
             Map<String, String> idLabelPair = new HashMap<>();
             idLabelPair.put(outputField, id);
