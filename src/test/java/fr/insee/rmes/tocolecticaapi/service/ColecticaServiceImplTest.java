@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestClient;
@@ -37,12 +37,11 @@ class ColecticaServiceImplTest {
         var uuid="1";
         var agency="insee";
 
-        MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
         String baseUrl = "http://keycloak/";
         RestClient.Builder builder = RestClient.builder()
                 .baseUrl(baseUrl);
-        customizer.customize(builder);
-        customizer.getServer().expect(MockRestRequestMatchers.requestTo(baseUrl+"item/"+agency+"/"+ uuid)).andRespond(MockRestResponseCreators.withResourceNotFound());
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(MockRestRequestMatchers.requestTo(baseUrl+"item/"+agency+"/"+ uuid)).andRespond(MockRestResponseCreators.withResourceNotFound());
 
         ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(null,  builder.build(), null, null, agency);
         var expectedException= assertThrows(RmesExceptionIO.class, ()-> colecticaService.findFragmentByUuid(uuid));
@@ -58,11 +57,10 @@ class ColecticaServiceImplTest {
         var agency="insee";
         String baseUrl = "http://keycloak/";
 
-        MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
         RestClient.Builder builder = RestClient.builder()
                 .baseUrl(baseUrl);
-        customizer.customize(builder);
-        customizer.getServer().expect(MockRestRequestMatchers.requestTo(baseUrl+"item/"+agency+"/"+ uuid)).andRespond(withSuccess(jsonContent, MediaType.APPLICATION_JSON));
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(MockRestRequestMatchers.requestTo(baseUrl+"item/"+agency+"/"+ uuid)).andRespond(withSuccess(jsonContent, MediaType.APPLICATION_JSON));
 
         ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(null,  builder.build(), null, null, agency);
 
@@ -74,11 +72,10 @@ class ColecticaServiceImplTest {
         String baseUrl = "http://collectica";
         byte[] xmlContentWithBom = ColecticaServiceImplTest.class.getResourceAsStream("/utf8-bom/fichierAvecBom.xml").readAllBytes();
         var expectedXml= new String(ColecticaServiceImplTest.class.getResourceAsStream("/utf8-bom/fichierSansBom.xml").readAllBytes());
-                MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
         RestClient.Builder builder = RestClient.builder()
                 .baseUrl(baseUrl);
-        customizer.customize(builder);
-        customizer.getServer().expect(MockRestRequestMatchers.requestTo(baseUrl+"/ddi")).andRespond(withSuccess(xmlContentWithBom, MediaType.APPLICATION_XML));
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(MockRestRequestMatchers.requestTo(baseUrl+"/ddi")).andRespond(withSuccess(xmlContentWithBom, MediaType.APPLICATION_XML));
         ColecticaServiceImpl colecticaService = new ColecticaServiceImpl(null,  builder.build(), null, null, null);
         var diff= DiffBuilder.compare(Input.fromString(colecticaService.getWithRestClient(URI.create("ddi"), MediaType.APPLICATION_XML)))
                 .withTest(Input.fromString(expectedXml))

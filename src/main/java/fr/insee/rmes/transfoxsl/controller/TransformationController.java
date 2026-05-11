@@ -1,7 +1,7 @@
 package fr.insee.rmes.transfoxsl.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import fr.insee.rmes.exceptions.RmesException;
 import fr.insee.rmes.exceptions.XsltTransformationException;
 import fr.insee.rmes.model.DDIItemType;
@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 import org.xml.sax.SAXException;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -127,7 +128,7 @@ public class TransformationController {
             var jsonOutput = xsltTransformationService.transformToRawText(inputStream, REL_TO_JSON_XSL);
 
             // Utiliser Jackson pour vérifier la validité du JSON
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = JsonMapper.builder().build();
             JsonNode jsonNode = mapper.readTree(jsonOutput); // Désérialisation pour vérifier
 
             // Sérialiser à nouveau le JSON proprement

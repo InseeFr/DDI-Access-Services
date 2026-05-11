@@ -1,7 +1,8 @@
 package fr.insee.rmes.config;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.DefaultBootstrapContext;
+import org.mockito.Mockito;
+import org.springframework.boot.bootstrap.ConfigurableBootstrapContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -12,7 +13,7 @@ class PropertiesLoggerTest {
 
     @Test
     void shouldVerifyStateAndTestResoutValeurAvecMasquePwdWhenOnApplicationEvent() {
-        DefaultBootstrapContext defaultBootstrapContext = new DefaultBootstrapContext();
+        ConfigurableBootstrapContext defaultBootstrapContext = Mockito.mock(ConfigurableBootstrapContext.class);
         SpringApplication springApplication = new SpringApplication();
         String[] args = {"password", "World"};
         ConfigurableEnvironment configurableEnvironment = new StandardEnvironment();

@@ -8,12 +8,14 @@ import fr.insee.rmes.tocolecticaapi.fragments.DdiFragmentServiceImpl;
 import fr.insee.rmes.tocolecticaapi.service.ColecticaService;
 import fr.insee.rmes.transfoxsl.service.XsltTransformationService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(MockitoExtension.class)
 @WebMvcTest(GetItem.class)
 @Import(value = {DdiFragmentServiceImpl.class, SecurityConfig.class, XsltTransformationService.class})
 @EnableConfigurationProperties(InseeSecurityTokenProperties.class)
