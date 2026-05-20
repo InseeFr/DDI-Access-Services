@@ -11,7 +11,7 @@
     </parent>
     <groupId>fr.insee.rmes</groupId>
     <artifactId>ddi-access-services</artifactId>
-    <version>2.1.11-rc0</version>
+    <version>2.1.12</version>
     <name>DDI Access Services</name>
     <description>Rest API to access to Colectica repository services</description>
     <properties>
@@ -20,6 +20,9 @@
         <springdoc.version>3.0.3</springdoc.version>
         <xdocreport.version>2.2.0</xdocreport.version>
         <saxon.version>12.9</saxon.version>
+        <!-- surcharge de dépendance de Springboot -->
+        <tomcat.version>10.1.55</tomcat.version>
+        <!-- fin surcharge -->
         <java-jwt.version>4.5.2</java-jwt.version>
         <json.version>20251224</json.version>
         <jacoco.version>0.8.14</jacoco.version>
