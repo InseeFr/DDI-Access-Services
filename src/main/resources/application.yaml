@@ -82,11 +82,8 @@ springdoc:
       clientId: localhost-frontend
 
 logging:
-  logback:
-    rollingpolicy:
-      max-file-size: 1MB
-  file:
-    name: XXXX
+  level:
+    root: INFO
 
 auth:
   api:
