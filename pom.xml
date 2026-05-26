@@ -21,7 +21,7 @@
         <xdocreport.version>2.2.0</xdocreport.version>
         <saxon.version>12.9</saxon.version>
         <!-- surcharge de dépendance de Springboot -->
-        <tomcat.version>10.1.55</tomcat.version>
+        <tomcat.version>11.0.22</tomcat.version>
         <!-- fin surcharge -->
         <java-jwt.version>4.5.2</java-jwt.version>
         <json.version>20251224</json.version>
