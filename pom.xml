@@ -22,7 +22,7 @@
         <freemarker.version>2.3.35</freemarker.version>
         <saxon.version>12.9</saxon.version>
         <!-- surcharge de dépendance de Springboot -->
-        <tomcat.version>11.0.22</tomcat.version>
+        <tomcat.version>11.0.25</tomcat.version>
         <!-- fin surcharge -->
         <java-jwt.version>4.6.1</java-jwt.version>
         <json.version>20260814</json.version>
